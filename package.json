@@ -1,0 +1,55 @@
+{
+  "name": "edit-ot-fe",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "parcel ./src/index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/edit-ot/fe.git"
+  },
+  "dependencies": {
+    "edit-ot-quill-delta": "^4.2.2",
+    "fast-diff": "^1.2.0",
+    "react": "^16.7.0-alpha.0",
+    "react-dom": "^16.7.0-alpha.0",
+    "react-redux": "^6.0.0",
+    "react-router-dom": "^4.3.1",
+    "redux": "^4.0.1",
+    "redux-thunk": "^2.3.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.2.0",
+    "@types/fast-diff": "^1.2.0",
+    "@types/jest": "^23.3.10",
+    "@types/node": "^10.12.18",
+    "@types/react": "^16.7.18",
+    "@types/react-dom": "^16.0.11",
+    "@types/react-redux": "^6.0.11",
+    "@types/react-router": "^4.4.3",
+    "@types/react-router-dom": "^4.3.1",
+    "@types/redux": "^3.6.0",
+    "babel-eslint": "^10.0.1",
+    "babel-polyfill": "^6.26.0",
+    "cross-env": "^5.2.0",
+    "eslint": "^5.10.0",
+    "eslint-config-ivweb": "^0.1.5",
+    "eslint-plugin-class-property": "^1.1.0",
+    "eslint-plugin-react-hooks": "0.0.0",
+    "koa": "^2.6.2",
+    "less": "^3.9.0",
+    "parcel": "^1.11.0",
+    "rimraf": "^2.6.3",
+    "typescript": "^3.2.2"
+  },
+  "author": "eczn",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/edit-ot/fe/issues"
+  },
+  "homepage": "https://github.com/edit-ot/fe#readme"
+}
