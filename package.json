@@ -12,14 +12,15 @@
     "url": "git+https://github.com/edit-ot/fe.git"
   },
   "dependencies": {
-    "edit-ot-quill-delta": "^4.2.2",
+    "edit-ot-quill-delta": "^4.2.3",
     "fast-diff": "^1.2.0",
     "react": "^16.7.0-alpha.0",
     "react-dom": "^16.7.0-alpha.0",
     "react-redux": "^6.0.0",
     "react-router-dom": "^4.3.1",
     "redux": "^4.0.1",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "wolfy87-eventemitter": "^5.2.6"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
