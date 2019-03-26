@@ -1,0 +1,24 @@
+@import (reference) "../../@ui/index.less"; 
+
+.home-aside-main {
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 40px @std-padding-left;
+
+    .line {
+        display: block;
+        border-radius: 2px;
+        padding: 4px 8px;
+        cursor: pointer;
+
+        text-decoration: none;
+
+        .text {
+            margin-left: .5em;
+        }
+
+        &.line-active {
+            background: @aside-line-background;
+        }
+    }
+}
