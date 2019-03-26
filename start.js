@@ -8,12 +8,13 @@ const SERVER_PORT = 5555;
 const bundler = new Bundler('src/index.html');
 const app = express();
 
-app.use(
-    '/api',
-    proxy({
-        target: `http://0.0.0.0:${ SERVER_PORT }`
-    })
-);
+app.use('/api', proxy({
+    target: `http://0.0.0.0:${ SERVER_PORT }`
+}));
+
+app.use('/default.png', proxy({
+    target: `http://0.0.0.0:${ SERVER_PORT }`
+}));
 
 // run
 app.use(

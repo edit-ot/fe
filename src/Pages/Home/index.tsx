@@ -1,7 +1,11 @@
 import * as React from "react";
+import { NavHeader } from "../../components/NavHeader";
 
 export function HomePage() {
     return (
-        <div>Home</div>
+        <div>
+            <NavHeader />
+            
+        </div>
     );
 }

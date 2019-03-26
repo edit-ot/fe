@@ -5,8 +5,9 @@ export type InputData = {
 }
 
 export type User = {
-    username: string,
-    avatar: string
+    username: string;
+    avatar: string;
+    nickname: string;
 }
 
 export function doLogin(data: InputData) {

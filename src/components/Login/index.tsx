@@ -12,7 +12,7 @@ export const loginCtx = React.createContext({
     user: null
 } as LoginCtx);
 
-export function LoginPage(props: { children: any[]; }) {
+export function NeedLogin(props: { children: any[]; }) {
     const [user, setUser] = React.useState(null);
     const [isRegister, setRegister] = React.useState(false);
 
