@@ -7,9 +7,17 @@ export type StdResp<T> = {
 }
 
 export const http = {
-    get(url: string, params: any) {
+    get<T>(url: string, params: any = {}): Promise< StdResp<T> > {
         return axios.get(url, {
             params
+        }).then(response => {
+            if (response.status === 200) {
+                const ret: StdResp<T> = response.data;
+
+                return Promise.resolve(ret);
+            } else {
+                return Promise.reject(response.data as StdResp<T>);
+            }
         });
     },
 

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { InputData, doLogin, User, doRegister } from "./login-api";
+import { InputData, doLogin, User, doRegister, getUserInfo } from "./login-api";
 import md5 from "md5";
 
 import "./login.less";
@@ -15,6 +15,14 @@ export const loginCtx = React.createContext({
 export function LoginPage(props: { children: any[]; }) {
     const [user, setUser] = React.useState(null);
     const [isRegister, setRegister] = React.useState(false);
+
+    React.useEffect(() => {
+        getUserInfo().then(resp => {
+            if (resp.code === 200 && resp.data) {
+                setUser(resp.data);
+            }
+        })
+    }, []);
 
     const onSubmit = e => {
         e.preventDefault();

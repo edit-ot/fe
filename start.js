@@ -5,8 +5,8 @@ const express = require('express');
 const PORT = 1234;
 const SERVER_PORT = 5555;
 
-let bundler = new Bundler('src/index.html');
-let app = express();
+const bundler = new Bundler('src/index.html');
+const app = express();
 
 app.use(
     '/api',
