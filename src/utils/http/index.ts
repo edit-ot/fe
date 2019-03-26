@@ -33,3 +33,6 @@ export const http = {
         });
     }
 }
+
+//@ts-ignore
+window.http = http;
