@@ -10,6 +10,8 @@ export type DocInfo = {
     title: string;
     owner: string;
     permission: string;
+    createAt: string;
+    updateAt: string;
 }
 
 export function getDoc() {
@@ -24,4 +26,10 @@ export function getDoc() {
 
 export function createBlankDoc() {
     return http.post<DocInfo>('/api/doc/create');
+}
+
+export function deleteDoc(data: DocInfo) {
+    return http.post<DocInfo | null>('/api/doc/delete', {
+        docId: data.id
+    });
 }
