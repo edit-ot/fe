@@ -21,7 +21,7 @@ export const http = {
         });
     },
 
-    post<T = any>(url: string, data: any): Promise< StdResp<T> > {
+    post<T = any>(url: string, data: any = {}): Promise< StdResp<T> > {
         return axios.post(url, data).then(response => {
             if (response.status === 200) {
                 const ret: StdResp<T> = response.data;
