@@ -15,7 +15,7 @@ export type DocFileProps = {
 
 export function DocFile({ doc, onDelete }: DocFileProps) {
     return (
-        <NavLink className="doc-file-main" to={`/edit?docId=${ doc.id }`}>
+        <NavLink className="doc-file-main" to={`/edit/${ doc.id }`}>
             <div>
                 <div className="_left">
                     <FontAwesomeIcon icon={ faFile } />

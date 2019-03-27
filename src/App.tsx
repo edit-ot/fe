@@ -16,7 +16,7 @@ export function App() {
                 <Route path="/home" component={ HomePage } />
 
                 {/* Edit */}
-                <Route path="/edit" exact component={ EditPage } />
+                <Route path="/edit/:docId" exact component={ EditPage } />
             </NeedLogin>
         </Router>
     );
