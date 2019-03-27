@@ -3,10 +3,16 @@ import { getDoc, DocInfo, createBlankDoc, deleteDoc } from "./doc-api";
 import { NoDocs } from "../../../components/NoDocs";
 import { DocFile } from "./DocFile";
 import { CreateBtn } from "../../../components/NoDocs/CreateBtn";
+import { loginCtx } from "../../../components/Login";
 
 import "./doc.less";
 
-export function Doc() {
+export type DocProps = {
+
+}
+
+export function Doc(props: DocProps) {
+    const _loginCtx = React.useContext(loginCtx);
     const [docs, setDocs] = React.useState([] as DocInfo[]);
 
     const initDocs = () => {
@@ -15,7 +21,8 @@ export function Doc() {
             .catch(console.error);
     }
 
-    React.useEffect(initDocs, []);
+    // 如果用户登录，也应该 initDocs
+    React.useEffect(initDocs,  [ _loginCtx.user ]);
 
     const onCreateDoc = e => {
         createBlankDoc().then(resp => {
