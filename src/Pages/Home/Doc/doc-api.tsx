@@ -36,5 +36,8 @@ export function deleteDoc(data: DocInfo) {
 
 
 export function docRename(doc: DocInfo, newTitle: string) {
-
+    return http.post<DocInfo>('/api/doc/update', {
+        ...doc, 
+        title: newTitle
+    });
 }

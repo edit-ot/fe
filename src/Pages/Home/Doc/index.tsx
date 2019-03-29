@@ -70,7 +70,15 @@ export function Doc(props: DocProps) {
                                     
                                     _popupCtx.push(GetInputPopup, {
                                         title: '修改文件名',
-                                        onConfirm: input => docRename(doc, input),
+                                        onConfirm: input => {
+                                            docRename(doc, input).then(resp => {
+                                                if (resp.code === 200 && resp.data) {
+                                                    initDocs()
+                                                } else {
+                                                    console.error(resp);
+                                                }
+                                            })
+                                        },
                                         checker: str => !!str,
                                         errorInfo: '文件名请勿为空'
                                     });
