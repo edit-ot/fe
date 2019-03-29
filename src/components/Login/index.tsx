@@ -62,7 +62,9 @@ export function NeedLogin(props: { children: any[]; }) {
         if (isRegister) {
             doRegister(data).then(resp => {
                 if (resp.code === 200 && resp.data) {
-                    setUser(resp.data);
+                    // setUser(resp.data);
+                    alert('注册成功');
+                    setRegister(false);
                 } else {
                     alert('注册失败' + (resp.msg || ''));
                 }

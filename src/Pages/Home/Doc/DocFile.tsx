@@ -2,10 +2,11 @@ import * as React from "react";
 import { DocInfo } from "./doc-api";
 import { NavLink } from "react-router-dom";
 import { date2str } from "../../../utils/date2str";
-import { faFile, faTrashAlt } from '@fortawesome/free-solid-svg-icons'; 
+import { faFile, faCog } from '@fortawesome/free-solid-svg-icons'; 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import "./doc-file.less";
+import { SideBtn } from "../../../components/SideBtn";
 
 export type DocFileProps = {
     doc: DocInfo,
@@ -29,15 +30,33 @@ export function DocFile({ doc, onDelete }: DocFileProps) {
                 </div>
             </div>
 
-            <div className="doc-operation">
-                <span  onClick={ e => {
-                    e.preventDefault();
-                    onDelete && onDelete(doc);
-                }}>
-                    <FontAwesomeIcon icon={ faTrashAlt }/>
-                </span>
+            <SideBtn icon={ faCog } slides={[
+                {
+                    name: 'shit2'
+                },
+                {
+                    name: 'shit1',
+                    inner: [
+                        {
+                            name: 'inner1'
+                        }, {
+                            name: 'inner2'
+                        }, {
+                            name: 'inner3'
+                        }
+                    ]
+                },
                 
-            </div>
+                {
+                    name: 'shit3'
+                },
+                {
+                    name: 'shit4'
+                }
+            ]} />
+            {/* <div className="doc-operation">
+                <FontAwesomeIcon icon={ faCog }/>
+            </div> */}
         </NavLink>
     );       
 }

@@ -74,10 +74,12 @@ export function EditPage(props: EditPageProps) {
             <div id="my-toolbar">
                 {
                     React.createElement('select', {
-                        className: 'ql-size', value: 'normal', readOnly: true
+                        className: 'ql-size',
                     }, [
                         <option value="small" key="qls-small" />,
-                        <option value="normal" key="qls-normal" />,
+                        React.createElement('option', {
+                            selected: true
+                        }),
                         <option value="large" key="qls-large"></option>,
                         <option value="huge" key="qls-huge"></option>
                     ])
