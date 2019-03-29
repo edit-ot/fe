@@ -3,10 +3,11 @@ import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import { HomePage } from "./Pages/Home";
 import { EditPage } from "./Pages/Edit";
 import { NeedLogin } from "./components/Login";
+import { PopupCtxWrap } from "./Ctx/Popup/popup-ctx";
 
 export function App() {
-    return (
-        <Router>
+    return [
+        <Router key="app-root-router">
             <NeedLogin>
                 {/* Redirect To Home */}
                 <Route path="/" exact component={ () => <Redirect to="/home" /> } />
@@ -18,6 +19,7 @@ export function App() {
                 {/* Edit */}
                 <Route path="/edit/:docId" exact component={ EditPage } />
             </NeedLogin>
-        </Router>
-    );
+        </Router>,
+        <PopupCtxWrap key="app-msg-ctx-wrap" />
+    ];
 }

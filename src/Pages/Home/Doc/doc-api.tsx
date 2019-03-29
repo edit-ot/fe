@@ -33,3 +33,8 @@ export function deleteDoc(data: DocInfo) {
         docId: data.id
     });
 }
+
+
+export function docRename(doc: DocInfo, newTitle: string) {
+
+}

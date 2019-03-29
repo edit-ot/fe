@@ -80,7 +80,6 @@ export function SideBtn(props: SideBtnProps) {
             {/* Visible 控制 */
                 (visible && slides && slides.length !== 0) &&
                 <Slides slides={ slides } handler={keep => {
-                    console.log('keep', keep);
                     if (!keep) setVisible(!visible);
                 }} />
             }

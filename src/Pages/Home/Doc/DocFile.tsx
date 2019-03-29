@@ -5,16 +5,16 @@ import { date2str } from "../../../utils/date2str";
 import { faFile, faCog } from '@fortawesome/free-solid-svg-icons'; 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import { SideBtn, SlideItem } from "../../../components/SideBtn";
+
 import "./doc-file.less";
-import { SideBtn } from "../../../components/SideBtn";
 
 export type DocFileProps = {
     doc: DocInfo,
-
-    onDelete?: (doc: DocInfo) => any
+    slides: SlideItem[]
 }
 
-export function DocFile({ doc, onDelete }: DocFileProps) {
+export function DocFile({ doc, slides }: DocFileProps) {
     return (
         <NavLink className="doc-file-main" to={`/edit/${ doc.id }`}>
             <div>
@@ -30,33 +30,7 @@ export function DocFile({ doc, onDelete }: DocFileProps) {
                 </div>
             </div>
 
-            <SideBtn icon={ faCog } slides={[
-                {
-                    name: 'shit2'
-                },
-                {
-                    name: 'shit1',
-                    inner: [
-                        {
-                            name: 'inner1'
-                        }, {
-                            name: 'inner2'
-                        }, {
-                            name: 'inner3'
-                        }
-                    ]
-                },
-                
-                {
-                    name: 'shit3'
-                },
-                {
-                    name: 'shit4'
-                }
-            ]} />
-            {/* <div className="doc-operation">
-                <FontAwesomeIcon icon={ faCog }/>
-            </div> */}
+            <SideBtn icon={ faCog } slides={ slides } />
         </NavLink>
     );       
 }

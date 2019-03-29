@@ -1,0 +1,65 @@
+.get-input-popup {
+    width: 300px;
+    background: #FFF;
+    padding: 35px 50px;
+
+    > ._title {
+        font-size: 24px;
+        margin-bottom: 24px;
+    }
+
+    .input-wrap {
+        position: relative;
+
+        .error-info {
+            line-height: .5;
+            font-size: 80%;
+            color: rgb(255, 50, 80);
+            padding-bottom: 5px;
+            position: absolute;
+            right: 0;
+            bottom: 100%;
+
+            span {
+                margin: 0 4px;
+            }
+        }
+
+        input {
+            line-height: 24px;
+            padding: .1em .5em;
+            box-sizing: border-box;
+
+            width: 100%;
+            outline: none;
+            margin-bottom: 24px;
+
+            cursor: pointer;
+            border: 1px solid #DDD;
+            &.unvalid {
+                border: 1px solid rgb(255, 50, 80);
+            }
+        }
+    }
+
+    > ._btn {
+        cursor: pointer;
+        margin-right: 2.3em;
+        font-size: 14px;
+        padding: 6px 2em;
+        display: inline-block;
+
+        &._confirm {
+            background-color: #555;
+            color: #FFF;        
+        }
+
+        &._cancel {
+            border: 1px solid #DDD;
+        }
+
+        appearance: none;
+        -webkit-appearance: none;
+        border: none;
+    }
+}

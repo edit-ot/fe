@@ -16,6 +16,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.5.0",
     "@fortawesome/react-fontawesome": "0.1.0-11",
     "axios": "^0.18.0",
+    "classnames": "^2.2.6",
     "edit-ot-quill-delta": "^4.2.3",
     "express": "^4.16.4",
     "fast-diff": "^1.2.0",
@@ -33,6 +34,7 @@
   "devDependencies": {
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.2.0",
+    "@types/classnames": "^2.2.7",
     "@types/fast-diff": "^1.2.0",
     "@types/jest": "^23.3.10",
     "@types/node": "^10.12.18",
