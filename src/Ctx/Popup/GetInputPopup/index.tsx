@@ -77,12 +77,14 @@ export function GetInputPopup(
                 }
             </div>
 
-            <button className="_btn _confirm" type="submit">
-                { confrimText || '提交' }
-            </button>
+            <div className="_btns">
+                <button className="_btn _confirm" type="submit">
+                    { confrimText || '提交' }
+                </button>
 
-            <div className="_btn _cancel" onClick={ $onCancel }>
-                { cancelText || '取消' }
+                <div className="_btn _cancel" onClick={ $onCancel }>
+                    { cancelText || '取消' }
+                </div>
             </div>
         </form>
     );

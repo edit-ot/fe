@@ -1,4 +1,5 @@
 .get-input-popup {
+    box-shadow: 8px 8px;
     width: 300px;
     background: #FFF;
     padding: 35px 50px;
@@ -42,24 +43,27 @@
         }
     }
 
-    > ._btn {
-        cursor: pointer;
-        margin-right: 2.3em;
-        font-size: 14px;
-        padding: 6px 2em;
-        display: inline-block;
+    ._btns {
+        // text-align: right;
+        > ._btn {
+            cursor: pointer;
+            margin-right: 2.3em;
+            font-size: 14px;
+            padding: 6px 2em;
+            display: inline-block;
 
-        &._confirm {
-            background-color: #555;
-            color: #FFF;        
+            &._confirm {
+                background-color: #555;
+                color: #FFF;        
+            }
+
+            &._cancel {
+                border: 1px solid #DDD;
+            }
+
+            appearance: none;
+            -webkit-appearance: none;
+            border: none;
         }
-
-        &._cancel {
-            border: 1px solid #DDD;
-        }
-
-        appearance: none;
-        -webkit-appearance: none;
-        border: none;
     }
 }

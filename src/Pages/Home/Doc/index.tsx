@@ -9,9 +9,7 @@ import "./doc.less";
 import { popupCtx } from "../../../Ctx/Popup/popup-ctx";
 import { GetInputPopup } from "../../../Ctx/Popup/GetInputPopup";
 
-export type DocProps = {
-
-}
+export type DocProps = {}
 
 export function Doc(props: DocProps) {
     const _popupCtx = React.useContext(popupCtx);
