@@ -2,7 +2,7 @@ import * as React from "react";
 import cls from "classnames";
 
 import "./get-input-popup.less";
-import { CreatePopupComponent } from "../popup-ctx";
+import { CreatePopupComponent } from "../Popup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes as ERROR_ICON } from "@fortawesome/free-solid-svg-icons";
 

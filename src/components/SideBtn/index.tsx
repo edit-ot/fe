@@ -9,7 +9,8 @@ export type SlideItem = {
     name: React.ReactNode,
     icon?: IconDefinition,
     onBtnClick?: (item: SlideItem) => boolean | any,
-    inner?: SlideItem[]
+    inner?: SlideItem[],
+    opened?: boolean
 }
 
 export type SideBtnProps = {
@@ -25,6 +26,19 @@ function Slides(
         isInner?: boolean
     }
 ) {
+    React.useEffect(() => {
+        slides.forEach(slideItem => {
+            if (slideItem.opened) {
+                const result = (
+                    slideItem.onBtnClick &&
+                        slideItem.onBtnClick(slideItem)
+                );
+
+                !slideItem.inner && handler(!!result);
+            }
+        })
+    }, []);
+
     const rendered = slides.map((slideItem, idx) => {
         return (
             <div key={ idx } onClick={e => {

@@ -11,10 +11,11 @@ import "./doc-file.less";
 
 export type DocFileProps = {
     doc: DocInfo,
-    slides: SlideItem[]
+    slides: SlideItem[],
+    initVisible?: boolean
 }
 
-export function DocFile({ doc, slides }: DocFileProps) {
+export function DocFile({ doc, slides, initVisible }: DocFileProps) {
     return (
         <NavLink className="doc-file-main" to={`/edit/${ doc.id }`}>
             <div>
@@ -30,7 +31,7 @@ export function DocFile({ doc, slides }: DocFileProps) {
                 </div>
             </div>
 
-            <SideBtn icon={ faCog } slides={ slides } />
+            <SideBtn initVisible={ !!initVisible } icon={ faCog } slides={ slides } />
         </NavLink>
     );       
 }

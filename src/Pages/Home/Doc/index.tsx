@@ -7,7 +7,8 @@ import { loginCtx } from "../../../components/Login";
 
 import "./doc.less";
 import { popupCtx } from "../../../Ctx/Popup/popup-ctx";
-import { GetInputPopup } from "../../../Ctx/Popup/GetInputPopup";
+import { GetInputPopup } from "../../../components/GetInputPopup";
+import { ChangePermissionPopup } from "../../../components/ChangePermissionPopup";
 
 export type DocProps = {}
 
@@ -55,34 +56,35 @@ export function Doc(props: DocProps) {
             {docs.map((doc, idx) => 
                 <div className="doc-file-wrap" key={ idx }>
                     <DocFile doc={ doc }
-                        slides={[
-                            {
-                                name: '删除',
-                                onBtnClick() {
-                                    onDeleteDoc(doc);
-                                }
-                            },
-                            {
-                                name: '重命名',
-                                onBtnClick() {
-                                    
-                                    _popupCtx.push(GetInputPopup, {
-                                        title: '修改文件名',
-                                        onConfirm: input => {
-                                            docRename(doc, input).then(resp => {
-                                                if (resp.code === 200 && resp.data) {
-                                                    initDocs()
-                                                } else {
-                                                    console.error(resp);
-                                                }
-                                            })
-                                        },
-                                        checker: str => !!str,
-                                        errorInfo: '文件名请勿为空'
-                                    });
-                                }
+                        initVisible={ true }
+                        slides={[{
+                            name: '删除',
+                            onBtnClick: () => onDeleteDoc(doc)
+                        }, {
+                            name: '重命名',
+                            onBtnClick() {
+                                _popupCtx.push(GetInputPopup, {
+                                    title: '修改文件名',
+                                    onConfirm: input => {
+                                        docRename(doc, input).then(resp => {
+                                            if (resp.code === 200 && resp.data) {
+                                                initDocs()
+                                            } else {
+                                                console.error(resp);
+                                            }
+                                        })
+                                    },
+                                    checker: str => !!str,
+                                    errorInfo: '文件名请勿为空'
+                                });
                             }
-                        ]} />
+                        }, {
+                            opened: true,
+                            name: '协作权限',
+                            onBtnClick() {
+                                _popupCtx.push(ChangePermissionPopup, {})
+                            }
+                        }]} />
                 </div>
             )}
         </div>
