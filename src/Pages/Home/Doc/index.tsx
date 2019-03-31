@@ -56,7 +56,7 @@ export function Doc(props: DocProps) {
             {docs.map((doc, idx) => 
                 <div className="doc-file-wrap" key={ idx }>
                     <DocFile doc={ doc }
-                        initVisible={ true }
+                        // initVisible={ true }
                         slides={[{
                             name: '删除',
                             onBtnClick: () => onDeleteDoc(doc)
@@ -79,7 +79,7 @@ export function Doc(props: DocProps) {
                                 });
                             }
                         }, {
-                            opened: true,
+                            // opened: true,
                             name: '协作权限',
                             onBtnClick() {
                                 _popupCtx.push(ChangePermissionPopup, {

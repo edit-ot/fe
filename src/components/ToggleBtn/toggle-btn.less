@@ -1,0 +1,35 @@
+.toggle-btn-main {
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+
+    width: 2.5em;
+    height: 1em;
+    background-color: #BBB;
+    line-height: 1;
+    border-radius: 100px;
+    transition: all .3s;
+
+    ._dot {
+        transform: translateY(-1px);
+        position: absolute;
+        height: 1.2em;
+        width: 1.2em;
+        border-radius: 100px;
+        top: -0.1em;
+        left: .2em;
+        background-color: #FFF;
+        border: 1px solid #BBB;
+        transition: all .3s;
+    }
+
+    
+    &._active {
+        background-color: rgb(88, 200, 99);
+
+        ._dot {
+            left: 1.1em;
+        }
+    }
+}
+

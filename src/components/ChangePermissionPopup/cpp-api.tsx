@@ -35,3 +35,9 @@ export function setPermissionRemote(docId: number, username: string, RW: RWDescr
         set: RW
     });
 }
+
+export function togglePublic(docId: number) {
+    return http.post('/api/doc/permission/toggle', {
+        docId
+    });
+}

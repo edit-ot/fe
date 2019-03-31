@@ -4,12 +4,13 @@ import "./change-permission-popup.less";
 import { CreatePopupComponent } from "../../Ctx/Popup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faSearch, faCaretDown } from "@fortawesome/free-solid-svg-icons";
-import { searchUser, delPermissionRemote, setPermissionRemote } from "./cpp-api";
+import { searchUser, delPermissionRemote, setPermissionRemote, togglePublic } from "./cpp-api";
 import { SideBtn } from "../SideBtn";
 import { DocInfo } from "../../Pages/Home/Doc/doc-api";
 import { loginCtx, User } from "../Login";
 import { getDocById } from "../../Pages/Edit/edit-api";
 import { UserLine } from "./UserLine";
+import { ToggleBtn } from "../ToggleBtn";
 
 export type RWPermission = {
     r: boolean,
@@ -97,6 +98,14 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
 
         setPermissionRemote(props.docId, theUsername, rw);
     }
+
+    const tooglePublic = () => {
+        const newDoc = { ...doc };
+        newDoc.isPublic = !doc.isPublic;
+        setDoc(newDoc);
+
+        togglePublic(props.docId);
+    }
     
     return (
         <div className="change-permission-popup-main">
@@ -156,8 +165,9 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
                     )}
                     
                     {
-                        Object.keys(doc.pmap).map((otherUser, idx) => {
+                        Object.keys(doc.pmap).filter(u => u !== '*').map((otherUser, idx) => {
                             return <UserLine avatar={ user.avatar }
+                                key={ idx }
                                 username={ otherUser }>
                                 <SideBtn slides={[
                                     {
@@ -182,6 +192,39 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
                     }
                 </div> 
             }
+
+
+            {!searchMode && doc && (
+                <div className="_pub-share">
+                    <h1>公开分享</h1>
+                    {
+                        <div>
+                            <div>
+                                <ToggleBtn active={ doc.isPublic }
+                                    onClick={ tooglePublic }/>
+                            </div>
+                            <span>
+                                开启公共分享
+                            </span>
+
+                            { doc.isPublic && (
+                                <SideBtn slides={[{
+                                    name: '设为只读',
+                                    onBtnClick: () => setPermission('*', { r: true })
+                                }, {
+                                    name: '可读可写',
+                                    onBtnClick: () => setPermission('*', { r: true, w: true })
+                                }]}>
+                                    <div className="_btn" style={{ textAlign: 'center', width: '100%' }}>
+                                        { RWToString(doc.pmap['*'] || { r: true }) } <FontAwesomeIcon icon={ faCaretDown } />
+                                    </div>
+                                </SideBtn>
+                            ) }
+                        </div>
+                    }
+                </div>
+            )}
+            
         </div>
     )
 }

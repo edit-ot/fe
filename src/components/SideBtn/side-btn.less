@@ -1,34 +1,37 @@
 @border-color: #DDD;
 
 .side-btn-main {
+    position: relative;
+    
     &._absolute {
         position: absolute;
     }
-    z-index: 600;
+
 
     ._icon {
         display: flex;
         align-items: center;
         position: relative;
-        z-index: 600;
+        // z-index: 600;
         height: 2em;
         line-height: 2em;
     }
     
 
     ._slide-btns {
+        z-index: 500;
         // border-radius: 1em;
         line-height: 2em;
         text-align: center;
-        z-index: 500;
-        padding: 2em 0px 0px 0px;
+        // z-index: 500;
+        padding: 0px;
 
         min-width: 100px;
         background: #FFF;
         box-shadow: 5px 5px 2px -1px rgba(0, 0, 0, .3);
         border: 1px solid @border-color;
         left: 50%;
-        top: 0%;
+        top: 2em;
 
         position: absolute;
 
@@ -60,6 +63,10 @@
                 > ._inner {
                     display: block;
                 }
+            }
+
+            &:first-child {
+                border: none;
             }
         }
 

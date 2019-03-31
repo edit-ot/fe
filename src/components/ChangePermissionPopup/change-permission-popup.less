@@ -3,7 +3,7 @@
 .change-permission-popup-main {
     .std-popup-main(400px);
 
-    min-height: 20em;
+    // min-height: 20em;
 
     input {
         box-sizing: border-box;
@@ -23,8 +23,12 @@
     }
 
     ._now-permission {
-        padding: 8px 0;
+        padding: 2em 0;
         background-color: #F5F5F5;
+        margin-bottom: 24px;
+
+        height: 10em;
+        overflow-y: scroll;
 
         ._user-line {
             display: flex;
@@ -53,15 +57,31 @@
                 }
             }
 
-            ._btn {
-                text-align: center;
-                cursor: pointer;
-                background: #FFF;
-                border: 1px solid #DDD;
+            
+        }
+    }
 
-                &._disable {
-                    background-color: #F5F5F5;
-                }
+    ._btn {
+        text-align: center;
+        cursor: pointer;
+        background: #FFF;
+        border: 1px solid #DDD;
+
+        &._disable {
+            background-color: #F5F5F5;
+        }
+    }
+
+
+    ._pub-share {
+        > div {
+            > * {
+                height: 2em;
+                line-height: 2em;
+                vertical-align: middle;
+                text-align: center;
+                width: 30%;
+                display: inline-block;
             }
         }
     }

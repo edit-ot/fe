@@ -14,6 +14,7 @@ export type DocInfo = {
     createAt: string;
     updateAt: string;
     pmap: UserPermissionMap;
+    isPublic: boolean
 }
 
 export function getDoc() {
