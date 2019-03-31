@@ -1,4 +1,5 @@
 import { http } from "../../../utils/http";
+import { UserPermissionMap } from "../../../components/ChangePermissionPopup/cpp-api";
 
 export type InputData = {
     [key: string]: string
@@ -12,6 +13,7 @@ export type DocInfo = {
     permission: string;
     createAt: string;
     updateAt: string;
+    pmap: UserPermissionMap;
 }
 
 export function getDoc() {

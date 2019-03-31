@@ -82,7 +82,9 @@ export function Doc(props: DocProps) {
                             opened: true,
                             name: '协作权限',
                             onBtnClick() {
-                                _popupCtx.push(ChangePermissionPopup, {})
+                                _popupCtx.push(ChangePermissionPopup, {
+                                    docId: doc.id
+                                })
                             }
                         }]} />
                 </div>

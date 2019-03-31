@@ -21,10 +21,8 @@ export function EditPage(props: EditPageProps) {
     React.useEffect(() => {
         console.log('docId', docId, props.match);
 
-        getDocById(+docId).then(resp => {
-            if (resp.code === 200 && resp.data) {
-                setDoc(resp.data);
-            }
+        getDocById(+docId).then(doc => {
+            setDoc(doc);
         });
 
         const toolbarOptions = [

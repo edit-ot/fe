@@ -4,6 +4,8 @@ import md5 from "md5";
 
 import "./login.less";
 
+export * from "./login-api";
+
 export type LoginCtx = {
     user: User | null
 }

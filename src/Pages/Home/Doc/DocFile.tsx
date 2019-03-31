@@ -31,7 +31,10 @@ export function DocFile({ doc, slides, initVisible }: DocFileProps) {
                 </div>
             </div>
 
-            <SideBtn initVisible={ !!initVisible } icon={ faCog } slides={ slides } />
+            <SideBtn initVisible={ !!initVisible }
+                icon={ faCog }
+                isAbsoulte={ true }
+                slides={ slides } />
         </NavLink>
-    );       
+    );
 }

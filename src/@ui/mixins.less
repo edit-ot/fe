@@ -12,8 +12,32 @@
     padding: 35px 50px;
 
     h1 {
+        position: relative;
         font-weight: normal;
         font-size: 24px;
         margin-bottom: 1em;
+
+        > ._icon {
+            cursor: pointer;
+            display: block;
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+    }
+
+    .std-input {
+        position: relative;
+        line-height: 24px;
+        padding: .1em .5em;
+        box-sizing: border-box;
+
+        width: 100%;
+        outline: none;
+        margin-bottom: 24px;
+
+        cursor: pointer;
+        border: 1px solid #DDD;
     }
 } 

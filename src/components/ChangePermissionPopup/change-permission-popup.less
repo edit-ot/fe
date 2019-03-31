@@ -1,7 +1,70 @@
 @import (reference) "../../@ui/index.less";
 
 .change-permission-popup-main {
-    .std-popup-main(300px);
+    .std-popup-main(400px);
+
+    min-height: 20em;
+
+    input {
+        box-sizing: border-box;
+        border: none;
+        width: 100%;
+
+        padding-left: 1.6em;
+
+        &:focus {
+            outline: none;
+            border: none;
+        }
+    }
+
+    ._search-icon {
+        position: absolute;
+    }
+
+    ._now-permission {
+        padding: 8px 0;
+        background-color: #F5F5F5;
+
+        ._user-line {
+            display: flex;
+            margin-bottom: 2em;
+
+            &:last-child {
+                margin: 0;
+            }
+
+            text-align: center;
+
+            > div {
+                width: 30%;
+                height: 2em;
+                line-height: 2em;
+                position: relative;
+                display: inline-block;
+            }
+
+            ._avatar {
+                img {
+                    width: 2em;
+                    height: 2em;
+                    display: inline-block;
+                    border-radius: 2px;
+                }
+            }
+
+            ._btn {
+                text-align: center;
+                cursor: pointer;
+                background: #FFF;
+                border: 1px solid #DDD;
+
+                &._disable {
+                    background-color: #F5F5F5;
+                }
+            }
+        }
+    }
 }
 
 

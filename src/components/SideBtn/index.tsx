@@ -1,8 +1,8 @@
 import * as React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { faCaretRight } from '@fortawesome/free-solid-svg-icons'; 
-
+import { faCaretRight, faCog } from '@fortawesome/free-solid-svg-icons'; 
+import cls from "classnames";
 import "./side-btn.less";
 
 export type SlideItem = {
@@ -11,12 +11,6 @@ export type SlideItem = {
     onBtnClick?: (item: SlideItem) => boolean | any,
     inner?: SlideItem[],
     opened?: boolean
-}
-
-export type SideBtnProps = {
-    icon: IconDefinition,
-    initVisible?: boolean
-    slides?: SlideItem[]
 }
 
 function Slides(
@@ -74,22 +68,35 @@ function Slides(
     )
 }
 
+export type SideBtnProps = React.PropsWithChildren<{
+    icon?: IconDefinition,
+    initVisible?: boolean,
+    slides?: SlideItem[],
+    isAbsoulte?: boolean
+}>
+
 export function SideBtn(props: SideBtnProps) {
     const { icon,  slides, initVisible } = props;
 
     const [ visible, setVisible ] = React.useState(!!initVisible);
 
     return (
-        <div className="side-btn-main" style={{
+        <div className={cls({
+            'side-btn-main': true,
+            '_absolute': !!props.isAbsoulte
+        })} style={{
             right: 0, top: 0
         }} onClick={ e => {
             e.persist();
             e.preventDefault();
             setVisible(!visible);
         }}>
-            <span className="_icon">
-                <FontAwesomeIcon icon={ icon }/>
-            </span>
+            <span className="_icon">{
+                props.children ?
+                    props.children : 
+                    <FontAwesomeIcon icon={ icon || faCog }/>                
+            }</span>
+            
 
             {/* Visible 控制 */
                 (visible && slides && slides.length !== 0) &&
