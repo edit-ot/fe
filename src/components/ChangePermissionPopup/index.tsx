@@ -130,7 +130,8 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
                     userList.map((user, idx) => {
                         // <UserLine></UserLine>
                         return (
-                            <UserLine avatar={ user.avatar } key={ idx }
+                            <UserLine avatar={ `/api/user/avatar/${ user.username }` }
+                                key={ idx }
                                 username={ user.username }>
                                 { doc.pmap[user.username] ? (
                                     <div className="_btn _disable"
@@ -151,7 +152,7 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
                 !searchMode && doc && 
                 <div className="_now-permission">
                     {user && (
-                        <UserLine avatar={ user.avatar } 
+                        <UserLine avatar={ `/api/user/avatar/${ user.username }` } 
                             username={ user.username }>
                             <div>
                                 <SideBtn slides={[]}>
@@ -166,7 +167,7 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
                     
                     {
                         Object.keys(doc.pmap).filter(u => u !== '*').map((otherUser, idx) => {
-                            return <UserLine avatar={ user.avatar }
+                            return <UserLine avatar={ `/api/user/avatar/${ otherUser }` }
                                 key={ idx }
                                 username={ otherUser }>
                                 <SideBtn slides={[
