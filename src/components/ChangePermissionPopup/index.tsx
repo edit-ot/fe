@@ -3,8 +3,8 @@ import * as React from "react";
 import "./change-permission-popup.less";
 import { CreatePopupComponent } from "../../Ctx/Popup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes, faSearch, faCaretDown } from "@fortawesome/free-solid-svg-icons";
-import { searchUser, delPermissionRemote, setPermissionRemote, togglePublic } from "./cpp-api";
+import { faTimes, faSearch, faCaretDown, faCopy, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import { searchUser, delPermissionRemote, setPermissionRemote, togglePublic, mapDocToPubLink } from "./cpp-api";
 import { SideBtn } from "../SideBtn";
 import { DocInfo } from "../../Pages/Home/Doc/doc-api";
 import { loginCtx, User } from "../Login";
@@ -13,6 +13,7 @@ import { UserLine } from "./UserLine";
 import { ToggleBtn } from "../ToggleBtn";
 import { MenuBtns } from "../MenuBtns";
 import { throttle, debounce } from "../../utils";
+import { copyTextToClipboard } from "../../utils/copyToClipboard";
 
 export type RWPermission = {
     r: boolean,
@@ -57,6 +58,7 @@ export type ChangePermissionPopupProps = CreatePopupComponent<{
 
 export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
     const [doc, setDoc] = React.useState(null as DocInfo | null);
+    const [copySuccess, setCopySuccess] = React.useState(false);
 
     React.useEffect(() => {
         getDocById(props.docId).then(setDoc);
@@ -239,6 +241,29 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
                             ) }
                         </div>
                     }
+                </div>
+            )}
+
+            { !searchMode && doc && doc.isPublic && (
+                <div className="_pub-link">
+                    <div className="_text">
+                        { mapDocToPubLink(doc) }
+                    </div>
+
+                    <div className="_copy-btn" onClick={ () => {
+                        copyTextToClipboard(mapDocToPubLink(doc));
+                        setCopySuccess(true);
+                        setTimeout(() => setCopySuccess(false), 2500);
+                    }}>
+                        {
+                            copySuccess ? (
+                                <FontAwesomeIcon style={{ color: 'rgb(67, 188, 123)' }}
+                                    icon={ faCheckCircle } />
+                            ) : (
+                                <FontAwesomeIcon icon={ faCopy } />
+                            )
+                        }
+                    </div>
                 </div>
             )}
             

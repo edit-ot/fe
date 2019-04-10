@@ -1,5 +1,6 @@
 import { http } from "../../utils/http";
 import { User } from "../Login";
+import { DocInfo } from "../../Pages/Home/Doc/doc-api";
 
 export type RWDescriptor = {
     r: boolean,
@@ -40,4 +41,8 @@ export function togglePublic(docId: number) {
     return http.post('/api/doc/permission/toggle', {
         docId
     });
+}
+
+export function mapDocToPubLink(doc: DocInfo) {
+    return `${ window.location.origin }/edit/${ doc.id }`;
 }

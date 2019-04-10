@@ -1,6 +1,6 @@
 import * as React from "react";
 import "./popup-ctx.less";
-import { Popup, Props } from "./Popup";
+import { Popup, OutterProps } from "./Popup";
 
 const popup = new Popup();
 
@@ -12,7 +12,7 @@ export const popupCtx = React.createContext(
 window.popup = popup;
 
 export function PopupCtxWrap() {
-    const [ popUps, setPopUps ] = React.useState([] as [React.ReactNode, Props][]);
+    const [ popUps, setPopUps ] = React.useState([] as [React.ReactNode, OutterProps][]);
 
     React.useEffect(() => {
         return popup.onPush(setPopUps);
