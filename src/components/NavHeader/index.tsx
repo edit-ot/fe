@@ -3,6 +3,8 @@ import { NavLink } from "react-router-dom";
 
 import "./nav-header.less";
 import { loginCtx } from "../Login";
+import { ClickHandler } from "../ClickHandler";
+import { MenuBtns } from "../MenuBtns";
 
 export function NavHeader() {
     const { user } = React.useContext(loginCtx);
@@ -17,19 +19,19 @@ export function NavHeader() {
                 <NavLink to="/edit">Edit</NavLink>
             </span>
             
-            <div className="to-right">
-            {
-                user && user.avatar && [
-                    <span className="navlink" key="nhl-avatar-name">
-                        { user.username }
-                    </span>,
-                    <span className="navlink avatar" key="nhl-avatar">
-                        
-                        <img src={ user.avatar } />
-                    </span>
-                ]
-            }
-            </div>
+            <MenuBtns className="to-right" slides={[]}>
+                {
+                    user && user.avatar && [
+                        <span className="navlink" key="nhl-avatar-name">
+                            { user.username }
+                        </span>,
+                        <span className="navlink avatar" key="nhl-avatar">
+                            
+                            <img src={ user.avatar } />
+                        </span>
+                    ]
+                }
+            </MenuBtns>
             
         </nav>
     );

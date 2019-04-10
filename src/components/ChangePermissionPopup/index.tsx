@@ -111,7 +111,12 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
         <div className="change-permission-popup-main">
             <h1>
                 { searchMode ? '搜索并添加...' : '修改权限' }
-                <span className="_icon" onClick={ () => props.pop() }>
+                <span className="_icon" onClick={ () => {
+                    // @ts-ignore
+                    window.props = props;
+                    console.log('!!!!', props);
+                    props.pop()
+                } }>
                     <FontAwesomeIcon icon={ faTimes } />
                 </span>
             </h1>

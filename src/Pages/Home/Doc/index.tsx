@@ -76,6 +76,8 @@ export function Doc(props: DocProps) {
                                     },
                                     checker: str => !!str,
                                     errorInfo: '文件名请勿为空'
+                                }, {
+                                    style: { backgroundColor: 'rgba(0, 0, 0, .5)' }
                                 });
                             }
                         }, {
@@ -84,6 +86,8 @@ export function Doc(props: DocProps) {
                             onBtnClick() {
                                 _popupCtx.push(ChangePermissionPopup, {
                                     docId: doc.id
+                                }, {
+                                    style: { backgroundColor: 'rgba(0, 0, 0, .5)' }
                                 })
                             }
                         }]} />

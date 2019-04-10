@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { SideBtn, SlideItem } from "../../../components/SideBtn";
 
 import "./doc-file.less";
+import { MenuBtns } from "../../../components/MenuBtns";
 
 export type DocFileProps = {
     doc: DocInfo,
@@ -31,10 +32,17 @@ export function DocFile({ doc, slides, initVisible }: DocFileProps) {
                 </div>
             </div>
 
-            <SideBtn initVisible={ !!initVisible }
+            <MenuBtns slides={ slides }>{
+                ref =>
+                    <span className="fa-cog-icon" ref={ ref }> 
+                        <FontAwesomeIcon icon={ faCog } />
+                    </span>
+            }</MenuBtns>
+
+            {/* <SideBtn initVisible={ !!initVisible }
                 icon={ faCog }
                 isAbsoulte={ true }
-                slides={ slides } />
+                slides={ slides } /> */}
         </NavLink>
     );
 }

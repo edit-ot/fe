@@ -1,0 +1,70 @@
+@border-color: #DDD;
+
+
+.menu-slides-main {
+    position: absolute;
+    
+    width: 100%;
+    height: 100%;
+    // background-color: rgba(0, 0, 0, .5);
+
+    ._set-position {
+        position: absolute;
+    }
+
+    ._slide-btns {
+        // border-radius: 1em;
+        line-height: 2em;
+        text-align: center;
+        // z-index: 500;
+        padding: 0px;
+
+        // min-width: 100px;
+        background: #FFF;
+        box-shadow: 5px 5px 2px -1px rgba(0, 0, 0, .3);
+        border: 1px solid @border-color;
+        cursor: pointer;
+        // left: 50%;
+        // top: 2em;
+        // position: absolute;
+
+        &._inner {
+            display: none;
+            transform: none;
+            left: 100%;
+            top: -1px;
+            padding-top: 0;
+
+            > div {
+                &:first-child {
+                    border: none;
+                }
+            }
+        }
+
+        > div {
+            position: relative;
+            padding: 0 10px;
+            border-top: 1px solid @border-color;
+
+            &:hover {
+                background: rgb(245, 245, 245);
+
+                > ._inner {
+                    display: block;
+                }
+            }
+
+            &:first-child {
+                border: none;
+            }
+        }
+
+        ._icon-right {
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+    }
+}

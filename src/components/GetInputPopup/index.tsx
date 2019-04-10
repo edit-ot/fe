@@ -2,9 +2,10 @@ import * as React from "react";
 import cls from "classnames";
 
 import "./get-input-popup.less";
-import { CreatePopupComponent } from "../Popup";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes as ERROR_ICON } from "@fortawesome/free-solid-svg-icons";
+import { CreatePopupComponent } from "../../Ctx/Popup";
 
 export type GetInputPopupProps = CreatePopupComponent<{
     title: string,
