@@ -1,9 +1,9 @@
 import * as React from "react";
 
 import "./change-permission-popup.less";
-import { CreatePopupComponent } from "../../Ctx/Popup";
+import { CreatePopupComponent, popupCtx } from "../../Ctx/Popup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes, faSearch, faCaretDown, faCopy, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import { faTimes, faSearch, faCaretDown, faCopy, faCheckCircle, faQrcode } from "@fortawesome/free-solid-svg-icons";
 import { searchUser, delPermissionRemote, setPermissionRemote, togglePublic, mapDocToPubLink } from "./cpp-api";
 import { SideBtn } from "../SideBtn";
 import { DocInfo } from "../../Pages/Home/Doc/doc-api";
@@ -14,6 +14,7 @@ import { ToggleBtn } from "../ToggleBtn";
 import { MenuBtns } from "../MenuBtns";
 import { throttle, debounce } from "../../utils";
 import { copyTextToClipboard } from "../../utils/copyToClipboard";
+import { QRCode } from "./QRCode";
 
 export type RWPermission = {
     r: boolean,
@@ -59,6 +60,8 @@ export type ChangePermissionPopupProps = CreatePopupComponent<{
 export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
     const [doc, setDoc] = React.useState(null as DocInfo | null);
     const [copySuccess, setCopySuccess] = React.useState(false);
+
+    const _popupCtx = React.useContext(popupCtx);
 
     React.useEffect(() => {
         getDocById(props.docId).then(setDoc);
@@ -263,6 +266,16 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
                                 <FontAwesomeIcon icon={ faCopy } />
                             )
                         }
+                    </div>
+
+                    <div className="_copy-btn" onClick={ () => {
+                        _popupCtx.push(QRCode, {
+                            text: mapDocToPubLink(doc)
+                        }, {
+                            style: { backgroundColor: 'rgba(0, 0, 0, .5)' }
+                        })
+                    }}>
+                        <FontAwesomeIcon icon={ faQrcode } />
                     </div>
                 </div>
             )}
