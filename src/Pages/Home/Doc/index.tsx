@@ -37,15 +37,23 @@ export function Doc(props: DocProps) {
     }
 
     const onDeleteDoc = doc => {
-        if (window.confirm(`确定删除 ${ doc.title } 吗?`)) {
-            deleteDoc(doc).then(resp => {
-                if (resp.code === 200 && resp.data) {
-                    initDocs();
-                } else {
-                    console.log('删除失败', resp);
-                }
-            }).catch(console.error);
-        }
+        _popupCtx.push(GetInputPopup, {
+            title: `删除 '${ doc.title }' ?`,
+            confrimText: '删除',
+            cancelText: '取消',
+            pureConfirm: true,
+            onConfirm() {
+                deleteDoc(doc).then(resp => {
+                    if (resp.code === 200 && resp.data) {
+                        initDocs();
+                    } else {
+                        console.log('删除失败', resp);
+                    }
+                }).catch(console.error);
+            }
+        }, {
+            style: { backgroundColor: 'rgba(0, 0, 0, .5)' }
+        })
     }
  
     return docs.length === 0 ? <NoDocs onClick={ onCreateDoc } /> : (

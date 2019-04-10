@@ -15,13 +15,15 @@ export type GetInputPopupProps = CreatePopupComponent<{
     errorInfo?: string
     checker?: (input: string) => boolean,
     onCancel?: () => any,
-    onConfirm: (input: string) => any
+    onConfirm: (input: string) => any,
+
+    pureConfirm?: boolean
 }>
 
 export function GetInputPopup(
     {
         title, confrimText, cancelText, onCancel, pop,
-        placeholder, checker, onConfirm, errorInfo
+        placeholder, checker, onConfirm, errorInfo, pureConfirm
     }: GetInputPopupProps
 ) {
     const [valid, setValid] = React.useState(true);
@@ -53,7 +55,10 @@ export function GetInputPopup(
 
         if (theValid) {
             pop();
-            onConfirm($input.current.value);
+            onConfirm(
+                // 针对 pureConfirm 的情况 
+                ($input && $input.current && $input.current.value) || undefined
+            );
         }
     }
 
@@ -61,23 +66,25 @@ export function GetInputPopup(
         <form className="get-input-popup" onSubmit={ $onSubmit }>
             <div className="_title">{ title }</div>
             
-            <div className="input-wrap">
-                <input ref={ $input }
-                    placeholder={ placeholder || '' }
-                    onChange={ toCheck }
-                    className={cls({
-                        unvalid: !valid
-                    })}/>
+            { !pureConfirm && (
+                <div className="input-wrap">
+                    <input ref={ $input }
+                        placeholder={ placeholder || '' }
+                        onChange={ toCheck }
+                        className={cls({
+                            unvalid: !valid
+                        })}/>
 
-                {
-                    !valid &&
-                        <div className="error-info">
-                            <span>{ errorInfo || '请检查输入' }</span>
-                            <FontAwesomeIcon icon={ ERROR_ICON } />
-                        </div>
-                }
-            </div>
-
+                    {
+                        !valid &&
+                            <div className="error-info">
+                                <span>{ errorInfo || '请检查输入' }</span>
+                                <FontAwesomeIcon icon={ ERROR_ICON } />
+                            </div>
+                    }
+                </div>
+            )}
+            
             <div className="_btns">
                 <button className="_btn _confirm" type="submit">
                     { confrimText || '提交' }

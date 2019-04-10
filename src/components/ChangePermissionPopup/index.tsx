@@ -11,6 +11,8 @@ import { loginCtx, User } from "../Login";
 import { getDocById } from "../../Pages/Edit/edit-api";
 import { UserLine } from "./UserLine";
 import { ToggleBtn } from "../ToggleBtn";
+import { MenuBtns } from "../MenuBtns";
+import { throttle, debounce } from "../../utils";
 
 export type RWPermission = {
     r: boolean,
@@ -66,11 +68,10 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
 
     const [userList, setUserList] = React.useState([] as User[]);
 
-    
-
     const $input = React.useRef<HTMLInputElement>();
 
-    const onChange = e => {
+    
+    const onChange = debounce(() => {
         const { value } = $input.current;
 
         setSearchMode(!!value);
@@ -81,7 +82,7 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
                     users.filter($ => $.username !== user.username)
                 )
             ).then(setUserList).catch(console.error);
-    }
+    });
 
     const delPermission = (theUsername: string) => {
         const newDoc = { ...doc };
@@ -112,10 +113,11 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
             <h1>
                 { searchMode ? '搜索并添加...' : '修改权限' }
                 <span className="_icon" onClick={ () => {
-                    // @ts-ignore
-                    window.props = props;
-                    console.log('!!!!', props);
-                    props.pop()
+                    if (searchMode) {
+                        setSearchMode(false);
+                    } else {
+                        props.pop();
+                    }
                 } }>
                     <FontAwesomeIcon icon={ faTimes } />
                 </span>
@@ -132,24 +134,28 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
 
             {searchMode && doc && 
                 <div className="_now-permission">{
-                    userList.map((user, idx) => {
-                        // <UserLine></UserLine>
-                        return (
-                            <UserLine avatar={ `/api/user/avatar/${ user.username }` }
-                                key={ idx }
-                                username={ user.username }>
-                                { doc.pmap[user.username] ? (
-                                    <div className="_btn _disable"
-                                        onClick={() => delPermission(user.username)}>
-                                        已添加</div>
-                                ) : (
-                                    <div className="_btn"
-                                        onClick={() => setPermission(user.username, { r: true })}>
-                                        添加</div>
-                                )}
-                            </UserLine>
-                        )
-                    })
+                    userList.length ? (
+                        userList.map((user, idx) => {
+                            // <UserLine></UserLine>
+                            return (
+                                <UserLine avatar={ `/api/user/avatar/${ user.username }` }
+                                    key={ idx }
+                                    username={ user.username }>
+                                    { doc.pmap[user.username] ? (
+                                        <div className="_btn _disable"
+                                            onClick={() => delPermission(user.username)}>
+                                            已添加</div>
+                                    ) : (
+                                        <div className="_btn"
+                                            onClick={() => setPermission(user.username, { r: true })}>
+                                            添加</div>
+                                    )}
+                                </UserLine>
+                            )
+                        })
+                    ) : (
+                        <div style={{ textAlign: 'center', color: '#BBB' }}>查无此人</div>
+                    )
                 }</div>
             }
 
@@ -160,12 +166,10 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
                         <UserLine avatar={ `/api/user/avatar/${ user.username }` } 
                             username={ user.username }>
                             <div>
-                                <SideBtn slides={[]}>
-                                    <div className="_btn _disable"
-                                        style={{ textAlign: 'center', width: '100%' }}>
-                                        所有者
-                                    </div>
-                                </SideBtn>
+                                <div className="_btn _disable"
+                                    style={{ textAlign: 'center', width: '100%' }}>
+                                    所有者
+                                </div>
                             </div>
                         </UserLine>
                     )}
@@ -175,7 +179,8 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
                             return <UserLine avatar={ `/api/user/avatar/${ otherUser }` }
                                 key={ idx }
                                 username={ otherUser }>
-                                <SideBtn slides={[
+
+                                <MenuBtns slides={[
                                     {
                                         name: '设为只读',
                                         onBtnClick: () => setPermission(otherUser, { r: true })
@@ -188,11 +193,14 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
                                         name: '移除',
                                         onBtnClick: () => delPermission(otherUser)
                                     }
-                                ]}>
-                                    <div className="_btn" style={{ textAlign: 'center', width: '100%' }}>
-                                        { RWToString(doc.pmap[otherUser]) } <FontAwesomeIcon icon={ faCaretDown } />
-                                    </div>
-                                </SideBtn>
+                                ]}>{
+                                    ref =>
+                                        <div className="_btn"
+                                            // style={{ textAlign: 'center', width: '100%' }}
+                                            ref={ ref }>
+                                            { RWToString(doc.pmap[otherUser]) } <FontAwesomeIcon icon={ faCaretDown } />
+                                        </div>
+                                }</MenuBtns>
                             </UserLine>
                         })
                     }
@@ -214,17 +222,20 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
                             </span>
 
                             { doc.isPublic && (
-                                <SideBtn slides={[{
+                                <MenuBtns slides={[{
                                     name: '设为只读',
                                     onBtnClick: () => setPermission('*', { r: true })
                                 }, {
                                     name: '可读可写',
                                     onBtnClick: () => setPermission('*', { r: true, w: true })
-                                }]}>
-                                    <div className="_btn" style={{ textAlign: 'center', width: '100%' }}>
-                                        { RWToString(doc.pmap['*'] || { r: true }) } <FontAwesomeIcon icon={ faCaretDown } />
-                                    </div>
-                                </SideBtn>
+                                }]}>{
+                                    ref => 
+                                        <div className="_btn"
+                                            style={{ textAlign: 'center' }}
+                                            ref={ ref }>
+                                            { RWToString(doc.pmap['*'] || { r: true }) } <FontAwesomeIcon icon={ faCaretDown } />
+                                        </div>
+                                }</MenuBtns>
                             ) }
                         </div>
                     }

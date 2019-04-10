@@ -23,10 +23,16 @@ export function PopupCtxWrap() {
             <div className="popup-main">{
                 popUps.map(([compo, outterProps], idx) => {
                     if (!outterProps.style) outterProps.style = {};
-                    outterProps.style.zIndex = idx + 100000;
+
+                    // outterProps.style.zIndex = idx + 100000;
 
                     return (
-                        <div className="fixed-to-top" key={idx} { ...outterProps }>
+                        <div className="fixed-to-top" key={idx}
+                            { ...outterProps }
+                            style={{
+                                ...(outterProps.style || {}),
+                                zIndex: idx + 100000
+                            }} >
                             { compo }
                         </div>
                     );
