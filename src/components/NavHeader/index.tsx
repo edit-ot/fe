@@ -19,19 +19,35 @@ export function NavHeader() {
                 <NavLink to="/edit">Edit</NavLink>
             </span>
             
-            <MenuBtns className="to-right" slides={[]}>
-                {
-                    user && user.avatar && [
-                        <span className="navlink" key="nhl-avatar-name">
-                            { user.username }
-                        </span>,
-                        <span className="navlink avatar" key="nhl-avatar">
-                            
-                            <img src={ user.avatar } />
-                        </span>
-                    ]
-                }
-            </MenuBtns>
+            {
+                user && user.avatar && (
+                    <MenuBtns className="to-right" align="right" slides={[
+                        {
+                            name: '注销登录',
+                            onBtnClick() {
+                                
+                            }
+                        },
+                        {
+                            name: '修改个人资料',
+                            onBtnClick() {
+
+                            }
+                        }
+                    ]}>{
+                        ref => <div ref={ ref }>
+                            <span className="navlink" key="nhl-avatar-name">
+                                { user.username }
+                            </span>
+                            <span className="navlink avatar" key="nhl-avatar">
+                                
+                                <img src={ user.avatar } />
+                            </span>
+                        </div>
+                    }</MenuBtns>
+                )
+            }
+            
             
         </nav>
     );

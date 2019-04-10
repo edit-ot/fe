@@ -17,6 +17,7 @@ export function ClickHandler(props: ClickHandlerProps) {
         const compo = props.children($target);
         
         return React.cloneElement(compo, {
+            className: props.className,
             onClick(e) {
                 props.preventDefault && e.preventDefault();
                 props.persist && e.persist();

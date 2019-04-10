@@ -13,7 +13,7 @@ export type MenuBtnsProps = {
     align?: SlideAlign,
     className?: string,
     slides: SlideItem[],
-    children: (ref: React.RefObject<any>) => React.ReactElement
+    children: (ref: React.RefObject<any>) => React.ReactElement | null
 }
 
 export type SlideItem = {
@@ -95,7 +95,7 @@ export function ShowMenuSlides(props: MenuSlidesProps) {
     }
 
     if (align === 'right') {
-        style.right = rect.right;
+        style.right = window.innerWidth - rect.right;
     }
 
     if (align === 'center') {

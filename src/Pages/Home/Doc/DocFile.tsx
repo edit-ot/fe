@@ -32,9 +32,9 @@ export function DocFile({ doc, slides, initVisible }: DocFileProps) {
                 </div>
             </div>
 
-            <MenuBtns slides={ slides }>{
+            <MenuBtns className="fa-cog-icon" slides={ slides }>{
                 ref =>
-                    <span className="fa-cog-icon" ref={ ref }> 
+                    <span ref={ ref }> 
                         <FontAwesomeIcon icon={ faCog } />
                     </span>
             }</MenuBtns>

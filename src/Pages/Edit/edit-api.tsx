@@ -10,3 +10,13 @@ export function getDocById(docId: number) {
             Promise.reject(resp);
     });
 }
+
+export type NewDocData = Partial< Pick<DocInfo, 'title' | 'content'> > & Pick<DocInfo, 'id'>;
+export function docSave(newDocData: NewDocData) {
+    
+    return http.post<NewDocData>('/api/doc/save', newDocData).then(resp => {
+        return resp.code === 200 && resp.data ? 
+            Promise.resolve(resp.data) : 
+            Promise.reject(resp);
+    })
+}

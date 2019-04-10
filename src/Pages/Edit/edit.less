@@ -1,7 +1,15 @@
 .edit-main {
     color: #555;
+    padding-top: 80px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
     
-    padding-top: 100px;
+    // padding-top: 100px;
+
     > * {
         display: block;
         margin: 0 auto;
@@ -27,6 +35,34 @@
 
             border-left: 1px solid #ccc;
             border-right: 1px solid #ccc;
+        }
+    }
+
+    .bottom-btns {
+        position: relative;
+        box-sizing: border-box;
+        border-bottom: 1px solid #ccc;
+        border-left: 1px solid #CCC;
+        border-right: 1px solid #CCC;
+
+        font-size: 0;
+        line-height: 36px;
+        height: 36px;
+
+        > span, .msg {
+            cursor: pointer;
+            display: inline-block;
+            font-size: 18px;
+            padding: 0 .5em;
+            border-right: 1px solid #ccc;
+        }
+
+        .msg {
+            position: absolute;
+            right: 0;
+            border: none;
+            font-size: 14px;
+            line-height: 40px;
         }
     }
 }

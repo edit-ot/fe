@@ -4,8 +4,12 @@ import { RouteComponentProps } from "react-router";
 
 import "quill/dist/quill.snow.css";
 import "./edit.less";
-import { getDocById } from "./edit-api";
+import { getDocById, docSave } from "./edit-api";
 import { DocInfo } from "../Home/Doc/doc-api";
+import { NavHeader } from "../../components/NavHeader";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSave } from "@fortawesome/free-solid-svg-icons";
+import { debounce } from "../../utils";
 // import { Delta } from "edit-ot-quill-delta";
 
 
@@ -13,18 +17,17 @@ export type EditPageProps = RouteComponentProps<{
 	docId: string
 }>
 
-export function EditPage(props: EditPageProps) {
-    const [doc, setDoc] = React.useState(null as null | DocInfo);
 
-    const { docId } = props.match.params;
+export type EditPanelProps = {
+	doc: DocInfo
+}
+
+export function EditPanel({ doc }: EditPanelProps) {
+    const [msg, showMsg] = React.useState('');
+    const [q, setQ] = React.useState(null as null | Quill);
+    const $input = React.useRef<HTMLInputElement>();
 
     React.useEffect(() => {
-        console.log('docId', docId, props.match);
-
-        getDocById(+docId).then(doc => {
-            setDoc(doc);
-        });
-
         const toolbarOptions = [
             [{ container: 'my-toolbar' }],
             [{ header: [1, 2, false] }],
@@ -50,6 +53,8 @@ export function EditPage(props: EditPageProps) {
             theme: 'snow'  // or 'bubble'
         });
 
+        setQ(q);
+
         q.on('text-change', function(delta, oldDelta, source) {
             if (source == 'api') {
                 console.log("An API call triggered this change.");
@@ -61,11 +66,39 @@ export function EditPage(props: EditPageProps) {
 
         // @ts-ignore
         window.q = q;
+
+        if (doc && doc.content) {
+            q.updateContents(JSON.parse(doc.content), 'silent');
+            $input.current.value = doc.title;
+        }
     }, []);
 
-    const onTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(e.target.value);
+    const saveAll = () => {
+        if (!q) return;
+
+        const delta = q.getContents();
+        const deltaStr = JSON.stringify(delta);
+        
+        showMsg('保存中 ...');
+
+        docSave({
+            id: doc.id, 
+            content: deltaStr
+        }).then(ok => {
+            showMsg('保存成功');
+        })
     }
+
+    const onTitleChange = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+        showMsg('同步标题中 ...');
+
+        docSave({
+            id: doc.id,
+            title: $input.current.value
+        }).then(ok => {
+            showMsg('标题同步成功');
+        });
+    })
 
     return (
         <div className="edit-main">
@@ -76,7 +109,8 @@ export function EditPage(props: EditPageProps) {
                     }, [
                         <option value="small" key="qls-small" />,
                         React.createElement('option', {
-                            selected: true
+                            selected: true, 
+                            key: 'ooooooooooooooops-option'
                         }),
                         <option value="large" key="qls-large"></option>,
                         <option value="huge" key="qls-huge"></option>
@@ -92,15 +126,38 @@ export function EditPage(props: EditPageProps) {
             
             { doc ? (
                 <div className="title-edit">
-                    <input type="text" defaultValue={ doc.title }
+                    <input ref={ $input } type="text" defaultValue={ doc.title }
                         onChange={ onTitleChange } />
                 </div>
             ) : (
                 <div className="title-edit loading">加载中...</div>
             ) }
             
+            <div id="my-text-area" style={{ height: window.innerHeight - 80 - 170 }}></div>
 
-            <div id="my-text-area"></div>
+            <div className="bottom-btns">
+                <span onClick={ saveAll }><FontAwesomeIcon icon={ faSave } /></span>
+                <div className="msg">{ msg }</div>
+            </div>
         </div>
     );
+}
+
+
+export function EditPage(props: EditPageProps) {
+    const [doc, setDoc] = React.useState(null as null | DocInfo);   
+
+    React.useState(() => {
+        getDocById(+props.match.params.docId).then(doc => {
+            setDoc(doc);
+        });
+    });
+
+    return (
+        <div>
+            <NavHeader />
+
+            { doc && <EditPanel doc={ doc } /> }
+        </div>
+    )
 }
