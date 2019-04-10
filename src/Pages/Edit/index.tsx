@@ -8,8 +8,9 @@ import { getDocById, docSave } from "./edit-api";
 import { DocInfo } from "../Home/Doc/doc-api";
 import { NavHeader } from "../../components/NavHeader";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave } from "@fortawesome/free-solid-svg-icons";
+import { faSave, faCarCrash } from "@fortawesome/free-solid-svg-icons";
 import { debounce } from "../../utils";
+import { loginCtx } from "../../components/Login";
 // import { Delta } from "edit-ot-quill-delta";
 
 
@@ -146,17 +147,36 @@ export function EditPanel({ doc }: EditPanelProps) {
 
 export function EditPage(props: EditPageProps) {
     const [doc, setDoc] = React.useState(null as null | DocInfo);   
+    const _loginCtx = React.useContext(loginCtx);
 
-    React.useState(() => {
+    const [perm, setPerm] = React.useState(200);
+
+    React.useEffect(() => {
         getDocById(+props.match.params.docId).then(doc => {
             setDoc(doc);
-        });
-    });
-
+        }).catch(err => {
+            if (err.code === 403) {
+                setPerm(403)   
+            } else if (err.code === 404) {
+                setPerm(404);
+            }
+        })
+    }, [ _loginCtx.user ]);
+    
     return (
-        <div>
+        <div className="edit-page">
             <NavHeader />
 
+            { perm === 404 && <div className="perm-err">
+                <span><FontAwesomeIcon icon={ faCarCrash } /></span>
+                找不到文档，请检查 URL
+            </div> }
+
+            { perm === 403 && <div className="perm-err">
+                <span><FontAwesomeIcon icon={ faCarCrash } /></span>
+                您没有权限打开此文档 <br />
+                请联系文档所有者
+            </div> }
             { doc && <EditPanel doc={ doc } /> }
         </div>
     )
