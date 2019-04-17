@@ -4,16 +4,15 @@ import "./change-permission-popup.less";
 import { CreatePopupComponent, popupCtx } from "../../Ctx/Popup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faSearch, faCaretDown, faCopy, faCheckCircle, faQrcode } from "@fortawesome/free-solid-svg-icons";
-import { searchUser, delPermissionRemote, setPermissionRemote, togglePublic, mapDocToPubLink } from "./cpp-api";
-import { DocInfo } from "../../Pages/Home/Doc/doc-api";
 import { loginCtx, User } from "../Login";
-import { getDocById } from "../../Pages/Edit/edit-api";
+
 import { UserLine } from "./UserLine";
 import { ToggleBtn } from "../ToggleBtn";
 import { MenuBtns } from "../MenuBtns";
 import { debounce } from "../../utils";
 import { copyTextToClipboard } from "../../utils/copyToClipboard";
 import { QRCode } from "./QRCode";
+import { UserPermissionMap, RWDescriptorBase } from "../../utils/RWDescriptor";
 
 export type RWPermission = {
     r: boolean,
@@ -29,12 +28,17 @@ export function RWToString(rw: RWPermission) {
     }
 }
 
+export interface HasPermission {
+    pmap: UserPermissionMap, 
+    permission: string
+}
+
 export type UserPermission = {
     username: string,
     permission: RWPermission
 }
 
-export function parsePermissionStr(doc: DocInfo): UserPermission[] {
+export function parsePermissionStr(doc: HasPermission): UserPermission[] {
     if (!doc.permission) return [];
 
     const lines = (doc.permission).split(', ');
@@ -52,18 +56,23 @@ export function parsePermissionStr(doc: DocInfo): UserPermission[] {
     });
 }
 
-export type ChangePermissionPopupProps = CreatePopupComponent<{
-    docId: number
+export type GeneralPermissionProps<T> = CreatePopupComponent<{
+    getData: () => Promise<T>,
+    searchUser: (keyword: string) => Promise<User[]>,
+    delPermission: (data: T, username: string) => any,
+    setPermission: (data: T, username: string, rw: RWDescriptorBase) => any,
+    title?: string | any
 }>
 
-export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
-    const [doc, setDoc] = React.useState(null as DocInfo | null);
-    const [copySuccess, setCopySuccess] = React.useState(false);
+export function GeneralPermission<T extends HasPermission>
+    (props: GeneralPermissionProps<T>) {
+    
+    const [data, setData] = React.useState(null as T | null);
 
-    const _popupCtx = React.useContext(popupCtx);
+    
 
     React.useEffect(() => {
-        getDocById(props.docId).then(setDoc);
+        props.getData().then(setData);
     }, []);
 
     const { user } = React.useContext(loginCtx);
@@ -81,7 +90,7 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
         setSearchMode(!!value);
 
         $input.current.value &&
-            searchUser($input.current.value).then(
+            props.searchUser($input.current.value).then(
                 users => Promise.resolve(
                     users.filter($ => $.username !== user.username)
                 )
@@ -89,33 +98,29 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
     });
 
     const delPermission = (theUsername: string) => {
-        const newDoc = { ...doc };
-        delete newDoc.pmap[theUsername];
-        setDoc(newDoc);
+        const newData = { ...data };
+        delete newData.pmap[theUsername];
+        setData(newData);
 
-        delPermissionRemote(props.docId, theUsername);
+        props.delPermission(newData, theUsername);
     }
 
     const setPermission = (theUsername: string, rw: RWPermission) => {
-        const newDoc = { ...doc };
-        newDoc.pmap[theUsername] = rw;
-        setDoc(newDoc);
+        console.log('setPermission', theUsername, rw);
 
-        setPermissionRemote(props.docId, theUsername, rw);
+        const newData = { ...data };
+        newData.pmap[theUsername] = rw;
+        setData(newData);
+
+        props.setPermission(newData, theUsername, rw);
     }
 
-    const tooglePublic = () => {
-        const newDoc = { ...doc };
-        newDoc.isPublic = !doc.isPublic;
-        setDoc(newDoc);
 
-        togglePublic(props.docId);
-    }
     
     return (
         <div className="change-permission-popup-main">
             <h1>
-                { searchMode ? '搜索并添加...' : '修改权限' }
+                { searchMode ? '搜索并添加...' : props.title || '修改权限' }
                 <span className="_icon" onClick={ () => {
                     if (searchMode) {
                         setSearchMode(false);
@@ -134,9 +139,9 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
                 <input ref={ $input } placeholder="搜索用户名" onChange={ onChange } />
             </div>
 
-            { !doc && <div>Loading ...</div> }
+            { !data && <div>Loading ...</div> }
 
-            {searchMode && doc && 
+            {searchMode && data && 
                 <div className="_now-permission">{
                     userList.length ? (
                         userList.map((user, idx) => {
@@ -145,7 +150,7 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
                                 <UserLine avatar={ `/api/user/avatar/${ user.username }` }
                                     key={ idx }
                                     username={ user.username }>
-                                    { doc.pmap[user.username] ? (
+                                    { data.pmap[user.username] ? (
                                         <div className="_btn _disable"
                                             onClick={() => delPermission(user.username)}>
                                             已添加</div>
@@ -164,7 +169,7 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
             }
 
             { 
-                !searchMode && doc && 
+                !searchMode && data && 
                 <div className="_now-permission">
                     {user && (
                         <UserLine avatar={ `/api/user/avatar/${ user.username }` } 
@@ -179,7 +184,7 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
                     )}
                     
                     {
-                        Object.keys(doc.pmap).filter(u => u !== '*').map((otherUser, idx) => {
+                        Object.keys(data.pmap).filter(u => u !== '*').map((otherUser, idx) => {
                             return <UserLine avatar={ `/api/user/avatar/${ otherUser }` }
                                 key={ idx }
                                 username={ otherUser }>
@@ -202,7 +207,7 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
                                         <div className="_btn"
                                             // style={{ textAlign: 'center', width: '100%' }}
                                             ref={ ref }>
-                                            { RWToString(doc.pmap[otherUser]) } <FontAwesomeIcon icon={ faCaretDown } />
+                                            { RWToString(data.pmap[otherUser]) } <FontAwesomeIcon icon={ faCaretDown } />
                                         </div>
                                 }</MenuBtns>
                             </UserLine>
@@ -211,74 +216,6 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
                 </div> 
             }
 
-
-            {!searchMode && doc && (
-                <div className="_pub-share">
-                    <h1>公开分享</h1>
-                    {
-                        <div>
-                            <div>
-                                <ToggleBtn active={ doc.isPublic }
-                                    onClick={ tooglePublic }/>
-                            </div>
-                            <span>
-                                开启公共分享
-                            </span>
-
-                            { doc.isPublic && (
-                                <MenuBtns slides={[{
-                                    name: '设为只读',
-                                    onBtnClick: () => setPermission('*', { r: true })
-                                }, {
-                                    name: '可读可写',
-                                    onBtnClick: () => setPermission('*', { r: true, w: true })
-                                }]}>{
-                                    ref => 
-                                        <div className="_btn"
-                                            style={{ textAlign: 'center' }}
-                                            ref={ ref }>
-                                            { RWToString(doc.pmap['*'] || { r: true }) } <FontAwesomeIcon icon={ faCaretDown } />
-                                        </div>
-                                }</MenuBtns>
-                            ) }
-                        </div>
-                    }
-                </div>
-            )}
-
-            { !searchMode && doc && doc.isPublic && (
-                <div className="_pub-link">
-                    <div className="_text">
-                        { mapDocToPubLink(doc) }
-                    </div>
-
-                    <div className="_copy-btn" onClick={ () => {
-                        copyTextToClipboard(mapDocToPubLink(doc));
-                        setCopySuccess(true);
-                        setTimeout(() => setCopySuccess(false), 2500);
-                    }}>
-                        {
-                            copySuccess ? (
-                                <FontAwesomeIcon style={{ color: 'rgb(67, 188, 123)' }}
-                                    icon={ faCheckCircle } />
-                            ) : (
-                                <FontAwesomeIcon icon={ faCopy } />
-                            )
-                        }
-                    </div>
-
-                    <div className="_copy-btn" onClick={ () => {
-                        _popupCtx.push(QRCode, {
-                            text: mapDocToPubLink(doc)
-                        }, {
-                            style: { backgroundColor: 'rgba(0, 0, 0, .5)' }
-                        })
-                    }}>
-                        <FontAwesomeIcon icon={ faQrcode } />
-                    </div>
-                </div>
-            )}
-            
         </div>
     )
 }

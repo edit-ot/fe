@@ -1,0 +1,122 @@
+@import (reference) "../../@ui/index.less";
+
+.change-permission-popup-main {
+    .std-popup-main(400px);
+
+    // min-height: 20em;
+
+    input {
+        box-sizing: border-box;
+        border: none;
+        width: 100%;
+
+        padding-left: 1.6em;
+
+        &:focus {
+            outline: none;
+            border: none;
+        }
+    }
+
+    ._search-icon {
+        position: absolute;
+    }
+
+    ._now-permission {
+        padding: 2em 0;
+        background-color: #F5F5F5;
+        margin-bottom: 24px;
+
+        height: 10em;
+        overflow-y: scroll;
+
+        ._user-line {
+            display: flex;
+            margin-bottom: 2em;
+
+            &:last-child {
+                margin: 0;
+            }
+
+            text-align: center;
+
+            > div {
+                width: 30%;
+                height: 2em;
+                line-height: 2em;
+                position: relative;
+                display: inline-block;
+            }
+
+            ._avatar {
+                img {
+                    width: 2em;
+                    height: 2em;
+                    display: inline-block;
+                    border-radius: 2px;
+                }
+            }
+
+            
+        }
+    }
+
+    ._btn {
+        text-align: center;
+        cursor: pointer;
+        background: #FFF;
+        border: 1px solid #DDD;
+
+        &._disable {
+            background-color: #F5F5F5;
+        }
+    }
+
+
+    ._pub-share {
+        > div {
+            > * {
+                height: 2em;
+                line-height: 2em;
+                vertical-align: middle;
+                text-align: center;
+                width: 30%;
+                display: inline-block;
+            }
+        }
+    }
+
+    ._pub-link {
+        line-height: 34px;
+        margin: 16px auto;
+        width: 80%;
+        display: flex;
+        font-size: 0;
+
+        > * {
+            font-size: 14px;
+        }
+        
+        >._text {
+            text-align: left;
+            color: #888;
+            padding: 0 2em;
+            background-color: #DDD;
+            // margin: .5em 0;
+            // padding: .5em 1em;
+            width: 70%;
+            border: 1px solid #DDD;
+        }
+
+        >._copy-btn {
+            cursor: pointer;
+            width: 15%;
+            text-align: center;
+            border: 1px solid #DDD;
+            border-left: none;
+        }
+
+    }
+}
+
+

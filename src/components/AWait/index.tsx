@@ -4,28 +4,35 @@ export type AWaitProps<T> = {
     wait: () => Promise<T>,
     loading?: React.ReactElement,
     err?: React.ReactElement,
-    children: (data: T) => React.ReactElement
+    onFinish?: () => void,
+    children: (data: T) => React.ReactElement,
+    whenOnChange?: any
 }
 
 export function AWait<T>(props: AWaitProps<T>): React.ReactElement {
     const [data, setData] = React.useState(null as null | T);
     const [load, setLoad] = React.useState(true);
+    const [isErr, setErr] = React.useState(false);
 
     React.useEffect(() => {
         setLoad(true);
-        props.wait().then(setData)
-            .catch(errInfo => setData(null))
-            .then(() => setLoad(false));
-    }, []);
+        props.wait().then(data => {
+            setData(data);
+            props.onFinish && props.onFinish();
+        }).catch(errInfo => setErr(errInfo || true))
+          .then(() => setLoad(false));
+
+        return () => {};
+    }, props.whenOnChange ? [ props.whenOnChange ] : []);
 
     return (
-        load ? (
-            props.loading || <div>加载中</div>
+        isErr ? (
+            props.err || null
         ) : (
-            data ? (
-                props.children(data)
+            load ? (
+                props.loading || null
             ) : (
-                props.err || <div>错误</div>
+                props.children(data) || null
             )
         )
     )

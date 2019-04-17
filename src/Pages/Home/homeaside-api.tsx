@@ -1,8 +1,12 @@
 import { User } from "../../components/Login";
 import { http } from "../../utils/http";
 import { DocInfo } from "./Doc/doc-api";
+import { UserPermissionMap } from "../../utils/RWDescriptor";
 
 export type Group = {
+    // 头像 
+    groupAvatar: string;
+
     // 名称
     groupName: string;
 
@@ -11,11 +15,18 @@ export type Group = {
 
     users: User[];
 
-    // 所有者
-    owner?: User;
+    // 所有者 id
+    owner: string;
+
+    // 所有者信息
+    ownerInfo: User;
 
     // 所属文档
     docs?: DocInfo[];
+
+    pmap: UserPermissionMap;
+
+    permission: string;
 }
 
 export function getGroup(groupId: string) {

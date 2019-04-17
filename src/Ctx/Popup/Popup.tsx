@@ -34,7 +34,12 @@ export class Popup {
         /**
          * 外部参数
          */
-        outterProps: OutterProps = {}
+        outterProps: OutterProps = {},
+
+        /**
+         * 回调
+         */
+        onPop?: () => void
     ): PopFunction {
         const idx = this.components.length;
 
@@ -51,7 +56,10 @@ export class Popup {
             // @ts-ignore
             <Component key={ idx }
                 { ...props }
-                pop={ () => pop() } />,
+                pop={ () => {
+                    pop();
+                    onPop && onPop();
+                } } />,
             // Outter Props
             outterProps
         ] as [React.ReactNode, OutterProps];

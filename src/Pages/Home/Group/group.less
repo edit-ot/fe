@@ -1,4 +1,11 @@
 .group-main {
+    ._title {
+        margin-left: 16px;
+        margin-top: 32px;
+        margin-bottom: 16px;
+        font-size: 24px;
+    }
+
     ._lr {
         display: flex;
         justify-content: space-between;
@@ -8,6 +15,80 @@
 
         .r {
             width: 30%;
+            margin-top: 32px;
+        }
+    }
+
+    .doc-file-main {
+        margin-bottom: 1em;
+    }
+
+    .fa-user-edit {
+        margin-left: .5em;
+        cursor: pointer;
+    }
+
+    .group-list {
+        padding: 16px 16px 60px 16px;
+        border-left: 1px solid #BBB;
+
+        ._g-l-t {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            // font-size: 24px;
+            margin-bottom: 16px;
+
+            ._add-btn {
+                font-size: 12px;
+                width: 6em;
+                // margin: 0 auto;
+                text-align: center;
+            }
+        }
+
+        .member-list {
+            ._user-line {
+                line-height: 0;
+                position: relative;
+                box-sizing: border-box;
+                padding: 8px;
+                > * {
+                    vertical-align: middle;
+                }
+                img {
+                    border-radius: 2px;
+                    margin-right: .5em;
+                    display: inline-block;
+                    width: 2em;
+                    height: 2em;
+                }
+
+                &._owner {
+                    
+                    // background-color: #BBB;
+
+                    
+                }
+
+                ._right-text {
+                    position: absolute;
+                    right: 0;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    font-size: 50%;
+                    color: #BBB;
+                }
+            }
+
+            > * {
+                margin-bottom: 16px;
+            }
+
+            ._bottom-info {
+                text-align: center;
+                color: #BBB;
+            }
         }
     }
 }

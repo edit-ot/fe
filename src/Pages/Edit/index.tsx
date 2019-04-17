@@ -154,14 +154,15 @@ export function EditPage(props: EditPageProps) {
     React.useEffect(() => {
         getDocById(+props.match.params.docId).then(doc => {
             setDoc(doc);
+            setPerm(200);
         }).catch(err => {
             if (err.code === 403) {
                 setPerm(403)   
             } else if (err.code === 404) {
                 setPerm(404);
             }
-        })
-    }, [ _loginCtx.user ]);
+        });
+    }, [ _loginCtx ]);
     
     return (
         <div className="edit-page">
@@ -177,7 +178,8 @@ export function EditPage(props: EditPageProps) {
                 您没有权限打开此文档 <br />
                 请联系文档所有者
             </div> }
-            { doc && <EditPanel doc={ doc } /> }
+
+            { perm === 200 && doc && <EditPanel doc={ doc } /> }
         </div>
     )
 }
