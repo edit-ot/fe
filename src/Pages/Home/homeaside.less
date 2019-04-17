@@ -5,12 +5,44 @@
     line-height: 1.5;
     padding: 40px @std-padding-left;
 
+    .text-title {
+        position: relative;
+        padding: 4px 8px;
+        margin-bottom: 8px;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        &._learn {
+            margin-top: 3em;
+        }
+
+        ._icon {
+            color: #BBB;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            // background-color: #999;
+            line-height: 1;
+            width: 16px;
+            height: 16px;
+            font-size: 14px;
+            border-radius: 16px;
+            border: 1px solid currentColor;
+        }
+
+        
+    }
+
     .line {
+        position: relative;
         display: block;
         border-radius: 2px;
         padding: 4px 8px;
+        margin-bottom: 8px;
         cursor: pointer;
-
         text-decoration: none;
 
         .text {
@@ -20,5 +52,25 @@
         &.line-active {
             background: @aside-line-background;
         }
+
+
+        .fa-cog-icon {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            color: #BBB;
+        }
+
+        &._disable {
+            color: #BBB;
+        }
+
+        // &:hover {
+        //     .fa-cog-icon {
+        //         display: block;
+        //     }
+        // }
     }
 }

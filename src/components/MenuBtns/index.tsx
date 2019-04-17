@@ -6,6 +6,7 @@ import { popupCtx, CreatePopupComponent } from "../../Ctx/Popup";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretRight } from "@fortawesome/free-solid-svg-icons";
+import { AWait } from "../AWait";
 
 export type SlideAlign = 'left' | 'right' | 'center';
 
@@ -21,7 +22,7 @@ export type SlideItem = {
     icon?: IconDefinition,
     onBtnClick?: (item: SlideItem) => boolean | any,
     opened?: boolean,
-    inner?: SlideItem[]
+    inner?: SlideItem[] | (() => Promise< SlideItem[] >)
 }
 
 export type MenuSlidesProps = CreatePopupComponent<{
@@ -29,6 +30,11 @@ export type MenuSlidesProps = CreatePopupComponent<{
     align?: SlideAlign,
     rect: ClientRect | DOMRect
 }>
+
+function isPromise(x: SlideItem[] | (() => Promise<SlideItem[]>)): x is SlideItem[] {
+    return Array.isArray(x);
+}
+
 
 function RecursiveSlides(
     { slides, handler, isInner }: {
@@ -70,10 +76,24 @@ function RecursiveSlides(
                         <FontAwesomeIcon icon={ faCaretRight } />
                     </div> }
                 
-                { slideItem.inner &&
+                { slideItem.inner && isPromise(slideItem.inner) && 
                     <RecursiveSlides slides={ slideItem.inner }
                         handler={ handler }
                         isInner={ true } /> }
+
+                { slideItem.inner && !isPromise(slideItem.inner) &&
+                    <AWait wait={ slideItem.inner }
+                        loading={
+                            <RecursiveSlides slides={[{ name: '加载中...' }]}
+                                handler={ handler }
+                                isInner={ true } />
+                        }>{
+                        theInner => 
+                            <RecursiveSlides slides={ theInner }
+                                handler={ handler }
+                                isInner={ true } />
+                    }</AWait>
+                }
             </div>
         )
     });

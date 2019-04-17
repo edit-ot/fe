@@ -5,10 +5,8 @@ import { date2str } from "../../../utils/date2str";
 import { faFile, faCog } from '@fortawesome/free-solid-svg-icons'; 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { SideBtn, SlideItem } from "../../../components/SideBtn";
-
 import "./doc-file.less";
-import { MenuBtns } from "../../../components/MenuBtns";
+import { MenuBtns, SlideItem } from "../../../components/MenuBtns";
 
 export type DocFileProps = {
     doc: DocInfo,

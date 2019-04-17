@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import "./home.less";
 import { HomeAside } from "./HomeAside";
 import { Doc } from "./Doc";
+import { Group } from "./Group";
 
 const ASIDE_WIDTH = '200px';
 
@@ -22,7 +23,11 @@ export function HomePage() {
                     <Route path="/home" exact component={() => 
                         <Redirect to="/home/docs" />
                     } />
+
                     <Route path="/home/docs" component={ Doc } />
+
+                    <Route path="/home/group/:groupId" component={ Group } />
+
                     <Route path="/home/files" component={ () => (
                         <div>wenjian</div>
                     )} />

@@ -13,6 +13,8 @@
     }
 
     ._slide-btns {
+        min-width: 100px;
+        position: relative;
         // border-radius: 1em;
         line-height: 2em;
         text-align: center;
@@ -31,9 +33,10 @@
         &._inner {
             display: none;
             transform: none;
-            left: 100%;
             top: -1px;
             padding-top: 0;
+            position: absolute;
+            left: 100%;
 
             > div {
                 &:first-child {

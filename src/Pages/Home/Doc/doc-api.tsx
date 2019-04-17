@@ -1,5 +1,6 @@
 import { http } from "../../../utils/http";
 import { UserPermissionMap } from "../../../components/ChangePermissionPopup/cpp-api";
+import { getGroups, getJoinedGroups } from "../homeaside-api";
 
 export type InputData = {
     [key: string]: string
@@ -42,5 +43,14 @@ export function docRename(doc: DocInfo, newTitle: string) {
     return http.post<DocInfo>('/api/doc/update', {
         ...doc, 
         title: newTitle
+    });
+}
+
+export function getAllGroup() {
+    return Promise.all([
+        getGroups(), getJoinedGroups()
+    ]).then(results => {
+        const [l, r] = results;
+        return l.concat(r);
     });
 }
