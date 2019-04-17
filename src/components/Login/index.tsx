@@ -1,5 +1,5 @@
 import * as React from "react";
-import { InputData, doLogin, User, doRegister, getUserInfo } from "./login-api";
+import { InputData, doLogin, User, doRegister, getUserInfo, doLogoutRemote } from "./login-api";
 import md5 from "md5";
 
 import "./login.less";
@@ -8,10 +8,12 @@ export * from "./login-api";
 
 export type LoginCtx = {
     user: User | null
+    doLogout: () => void
 }
 
 export const loginCtx = React.createContext({
-    user: null
+    user: null,
+    doLogout: () => {}
 } as LoginCtx);
 
 export function NeedLogin(props: { children: any[]; }) {
@@ -82,8 +84,14 @@ export function NeedLogin(props: { children: any[]; }) {
         }
     }
 
+    const doLogout = () => {
+        doLogoutRemote().then(() => {
+            setUser(null);
+        })
+    }
+
     return (
-        <loginCtx.Provider value={{ user }}>
+        <loginCtx.Provider value={{ user, doLogout }}>
             {
                 !user && (
                     <form className="login-container" onSubmit={ onSubmit }>

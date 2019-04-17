@@ -139,7 +139,7 @@ export function Group(props: GroupProps) {
         
             {
                 loading ? (
-                    <div>加载中</div>
+                    <div>加载登录中</div>
                 ) : (
                     group ? (
                         <loginCtx.Consumer>{ctx => 

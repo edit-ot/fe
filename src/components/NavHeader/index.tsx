@@ -7,7 +7,7 @@ import { ClickHandler } from "../ClickHandler";
 import { MenuBtns } from "../MenuBtns";
 
 export function NavHeader() {
-    const { user } = React.useContext(loginCtx);
+    const { user, doLogout } = React.useContext(loginCtx);
 
     return (
         <nav className="nav-header">
@@ -25,7 +25,7 @@ export function NavHeader() {
                         {
                             name: '注销登录',
                             onBtnClick() {
-                                
+                                doLogout();
                             }
                         },
                         {

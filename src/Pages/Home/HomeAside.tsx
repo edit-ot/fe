@@ -81,7 +81,7 @@ export function HomeAside(props: HomeAsideProps) {
             {
                 loading ? (
                     <div className="line">
-                        加载中 ...
+                        加载登陆中 ...
                     </div>
                 ) : (
                     groups.length ? (
@@ -148,7 +148,7 @@ export function HomeAside(props: HomeAsideProps) {
             {
                 loading ? (
                     <div className="line">
-                        加载中 ...
+                        加载登录中 ...
                     </div>
                 ) : (
                     joinedGroups.length ? (
