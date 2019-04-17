@@ -12,11 +12,11 @@ export function NavHeader() {
     return (
         <nav className="nav-header">
             <span className="navlink">
-                <NavLink activeClassName="navlink-active" to="/">首页</NavLink>
+                <NavLink activeClassName="navlink-active" to="/">刷新</NavLink>
             </span>
 
             <span className="navlink">
-                <NavLink to="/edit">Edit</NavLink>
+                <NavLink activeClassName="navlink-active" to="/about">关于</NavLink>
             </span>
             
             {
