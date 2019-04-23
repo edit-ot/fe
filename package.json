@@ -19,6 +19,7 @@
     "axios": "^0.18.0",
     "classnames": "^2.2.6",
     "edit-ot-quill-delta": "^4.2.3",
+    "eventemitter3": "^3.1.0",
     "express": "^4.16.4",
     "fast-diff": "^1.2.0",
     "http-proxy-middleware": "^0.19.1",

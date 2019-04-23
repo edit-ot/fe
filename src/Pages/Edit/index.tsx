@@ -8,11 +8,12 @@ import { getDocById, docSave } from "./edit-api";
 import { DocInfo } from "../Home/Doc/doc-api";
 import { NavHeader } from "../../components/NavHeader";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave, faCarCrash } from "@fortawesome/free-solid-svg-icons";
+import { faSave, faCarCrash, faCommentAlt } from "@fortawesome/free-solid-svg-icons";
 import { debounce } from "../../utils";
 import { loginCtx, User } from "../../components/Login";
 import { WS } from "../../utils/WS";
 import { HoverInfo } from "../../components/HoverHandler";
+import { EditComments, editCommentsCtx } from "./EditComments";
 // import { Delta } from "edit-ot-quill-delta";
 
 
@@ -29,8 +30,13 @@ export type EditPanelProps = {
 export function EditPanel({ doc, user }: EditPanelProps) {
     const [msg, showMsg] = React.useState('');
     const [q, setQ] = React.useState(null as null | Quill);
+    const [ws, setWS] = React.useState(null as null | WS);
     const $input = React.useRef<HTMLInputElement>();
     const [loginedUsers, setLoginedUsers] = React.useState([] as User[]);
+    const [commentBtnPosition, setCommentBtnPosition] = React.useState(null as number | null);
+    const [line, setLine] = React.useState(null as null | number);
+
+    const _editCommentsCtx = React.useContext(editCommentsCtx)
 
     React.useEffect(() => {
         const toolbarOptions = [
@@ -74,6 +80,11 @@ export function EditPanel({ doc, user }: EditPanelProps) {
             console.log('i-logined', data);
             const user: User = data.userInfo;
             const users: User[] = data.users;
+            const doc = data.doc;
+
+            if (doc) {
+                const { now } = doc;
+            }
 
             setLoginedUsers(users);
         });
@@ -87,7 +98,26 @@ export function EditPanel({ doc, user }: EditPanelProps) {
             setLoginedUsers(lu);
         });
 
+        ws.on('selection-change', (line: number | null) => {
+            if (line) {
+                setLine(line);
+                const s = q.getSelection();
+                if (s) {
+                    const b = q.getBounds(s.index);
+                    const targetPosition = ~~((b.top + b.bottom) / 2);
+
+                    setCommentBtnPosition(targetPosition);
+                } else {
+                    setTimeout(() => setCommentBtnPosition(null), 50);
+                }
+            } else {
+                setTimeout(() => setLine(null), 50);
+                setTimeout(() => setCommentBtnPosition(null), 50);
+            }
+        });
+
         setQ(q);
+        setWS(ws);
 
         // @ts-ignore
         window.q = q;
@@ -110,13 +140,13 @@ export function EditPanel({ doc, user }: EditPanelProps) {
     }
 
     const onTitleChange = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-        showMsg('同步标题中 ...');
+        showMsg('修改标题中...');
 
         docSave({
             id: doc.id,
             title: $input.current.value
         }).then(ok => {
-            showMsg('标题同步成功');
+            showMsg('修改标题成功');
         });
     })
 
@@ -153,10 +183,10 @@ export function EditPanel({ doc, user }: EditPanelProps) {
                                     onChange={ onTitleChange } />
                             ) : (
                                 <HoverInfo info="只有文档所有者才能修改标题">
-                                    <input ref={ $input } className="_disable" type="text" defaultValue={ doc.title }
-                                        onChange={ onTitleChange } disabled={ true } />
+                                    <input ref={ $input } className="_disable"
+                                        type="text" defaultValue={ doc.title }
+                                        disabled={ true } />
                                 </HoverInfo>
-                                
                             )
                         }
                         
@@ -164,9 +194,32 @@ export function EditPanel({ doc, user }: EditPanelProps) {
                 ) : (
                     <div className="title-edit loading">加载中...</div>
                 ) }
-                
-                <div id="my-text-area" style={{ height: window.innerHeight - 80 - 170 }}></div>
 
+                <div className="editor-comment">{
+                    commentBtnPosition && (
+                        <span className="_comment-btn"
+                            style={{
+                                top: commentBtnPosition
+                            }}
+                            onClick={ e => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                ws.emit('add-comment', line);
+                            } }>
+                            <FontAwesomeIcon icon={ faCommentAlt } />                                
+                        </span>
+                    )
+                }</div>
+
+                { q && ws && doc && <EditComments q={ q } ws={ ws } doc={ doc } /> }
+                
+                <div id="my-text-area" style={{
+                    height: Math.max(
+                        (window.innerHeight - 300),
+                        (commentBtnPosition + 50) ? (commentBtnPosition + 50) : 0
+                    ) }}
+                />
+        
                 <div className="bottom-btns">
                     <span onClick={ saveAll }><FontAwesomeIcon icon={ faSave } /></span>
                     <div className="msg">{ msg }</div>

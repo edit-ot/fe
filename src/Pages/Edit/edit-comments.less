@@ -1,0 +1,82 @@
+.edit-comments-main {
+    position: relative;
+
+
+    .edit-comment-one {
+        position: absolute;
+        right: 0;
+
+        ._posi {
+            position: absolute;
+        }
+
+        ._smaller {
+            text-align: center;
+            box-sizing: border-box;
+            width: 200px;
+            font-size: 12px;
+            white-space: nowrap;
+            background: #FFF;
+            padding: 10px 12px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, .2);
+            cursor: pointer;
+        }
+    }
+
+    .line-comments-main {
+        font-size: 12px;
+        background: #FFF;
+        width: 200px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, .2);
+
+        .click-to-close {
+            cursor: pointer;
+            padding: 10px 0;
+            border-bottom: 1px solid #EEE;
+            color: #FFF;
+            background: rgb(255, 80, 80);
+            text-align: center;
+            font-size: 12px;
+        }
+
+        input {
+            border-top: 1px solid #EEE!important;
+        }
+    }
+
+
+    .user-comment {
+        
+        background: #FFF;
+        // border: 1px solid #EEE;
+        padding: 10px 12px;
+        display: flex;
+
+        ._avatar {
+            margin-right: 12px;
+            img {
+                width: 32px;
+                height: 32px;
+                border-radius: 100px;
+            }
+        }
+        ._text {
+            line-height: 16px;
+            ._username {
+                color: #999;
+            }
+        }
+        
+    }
+
+    .type-comment {
+        line-height: 24px;
+        input {
+            font-size: 12px;
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px 12px;
+            border: none;
+        }
+    }
+}

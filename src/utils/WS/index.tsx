@@ -3,6 +3,7 @@ import Quill from "quill";
 import { Delta } from "edit-ot-quill-delta";
 import { User } from "../../components/Login";
 import md5 = require("md5");
+import EventEmitter from "eventemitter3";
 
 // @ts-ignore
 window.Delta = Delta;
@@ -13,12 +14,13 @@ const TICK_INTERVAL = 1500;
 
 const DEFAULT_URL = 'http://localhost:1234/doc'
 
-export class WS {
+export class WS extends EventEmitter {
     socket: SocketIOClient.Socket;
     q: Quill;
     user: User;
 
     constructor(q: Quill, docId: number, user: User) {
+        super();
         this.user = user;
         this.q = q;
 
@@ -55,9 +57,11 @@ export class WS {
 
                 if (why === 'selection-change' || why === 'text-change') {
                     this.cursorChnage(index);
+                    this.emit('selection-change', index);
                 }
             } catch (err) {
                 // 嗯
+                this.emit('selection-change', null);
             }
         });
 
