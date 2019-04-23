@@ -28,12 +28,12 @@ export function NavHeader() {
                                 doLogout();
                             }
                         },
-                        {
-                            name: '修改个人资料',
-                            onBtnClick() {
+                        // {
+                        //     name: '修改个人资料',
+                        //     onBtnClick() {
 
-                            }
-                        }
+                        //     }
+                        // }
                     ]}>{
                         ref => <div ref={ ref }>
                             <span className="navlink" key="nhl-avatar-name">
