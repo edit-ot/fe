@@ -16,6 +16,11 @@ app.use('/default.png', proxy({
     target: `http://0.0.0.0:${ SERVER_PORT }`
 }));
 
+app.use('/socket.io', proxy({
+    target: `http://0.0.0.0:${ SERVER_PORT }`
+}));
+
+
 // run
 app.use(
     bundler.middleware()

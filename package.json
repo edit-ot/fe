@@ -15,6 +15,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.8",
     "@fortawesome/free-solid-svg-icons": "^5.5.0",
     "@fortawesome/react-fontawesome": "0.1.0-11",
+    "@types/md5": "^2.1.33",
     "axios": "^0.18.0",
     "classnames": "^2.2.6",
     "edit-ot-quill-delta": "^4.2.3",
@@ -29,6 +30,7 @@
     "react-router-dom": "^4.3.1",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
+    "socket.io-client": "^2.2.0",
     "wolfy87-eventemitter": "^5.2.6"
   },
   "devDependencies": {
@@ -45,6 +47,7 @@
     "@types/react-router": "^4.4.3",
     "@types/react-router-dom": "^4.3.1",
     "@types/redux": "^3.6.0",
+    "@types/socket.io-client": "^1.4.32",
     "babel-eslint": "^10.0.1",
     "babel-polyfill": "^6.26.0",
     "cross-env": "^5.2.0",
