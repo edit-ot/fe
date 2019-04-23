@@ -10,7 +10,9 @@ import { NavHeader } from "../../components/NavHeader";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faCarCrash } from "@fortawesome/free-solid-svg-icons";
 import { debounce } from "../../utils";
-import { loginCtx } from "../../components/Login";
+import { loginCtx, User } from "../../components/Login";
+import { WS } from "../../utils/WS";
+import { HoverInfo } from "../../components/HoverHandler";
 // import { Delta } from "edit-ot-quill-delta";
 
 
@@ -20,13 +22,15 @@ export type EditPageProps = RouteComponentProps<{
 
 
 export type EditPanelProps = {
-	doc: DocInfo
+    doc: DocInfo,
+    user: User
 }
 
-export function EditPanel({ doc }: EditPanelProps) {
+export function EditPanel({ doc, user }: EditPanelProps) {
     const [msg, showMsg] = React.useState('');
     const [q, setQ] = React.useState(null as null | Quill);
     const $input = React.useRef<HTMLInputElement>();
+    const [loginedUsers, setLoginedUsers] = React.useState([] as User[]);
 
     React.useEffect(() => {
         const toolbarOptions = [
@@ -54,24 +58,39 @@ export function EditPanel({ doc }: EditPanelProps) {
             theme: 'snow'  // or 'bubble'
         });
 
-        setQ(q);
+        if (doc && doc.content) {
+            q.setContents(JSON.parse(doc.content), 'silent');
+            $input.current.value = doc.title;
+        }
+        
 
-        q.on('text-change', function(delta, oldDelta, source) {
-            if (source == 'api') {
-                console.log("An API call triggered this change.");
-            } else if (source == 'user') {
-                console.log(delta, oldDelta, source);
-                console.log("A user action triggered this change.");
-            }
+        const ws = new WS(q, doc.id, user);
+        // @ts-ignore
+        window.ws = ws;
+        ws.socket.on('!', console.log);
+
+        ws.socket.on('i-logined', data => {
+            // data.userInfo 是自己的信息, users 是目前在该文档下的用户
+            console.log('i-logined', data);
+            const user: User = data.userInfo;
+            const users: User[] = data.users;
+
+            setLoginedUsers(users);
         });
+
+        ws.socket.on('others-joined', (others: User) => {
+            // 排除自己 
+            if (others.username === user.username) return;
+
+            console.log('others-joined', user);
+            const lu = loginedUsers.concat(user);
+            setLoginedUsers(lu);
+        });
+
+        setQ(q);
 
         // @ts-ignore
         window.q = q;
-
-        if (doc && doc.content) {
-            q.updateContents(JSON.parse(doc.content), 'silent');
-            $input.current.value = doc.title;
-        }
     }, []);
 
     const saveAll = () => {
@@ -103,42 +122,55 @@ export function EditPanel({ doc }: EditPanelProps) {
 
     return (
         <div className="edit-main">
-            <div id="my-toolbar">
-                {
-                    React.createElement('select', {
-                        className: 'ql-size',
-                    }, [
-                        <option value="small" key="qls-small" />,
-                        React.createElement('option', {
-                            selected: true, 
-                            key: 'ooooooooooooooops-option'
-                        }),
-                        <option value="large" key="qls-large"></option>,
-                        <option value="huge" key="qls-huge"></option>
-                    ])
-                }
-                <button className="ql-bold"></button>
-                <button className="ql-link"></button>
-                <button className="ql-image"></button>
+            <div className="edit-main-inner">
+                <div id="my-toolbar">
+                    {
+                        React.createElement('select', {
+                            className: 'ql-size',
+                        }, [
+                            <option value="small" key="qls-small" />,
+                            React.createElement('option', {
+                                selected: true, 
+                                key: 'ooooooooooooooops-option'
+                            }),
+                            <option value="large" key="qls-large"></option>,
+                            <option value="huge" key="qls-huge"></option>
+                        ])
+                    }
+                    <button className="ql-bold"></button>
+                    <button className="ql-link"></button>
+                    <button className="ql-image"></button>
 
-                {/* <button className="ql-script" value="sub"></button> */}
-                {/* <button className="ql-script" value="super"></button> */}
-            </div>
-            
-            { doc ? (
-                <div className="title-edit">
-                    <input ref={ $input } type="text" defaultValue={ doc.title }
-                        onChange={ onTitleChange } />
+                    {/* <button className="ql-script" value="sub"></button> */}
+                    {/* <button className="ql-script" value="super"></button> */}
                 </div>
-            ) : (
-                <div className="title-edit loading">加载中...</div>
-            ) }
-            
-            <div id="my-text-area" style={{ height: window.innerHeight - 80 - 170 }}></div>
+                
+                { doc ? (
+                    <div className="title-edit">
+                        { doc.owner === user.username ? 
+                            (
+                                <input ref={ $input } type="text" defaultValue={ doc.title }
+                                    onChange={ onTitleChange } />
+                            ) : (
+                                <HoverInfo info="只有文档所有者才能修改标题">
+                                    <input ref={ $input } className="_disable" type="text" defaultValue={ doc.title }
+                                        onChange={ onTitleChange } disabled={ true } />
+                                </HoverInfo>
+                                
+                            )
+                        }
+                        
+                    </div>
+                ) : (
+                    <div className="title-edit loading">加载中...</div>
+                ) }
+                
+                <div id="my-text-area" style={{ height: window.innerHeight - 80 - 170 }}></div>
 
-            <div className="bottom-btns">
-                <span onClick={ saveAll }><FontAwesomeIcon icon={ faSave } /></span>
-                <div className="msg">{ msg }</div>
+                <div className="bottom-btns">
+                    <span onClick={ saveAll }><FontAwesomeIcon icon={ faSave } /></span>
+                    <div className="msg">{ msg }</div>
+                </div>
             </div>
         </div>
     );
@@ -179,7 +211,8 @@ export function EditPage(props: EditPageProps) {
                 请联系文档所有者
             </div> }
 
-            { perm === 200 && doc && <EditPanel doc={ doc } /> }
+            { perm === 200 && _loginCtx.user &&
+                doc && <EditPanel user={ _loginCtx.user } doc={ doc } /> }
         </div>
     )
 }
