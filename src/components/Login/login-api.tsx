@@ -8,6 +8,7 @@ export type User = {
     username: string;
     avatar: string;
     nickname: string;
+    intro: string;
 }
 
 export function doLogin(data: InputData) {

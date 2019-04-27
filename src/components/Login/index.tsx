@@ -7,8 +7,9 @@ import "./login.less";
 export * from "./login-api";
 
 export type LoginCtx = {
-    user: User | null
-    doLogout: () => void
+    user: User | null;
+    doLogout: () => void;
+    update: (userInfo: Partial<User>) => void;
 }
 
 export const loginCtx = React.createContext({
@@ -17,7 +18,7 @@ export const loginCtx = React.createContext({
 } as LoginCtx);
 
 export function NeedLogin(props: { children: any[]; }) {
-    const [user, setUser] = React.useState(null);
+    const [user, setUser] = React.useState(null as null | User);
     const [isRegister, setRegister] = React.useState(false);
 
     React.useEffect(() => {
@@ -91,7 +92,16 @@ export function NeedLogin(props: { children: any[]; }) {
     }
 
     return (
-        <loginCtx.Provider value={{ user, doLogout }}>
+        <loginCtx.Provider value={{
+            user,
+            doLogout,
+            update(info) {
+                setUser({
+                    ...user, 
+                    ...info
+                });
+            }
+        }}>
             {
                 !user && (
                     <form className="login-container" onSubmit={ onSubmit }>

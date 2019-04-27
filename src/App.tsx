@@ -5,6 +5,7 @@ import { EditPage } from "./Pages/Edit";
 import { NeedLogin } from "./components/Login";
 import { PopupCtxWrap } from "./Ctx/Popup/popup-ctx";
 import { AboutPage } from "./Pages/About";
+import { UserPage } from "./Pages/User";
 
 export function App() {
     return (
@@ -23,6 +24,8 @@ export function App() {
                 {/* About */}
                 <Route path="/about" exact component={ AboutPage } />
 
+                {/* User */}
+                <Route path="/user/:username" exact component={ UserPage } />
 
 
                 <PopupCtxWrap key="app-msg-ctx-wrap" />

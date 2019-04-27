@@ -17,12 +17,13 @@ export type GetInputPopupProps = CreatePopupComponent<{
     onCancel?: () => any,
     onConfirm: (input: string) => any,
 
+    mask?: boolean,
     pureConfirm?: boolean
 }>
 
 export function GetInputPopup(
     {
-        title, confrimText, cancelText, onCancel, pop,
+        title, confrimText, cancelText, onCancel, pop, mask,
         placeholder, checker, onConfirm, errorInfo, pureConfirm
     }: GetInputPopupProps
 ) {
@@ -73,7 +74,9 @@ export function GetInputPopup(
                         onChange={ toCheck }
                         className={cls({
                             unvalid: !valid
-                        })}/>
+                        })}
+                        type={ mask ? 'password' : '' }
+                        />
 
                     {
                         !valid &&

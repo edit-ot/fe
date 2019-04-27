@@ -4,6 +4,7 @@ import { Delta } from "edit-ot-quill-delta";
 import { User } from "../../components/Login";
 import md5 = require("md5");
 import EventEmitter from "eventemitter3";
+import JSONStringify from "fast-json-stable-stringify"
 
 // @ts-ignore
 window.Delta = Delta;
@@ -12,7 +13,7 @@ window.Delta = Delta;
 
 const TICK_INTERVAL = 1500;
 
-const DEFAULT_URL = 'http://localhost:1234/doc'
+const DEFAULT_URL = '/doc'
 
 export class WS extends EventEmitter {
     socket: SocketIOClient.Socket;
@@ -29,8 +30,6 @@ export class WS extends EventEmitter {
             reconnection: false
         });
         this.socket = socket;
-
-        this.init();
     }
 
     init() {
@@ -125,23 +124,23 @@ export class WS extends EventEmitter {
                 
                 const remoteHash = data.contentHash as string;
                 const nextDocDelta = nowDocDelta.compose(toSend);
-                const localHash = md5(JSON.stringify(nextDocDelta));
+                const localHash = md5(JSONStringify(nextDocDelta));
 
                 if (remoteHash === localHash) {
                     isAwait = false;
                     nowDocDelta = nextDocDelta;
                 } else {
-                    if (md5(JSON.stringify(nowDocDelta)) === remoteHash) {
+                    if (md5(JSONStringify(nowDocDelta)) === remoteHash) {
                         console.info('finishUpdate: Hash Equal To nowDocDelta, Also OK');
                         isAwait = false;
                     } else {
                         console.error('finishUpdate: Local/Remote Hash Not Equal');
-                        console.log(' - local ', localHash, JSON.stringify(nextDocDelta));
+                        console.log(' - local ', localHash, JSONStringify(nextDocDelta));
                         console.log(' - remote', remoteHash);
 
-                        console.log(' - nowDocDelta  ', JSON.stringify(nowDocDelta));
-                        console.log(' - tosendDelta  ', JSON.stringify(toSend));
-                        console.log(' - nextDocDelta ', JSON.stringify(nextDocDelta));
+                        console.log(' - nowDocDelta  ', JSONStringify(nowDocDelta));
+                        console.log(' - tosendDelta  ', JSONStringify(toSend));
+                        console.log(' - nextDocDelta ', JSONStringify(nextDocDelta));
                     }
                 }
             });
@@ -162,7 +161,7 @@ export class WS extends EventEmitter {
                 nowDocDelta.compose(delta);
 
             // const nextDocDelta = nowDocDelta.compose(delta);
-            const localHash = md5(JSON.stringify(nextDocDelta));
+            const localHash = md5(JSONStringify(nextDocDelta));
 
             if (localHash !== contentHash) {
                 // isAwait = false;
@@ -172,9 +171,9 @@ export class WS extends EventEmitter {
                 console.log(' - local ', localHash);
                 console.log(' - remote', contentHash);
 
-                console.log(' - nowDocDelta  ', JSON.stringify(nowDocDelta));
-                console.log(' - updateDelta  ', JSON.stringify(delta));
-                console.log(' - nextDocDelta ', JSON.stringify(nextDocDelta));
+                console.log(' - nowDocDelta  ', JSONStringify(nowDocDelta));
+                console.log(' - updateDelta  ', JSONStringify(delta));
+                console.log(' - nextDocDelta ', JSONStringify(nextDocDelta));
                 
             } else {
                 console.info('OK: Hash Check');

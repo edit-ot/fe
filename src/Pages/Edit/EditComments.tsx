@@ -110,10 +110,12 @@ export type EditCommentsCtxProviderProps = React.PropsWithChildren<{
 
 export function EditCommentsCtxProvider(props: EditCommentsCtxProviderProps) {
     const [docComments, setDocComments] = React.useState([] as DocComment[]);
+
     const { q, ws, docId } = props;
     const _loginCtx = React.useContext(loginCtx);
 
     React.useEffect(() => {
+        console.log('re get doccoments');
         ws.socket.emit('get-docComments', docId);
         ws.socket.once('reveive-docComments', dccs => setDocComments(dccs));
 
@@ -130,17 +132,17 @@ export function EditCommentsCtxProvider(props: EditCommentsCtxProviderProps) {
 
     React.useEffect(() => {
         const addComment = idx => {
-            docComments.push({
+            // console.log('docComments.length', docComments.length);
+            setDocComments(docComments.slice().concat({
                 line: idx,
                 comments: []
-            });
-            setDocComments(docComments.slice());
+            }));
         }
 
         ws.on('add-comment', addComment);
 
         return () => ws.off('add-comment', addComment);
-    }, []);
+    }, [ docComments ]);
 
     React.useEffect(() => {
         ws.socket.on('remove-doc-comments', line => {
@@ -170,15 +172,17 @@ export function EditCommentsCtxProvider(props: EditCommentsCtxProviderProps) {
         }
 
         // Force Update
-        setDocComments(docComments.slice());
+        setDocComments(docComments.slice().filter(e => e.comments.length));
     }
 
     const removeDocComments = (line: number, isActive = true) => {
         const idx = docComments.findIndex(d => d.line === line);
-        if (idx === -1) return;
+        if (idx === -1) return console.log('removeDocComments not found', line);
         const nextDoccs = docComments.slice();
         nextDoccs.splice(idx, 1);
-        setDocComments(nextDoccs);
+        setDocComments(nextDoccs.filter(d => d.comments.length));
+
+        console.log('removeDocComments', line, JSON.stringify(nextDoccs.filter(d => d.comments.length)));
 
         if (isActive) {
             ws.socket.emit('remove-doc-comments', line);
@@ -228,9 +232,9 @@ export function EditComments(props: EditCommentsProps) {
                 e.stopPropagation();
             }}>
                 <editCommentsCtx.Consumer>{ ctx => (
-                    ctx && ctx.docComments.map(docc => {
+                    ctx && ctx.docComments.map((docc, idx) => {
                         return (
-                            <div key={ docc.line }
+                            <div key={ idx }
                                 className="edit-comment-one">
                                 
                                 <div className="_posi" style={{ top: getLineTop(q, docc.line) }}>
@@ -243,11 +247,13 @@ export function EditComments(props: EditCommentsProps) {
                                             });
                                         }} /> 
                                     ) : (
-                                        <div className="_smaller" onClick={ e => {
-                                            setNowShowLine(docc.line);
-                                        }}>
-                                            此处有 { docc.comments.length } 条讨论, 点击展开
-                                        </div>
+                                        docc.comments.length ? (
+                                            <div className="_smaller" onClick={ e => {
+                                                setNowShowLine(docc.line);
+                                            }}>
+                                                此处有 { docc.comments.length } 条讨论, 点击展开
+                                            </div>
+                                        ) : null                                        
                                     )}
                                 </div>
                                 

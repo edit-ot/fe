@@ -1,44 +1,52 @@
 .login-container {
     position: fixed;
     z-index: 99999;
-    background-color: rgba(0, 0, 0, .6);
+    background: rgb(240, 240, 240);
     width: 100%;
     height: 100%;
 
     .login-form {
+        background: #FFF;
+        padding: 40px 60px 60px 60px;
+        box-shadow: 0 1px 7px -2px rgba(0, 0, 0, 0.5);
         border: 1px solid rgba(255, 255, 255, .3);
         border-radius: 4px;
         line-height: 1.5;
-        padding: .8em 1em;
         max-width: 320px;
         margin: 200px auto 0 auto;
 
+        @media (max-width: 600px) {
+            padding: 30px 50px;
+            margin: 0 auto;
+            box-shadow: none;
+        }
+
         input {
             text-align: center;
-
             border-radius: 2px;
-
-            background-color: rgba(255, 255, 255, .8);
+            background: rgba(232, 240, 254, 1);
             width: 100%;
             padding: .5em .3em;
             border: none;
             box-sizing: border-box;
 
             &:focus {
-                background-color: rgba(255, 255, 255, 1);                
+                background: rgba(232, 240, 254, 1);        
             }
         }
 
         .field-name {
-            text-align: center;
-            color: #FFF;
+            font-size: 12px;
+            text-align: left;
+            color: #BBB;
+            // color: #FFF;
             margin-bottom: 4px;
         }
 
         .field-line {
             text-align: center;
             width: 100%;
-            margin-bottom: 1em;
+            margin-bottom: 1.5em;
 
             button, .fake-btn {
                 box-sizing: border-box;
@@ -53,12 +61,20 @@
             }
 
             button {
+                color: #FFF;
                 background-color: rgb(123, 157, 208);
             }
 
             .fake-btn {
-                background-color: rgb(55, 55, 55);
+                background-color: rgb(95, 95, 95);
             }
+        }
+
+        &::before {
+            content: "登录";
+            display: block;
+            font-size: 26px;
+            margin-bottom: 1em;
         }
     }
 }

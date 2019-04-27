@@ -30,8 +30,8 @@ export function PopupCtxWrap() {
                         <div className="fixed-to-top" key={idx}
                             { ...outterProps }
                             style={{
-                                ...(outterProps.style || {}),
-                                zIndex: idx + 100000
+                                zIndex: idx + 10000,
+                                ...(outterProps.style || {})
                             }} >
                             { compo }
                         </div>

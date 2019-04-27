@@ -5,12 +5,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretUp } from "@fortawesome/free-solid-svg-icons";
 
 export type HoverHandleProps = React.PropsWithChildren<{
-    hoverComponent: React.ReactNode
+    hoverComponent: React.ReactNode,
+    onClick?: () => void
 }>
 
 export function HoverHandler(props: HoverHandleProps) {
     return (
-        <div className="hover-info-main">
+        <div className="hover-handler-main" onClick={ e => props.onClick && props.onClick() }>
             { props.children }
 
             <div className="hover-info-hidden-one">
@@ -21,7 +22,8 @@ export function HoverHandler(props: HoverHandleProps) {
 }
 
 export type HoverInfoProps = React.PropsWithChildren<{
-    info: string
+    info: string,
+    onClick?: () => void
 }>
 
 export function HoverInfo(props: HoverInfoProps) {
@@ -32,7 +34,7 @@ export function HoverInfo(props: HoverInfoProps) {
     );
     
     return (
-        <HoverHandler hoverComponent={ hoverInfo }>
+        <HoverHandler hoverComponent={ hoverInfo } onClick={ props.onClick }>
             { props.children }
         </HoverHandler>
     )

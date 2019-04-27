@@ -14,6 +14,7 @@ import { loginCtx, User } from "../../components/Login";
 import { WS } from "../../utils/WS";
 import { HoverInfo } from "../../components/HoverHandler";
 import { EditComments, editCommentsCtx } from "./EditComments";
+import { editHeaderCtx, EditHedaerProvider, EditHeader } from "./EditHeader";
 // import { Delta } from "edit-ot-quill-delta";
 
 
@@ -36,7 +37,8 @@ export function EditPanel({ doc, user }: EditPanelProps) {
     const [commentBtnPosition, setCommentBtnPosition] = React.useState(null as number | null);
     const [line, setLine] = React.useState(null as null | number);
 
-    const _editCommentsCtx = React.useContext(editCommentsCtx)
+    const _editHeaderCtx = React.useContext(editHeaderCtx);
+    // const _editCommentsCtx = React.useContext(editCommentsCtx);
 
     React.useEffect(() => {
         const toolbarOptions = [
@@ -64,30 +66,51 @@ export function EditPanel({ doc, user }: EditPanelProps) {
             theme: 'snow'  // or 'bubble'
         });
 
-        if (doc && doc.content) {
-            q.setContents(JSON.parse(doc.content), 'silent');
-            $input.current.value = doc.title;
-        }
-        
-
         const ws = new WS(q, doc.id, user);
         // @ts-ignore
         window.ws = ws;
-        ws.socket.on('!', console.log);
 
         ws.socket.on('i-logined', data => {
             // data.userInfo 是自己的信息, users 是目前在该文档下的用户
             console.log('i-logined', data);
             const user: User = data.userInfo;
             const users: User[] = data.users;
-            const doc = data.doc;
 
-            if (doc) {
-                const { now } = doc;
+            _editHeaderCtx.pushMsg(`登录成功, 欢迎 ${user.username}, 目前有 ${ users.length } 人在编辑本文档`);
+            _editHeaderCtx.setLoginedList(users);
+
+            if (data.doc) {
+                // if (doc && doc.content) {
+                    if (data.doc.now) {
+                        console.log(data.doc.now, doc.content);
+                        q.setContents(data.doc.now, 'silent');
+                    }
+                    $input.current.value = doc.title;
+                // }
             }
+
+            setTimeout(() => {
+                ws.init();
+            }, 50);
 
             setLoginedUsers(users);
         });
+
+        _editHeaderCtx.bus.on('say-hello', () => {
+            ws.socket.emit('say-hello', user);
+        });
+
+        ws.socket.on('say-hello', (theUser: User) => {
+            _editHeaderCtx.bus.emit('receive-hello', theUser);
+        });
+
+        ws.socket.on('owner-change-title', (newTitle: string) => {
+            if (doc.owner === user.username) return;
+            console.log('newTitle', newTitle);
+            if ($input && $input.current) $input.current.value = newTitle;
+        });
+
+        // q.setContents(JSON.parse(doc.content), 'silent');
 
         ws.socket.on('others-joined', (others: User) => {
             // 排除自己 
@@ -141,6 +164,16 @@ export function EditPanel({ doc, user }: EditPanelProps) {
 
     const onTitleChange = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
         showMsg('修改标题中...');
+
+        if (!$input.current.value) {
+            showMsg('标题不能为空！');
+            return;
+        }
+
+        ws.socket.emit('change-title', {
+            docId: doc.id, 
+            title: $input.current.value
+        });
 
         docSave({
             id: doc.id,
@@ -233,7 +266,7 @@ export function EditPanel({ doc, user }: EditPanelProps) {
 export function EditPage(props: EditPageProps) {
     const [doc, setDoc] = React.useState(null as null | DocInfo);   
     const _loginCtx = React.useContext(loginCtx);
-
+    
     const [perm, setPerm] = React.useState(200);
 
     React.useEffect(() => {
@@ -248,24 +281,31 @@ export function EditPage(props: EditPageProps) {
             }
         });
     }, [ _loginCtx ]);
+
+
+    if (!doc) return null;
     
     return (
-        <div className="edit-page">
-            <NavHeader />
+        <EditHedaerProvider doc={ doc }>
+            <div className="edit-page">
+                <EditHeader />
 
-            { perm === 404 && <div className="perm-err">
-                <span><FontAwesomeIcon icon={ faCarCrash } /></span>
-                找不到文档，请检查 URL
-            </div> }
+                { perm === 404 && <div className="perm-err">
+                    <span><FontAwesomeIcon icon={ faCarCrash } /></span>
+                    找不到文档，请检查 URL
+                </div> }
 
-            { perm === 403 && <div className="perm-err">
-                <span><FontAwesomeIcon icon={ faCarCrash } /></span>
-                您没有权限打开此文档 <br />
-                请联系文档所有者
-            </div> }
+                { perm === 403 && <div className="perm-err">
+                    <span><FontAwesomeIcon icon={ faCarCrash } /></span>
+                    您没有权限打开此文档 <br />
+                    请联系文档所有者
+                </div> }
 
-            { perm === 200 && _loginCtx.user &&
-                doc && <EditPanel user={ _loginCtx.user } doc={ doc } /> }
-        </div>
+                <editHeaderCtx.Consumer>{ ctx => 
+                    (perm === 200) && _loginCtx.user &&
+                        doc && <EditPanel user={ _loginCtx.user } doc={ doc } />                    
+                }</editHeaderCtx.Consumer>
+            </div>
+        </EditHedaerProvider>
     )
 }
