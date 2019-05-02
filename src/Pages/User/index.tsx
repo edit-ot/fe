@@ -9,7 +9,7 @@ import { popupCtx, CreatePopupComponent } from "../../Ctx/Popup";
 import 'cropperjs/dist/cropper.css';
 import Cropper from 'cropperjs';
 import { GetInputPopup } from "../../components/GetInputPopup";
-import { updateUserInfo } from "./user-api";
+import { updateUserInfo, uploadAvatar } from "./user-api";
 import { Link } from "react-router-dom";
 
 export type UserPageProps = RouteComponentProps<{
@@ -41,7 +41,7 @@ export function UserPageNav() {
 }
 
 export function UserPanel() {
-    const { user, update } = React.useContext(loginCtx);
+    const { user, update, doLogout, loadUser } = React.useContext(loginCtx);
     const _popup = React.useContext(popupCtx);
     // const [previewSrc, setPreviewSrc] = React.useState(null as null | string);
     const [cropped, setCropped] = React.useState(null as null | HTMLCanvasElement);
@@ -89,7 +89,7 @@ export function UserPanel() {
         } }>
             修改密码
         </div>
-        <div className="_btn _red">
+        <div className="_btn _red" onClick={ doLogout }>
             退出登录
         </div>
     </>
@@ -99,12 +99,20 @@ export function UserPanel() {
             <input id="_file" style={{ visibility: 'hidden' }} type="file" onChange={ e => {
                 if (e.target.files && e.target.files.length > 0) {
                     const reader = new FileReader();
+                    
                     reader.addEventListener("load", () =>
                         _popup.push(PreviewSelected, {
                             src: reader.result as string,
-                            ok: setCropped
+                            ok(canvas: HTMLCanvasElement) {
+                                setCropped(canvas);
+                                uploadAvatar(canvas).then(() => {
+                                    loadUser();
+                                })
+
+                            }
                         }, { style: { background: 'rgba(0, 0, 0, .5)' } })
                     );
+                    
                     reader.readAsDataURL(e.target.files[0]);
                 }
             } } />

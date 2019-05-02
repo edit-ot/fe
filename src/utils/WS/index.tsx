@@ -67,10 +67,18 @@ export class WS extends EventEmitter {
         this.whenTextChange();
     }
 
+    lastTimeLineCursor: number | null = null;
+
     cursorChnage = (idx: number) => {
-        this.socket.emit('change-line', {
-            idx
-        })
+        if (idx === this.lastTimeLineCursor) {
+            return;
+        } else {
+            console.log('Change Line Send');
+            this.socket.emit('change-line', {
+                idx
+            });
+            this.lastTimeLineCursor = idx;
+        }
     }
 
 

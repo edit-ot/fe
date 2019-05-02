@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 
 export type StdResp<T> = {
     code: number, 
@@ -21,8 +21,8 @@ export const http = {
         });
     },
 
-    post<T = any>(url: string, data: any = {}): Promise< StdResp<T> > {
-        return axios.post(url, data).then(response => {
+    post<T = any>(url: string, data: any = {}, config?: AxiosRequestConfig): Promise< StdResp<T> > {
+        return axios.post(url, data, config).then(response => {
             if (response.status === 200) {
                 const ret: StdResp<T> = response.data;
 

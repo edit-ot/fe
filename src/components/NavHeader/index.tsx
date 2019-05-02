@@ -12,7 +12,7 @@ export function NavHeader() {
     return (
         <nav className="nav-header">
             <span className="navlink">
-                <NavLink activeClassName="navlink-active" to="/">刷新</NavLink>
+                <NavLink activeClassName="navlink-active" to="/">首页</NavLink>
             </span>
 
             <span className="navlink">

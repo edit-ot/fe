@@ -144,6 +144,11 @@ export function EditPanel({ doc, user }: EditPanelProps) {
 
         // @ts-ignore
         window.q = q;
+
+        return () => {
+            ws.socket.close();
+            ws.removeAllListeners();
+        }
     }, []);
 
     const saveAll = () => {

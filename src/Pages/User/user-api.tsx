@@ -8,3 +8,23 @@ export function updateUserInfo(userInfo: Partial<User>) {
             Promise.reject(resp);
     });
 }
+
+function getBlob(canvas: HTMLCanvasElement): Promise<Blob> {
+    return new Promise(r => {
+        canvas.toBlob(b => {
+            r(b);
+        });
+    });
+}
+
+export function uploadAvatar(canvas: HTMLCanvasElement) {
+    return getBlob(canvas).then(blob => {
+        const data = new FormData();
+        // data.append('name', 'image');
+        data.append('file', blob);
+
+        return http.post('/api/user/avatar', data, {
+            headers: { 'Content-Type' : 'multipart/form-data' }
+        });
+    });
+}

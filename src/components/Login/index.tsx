@@ -9,25 +9,30 @@ export * from "./login-api";
 export type LoginCtx = {
     user: User | null;
     doLogout: () => void;
+    loadUser: () => void;
     update: (userInfo: Partial<User>) => void;
 }
 
 export const loginCtx = React.createContext({
     user: null,
-    doLogout: () => {}
+    doLogout: () => {},
+    loadUser: () => {},
+    update: () => {}
 } as LoginCtx);
 
 export function NeedLogin(props: { children: any[]; }) {
     const [user, setUser] = React.useState(null as null | User);
     const [isRegister, setRegister] = React.useState(false);
 
-    React.useEffect(() => {
+    const loadUser = () => {
         getUserInfo().then(resp => {
             if (resp.code === 200 && resp.data) {
                 setUser(resp.data);
             }
         })
-    }, []);
+    }
+
+    React.useEffect(loadUser, []);
 
     const onSubmit = e => {
         e.preventDefault();
@@ -94,6 +99,7 @@ export function NeedLogin(props: { children: any[]; }) {
     return (
         <loginCtx.Provider value={{
             user,
+            loadUser,
             doLogout,
             update(info) {
                 setUser({
