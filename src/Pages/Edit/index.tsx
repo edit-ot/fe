@@ -67,6 +67,7 @@ export function EditPanel({ doc, user }: EditPanelProps) {
             },
             theme: 'snow'  // or 'bubble'
         });
+
         q.root.setAttribute('spellcheck', 'false');
 
         const ws = new WS(q, doc.id, user);
@@ -106,6 +107,7 @@ export function EditPanel({ doc, user }: EditPanelProps) {
         window.q = q;
 
         return () => {
+            console.log('            EXITEXITEXITEXIT             ');
             ws.socket.close();
             ws.removeAllListeners();
         }
@@ -228,6 +230,7 @@ export function EditPanel({ doc, user }: EditPanelProps) {
                         ])
                     }
                     <button className="ql-bold"></button>
+                    <button className="ql-align"></button>
                     <button className="ql-link"></button>
                     <button className="ql-image"></button>
 

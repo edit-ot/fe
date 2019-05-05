@@ -5,7 +5,7 @@ import { User } from "../../components/Login";
 import md5 = require("md5");
 import EventEmitter from "eventemitter3";
 import JSONStringify from "fast-json-stable-stringify"
-import { debounce } from "..";
+// import { debounce } from "..";
 
 // @ts-ignore
 window.Delta = Delta;
@@ -28,7 +28,7 @@ export class WS extends EventEmitter {
 
         const socket = IO(DEFAULT_URL, {
             query: { docId },
-            reconnection: false
+            // reconnection: false
         });
         this.socket = socket;
     }
@@ -36,21 +36,28 @@ export class WS extends EventEmitter {
     init() {
         const Parchment = Quill.import('parchment');
 
-        let composing = false;
-        
-        window.addEventListener('compositionstart', e => {
-            composing = true;
-        });
+        // let composing = false;       
+        // window.addEventListener('compositionstart', e => {
+        //     composing = true;
+        // });
+        // window.addEventListener('compositionend', e => {
+        //     composing = false;
+        // });
 
-        window.addEventListener('compositionend', e => {
-            composing = false;
-        });
-
-        this.q.on('editor-change', why => {
+        const setFormat = () => {
             const f = this.q.getFormat();
             if ((!f) || (f.author !== this.user.username)) {
                 this.q.format('author', this.user.username, 'silent');
             }
+        }
+
+        this.q.on('selection-change', (range, oldRange, source) => {
+            if (range && range.length === 0) {
+                setFormat();
+            }
+        });
+        this.q.on('text-change', why => {
+            setFormat();
         });
 
         this.q.on('editor-change', why => {
@@ -77,7 +84,6 @@ export class WS extends EventEmitter {
                     this.cursorChnage(index, why);
                     this.emit('selection-change', index);
                 }
-                
             } catch (err) {
                 // 嗯
                 this.emit('selection-change', null);
