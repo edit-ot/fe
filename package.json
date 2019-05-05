@@ -25,6 +25,7 @@
     "fast-diff": "^1.2.0",
     "fast-json-stable-stringify": "^2.0.0",
     "http-proxy-middleware": "^0.19.1",
+    "parchment": "^1.1.4",
     "quill": "^1.3.6",
     "react": "^16.7.0-alpha.0",
     "react-dom": "^16.7.0-alpha.0",

@@ -9,6 +9,7 @@ import EventEmitter from "eventemitter3";
 import { popupCtx } from "../../../Ctx/Popup";
 import { ChangePermissionPopup } from "../../../components/ChangePermissionPopup";
 import { DocInfo } from "../../Home/Doc/doc-api";
+import { userDomStyle } from "./dom-style";
 
 export type EditHeaderCtx = {
     doc: DocInfo,
@@ -101,8 +102,16 @@ function RenderLoginedList(props: { list: User[] }) {
 
 export function EditHedaerProvider(props: React.PropsWithChildren<{ doc: DocInfo }>) {
     const [msgs, setMsgs] = React.useState([] as React.ReactNode[]);
-    const [loginedList , setLoginedList] = React.useState([] as User[]);
+    const [loginedList , ReactSetLoginedList] = React.useState([] as User[]);
     const [bus, setBus] = React.useState(new EventEmitter() as EventEmitter);
+
+    const setLoginedList = (users: User[]) => {
+        console.log('setLoginedList', users.map(u => u.username));
+        ReactSetLoginedList(users);
+        userDomStyle.reload(users);
+    }
+
+    console.log('!!!!!!!', loginedList.map(u => u.username));
 
     return (
         <editHeaderCtx.Provider value={{
@@ -113,12 +122,17 @@ export function EditHedaerProvider(props: React.PropsWithChildren<{ doc: DocInfo
             setLoginedList,
 
             addLoginedList(user) {
+                console.log(
+                    'addLoginedList', user.username);
                 setLoginedList( loginedList.concat(user) );
             },
+
             removeLoginedList(user) {
+                console.log(
+                    'removeLoginedList', user.username, loginedList.map(u => u.username));
                 setLoginedList(
-                    loginedList.filter(u => u.username !== user.username)
-                )
+                    loginedList.filter(
+                        u => u.username !== user.username));
             },
 
             msgs,

@@ -5,6 +5,7 @@ import { User } from "../../components/Login";
 import md5 = require("md5");
 import EventEmitter from "eventemitter3";
 import JSONStringify from "fast-json-stable-stringify"
+import { debounce } from "..";
 
 // @ts-ignore
 window.Delta = Delta;
@@ -34,6 +35,24 @@ export class WS extends EventEmitter {
 
     init() {
         const Parchment = Quill.import('parchment');
+
+        let composing = false;
+        
+        window.addEventListener('compositionstart', e => {
+            composing = true;
+        });
+
+        window.addEventListener('compositionend', e => {
+            composing = false;
+        });
+
+        this.q.on('editor-change', why => {
+            const f = this.q.getFormat();
+            if ((!f) || (f.author !== this.user.username)) {
+                this.q.format('author', this.user.username, 'silent');
+            }
+        });
+
         this.q.on('editor-change', why => {
             try {
                 if (why === 'silent') return;
@@ -55,9 +74,10 @@ export class WS extends EventEmitter {
                 }
 
                 if (why === 'selection-change' || why === 'text-change') {
-                    this.cursorChnage(index);
+                    this.cursorChnage(index, why);
                     this.emit('selection-change', index);
                 }
+                
             } catch (err) {
                 // 嗯
                 this.emit('selection-change', null);
@@ -69,7 +89,7 @@ export class WS extends EventEmitter {
 
     lastTimeLineCursor: number | null = null;
 
-    cursorChnage = (idx: number) => {
+    cursorChnage = (idx: number, why: string) => {
         if (idx === this.lastTimeLineCursor) {
             return;
         } else {
@@ -102,11 +122,6 @@ export class WS extends EventEmitter {
                 addition = addition.compose(delta);
                 // @ts-ignore
                 window.addition = addition;
-
-                // console.group('Onchange');
-                //  console.log('N', JSON.stringify(delta.ops));
-                //  console.log('P', JSON.stringify(oldDel.ops))
-                // console.groupEnd();
             }
         });
 
@@ -122,6 +137,9 @@ export class WS extends EventEmitter {
             addition = new Delta();
             
             isAwait = true;
+
+            
+
             this.socket.emit('updateContents', {
                 delta: toSend
             });

@@ -1,6 +1,9 @@
 import * as React from "react";
 import Quill from "quill";
+
 import { RouteComponentProps } from "react-router";
+// import { Blot } from 'parchment/dist/src/blot/abstract/blot';
+
 
 import "quill/dist/quill.snow.css";
 import "./edit.less";
@@ -15,8 +18,11 @@ import { WS } from "../../utils/WS";
 import { HoverInfo } from "../../components/HoverHandler";
 import { EditComments, editCommentsCtx } from "./EditComments";
 import { editHeaderCtx, EditHedaerProvider, EditHeader } from "./EditHeader";
-// import { Delta } from "edit-ot-quill-delta";
 
+// import { Delta } from "edit-ot-quill-delta";
+import { AuthorAttr } from "./Custom/AuthorColor";
+
+Quill.register(AuthorAttr);
 
 export type EditPageProps = RouteComponentProps<{
 	docId: string
@@ -33,12 +39,8 @@ export function EditPanel({ doc, user }: EditPanelProps) {
     const [q, setQ] = React.useState(null as null | Quill);
     const [ws, setWS] = React.useState(null as null | WS);
     const $input = React.useRef<HTMLInputElement>();
-    const [loginedUsers, setLoginedUsers] = React.useState([] as User[]);
     const [commentBtnPosition, setCommentBtnPosition] = React.useState(null as number | null);
     const [line, setLine] = React.useState(null as null | number);
-
-    const _editHeaderCtx = React.useContext(editHeaderCtx);
-    // const _editCommentsCtx = React.useContext(editCommentsCtx);
 
     React.useEffect(() => {
         const toolbarOptions = [
@@ -65,44 +67,11 @@ export function EditPanel({ doc, user }: EditPanelProps) {
             },
             theme: 'snow'  // or 'bubble'
         });
+        q.root.setAttribute('spellcheck', 'false');
 
         const ws = new WS(q, doc.id, user);
         // @ts-ignore
         window.ws = ws;
-
-        ws.socket.on('i-logined', data => {
-            // data.userInfo 是自己的信息, users 是目前在该文档下的用户
-            console.log('i-logined', data);
-            const user: User = data.userInfo;
-            const users: User[] = data.users;
-
-            _editHeaderCtx.pushMsg(`登录成功, 欢迎 ${user.username}, 目前有 ${ users.length } 人在编辑本文档`);
-            _editHeaderCtx.setLoginedList(users);
-
-            if (data.doc) {
-                // if (doc && doc.content) {
-                    if (data.doc.now) {
-                        console.log(data.doc.now, doc.content);
-                        q.setContents(data.doc.now, 'silent');
-                    }
-                    $input.current.value = doc.title;
-                // }
-            }
-
-            setTimeout(() => {
-                ws.init();
-            }, 50);
-
-            setLoginedUsers(users);
-        });
-
-        _editHeaderCtx.bus.on('say-hello', () => {
-            ws.socket.emit('say-hello', user);
-        });
-
-        ws.socket.on('say-hello', (theUser: User) => {
-            _editHeaderCtx.bus.emit('receive-hello', theUser);
-        });
 
         ws.socket.on('owner-change-title', (newTitle: string) => {
             if (doc.owner === user.username) return;
@@ -112,16 +81,7 @@ export function EditPanel({ doc, user }: EditPanelProps) {
 
         // q.setContents(JSON.parse(doc.content), 'silent');
 
-        ws.socket.on('others-joined', (others: User) => {
-            // 排除自己 
-            if (others.username === user.username) return;
-
-            console.log('others-joined', user);
-            const lu = loginedUsers.concat(user);
-            setLoginedUsers(lu);
-        });
-
-        ws.on('selection-change', (line: number | null) => {
+        ws.on('selection-change', (line: number | null) => {          
             if (line) {
                 setLine(line);
                 const s = q.getSelection();
@@ -150,6 +110,68 @@ export function EditPanel({ doc, user }: EditPanelProps) {
             ws.removeAllListeners();
         }
     }, []);
+
+    const _editHeaderCtx = React.useContext(editHeaderCtx);
+    React.useEffect(() => {
+        if (!ws) return;
+
+        ws.socket.on('others-joined', (others: User) => {
+            // 排除自己 
+            if (others.username === user.username) return;
+
+            console.log('others-joined', others);
+            _editHeaderCtx.addLoginedList(others)
+        });
+
+        ws.socket.on('others-exit', (user: User) => {
+            console.log('others-exit', user);
+            _editHeaderCtx.removeLoginedList(user);
+        });
+
+        ws.socket.on('i-logined', data => {
+            // data.userInfo 是自己的信息, users 是目前在该文档下的用户
+            console.log('i-logined', JSON.stringify(data));
+            const user: User = data.userInfo;
+            const users: User[] = data.users;
+
+            _editHeaderCtx.pushMsg(
+                `登录成功, 欢迎 ${user.username}, 目前有 ${ users.length } 人在编辑本文档`
+            );
+
+            _editHeaderCtx.setLoginedList(users);
+
+            if (data.doc) {
+                // if (doc && doc.content) {
+                    if (data.doc.now) {
+                        console.log(data.doc.now, doc.content);
+                        q.setContents(data.doc.now, 'silent');
+                    }
+                    $input.current.value = doc.title;
+                // }
+            }
+
+            setTimeout(() => {
+                ws.init();
+            }, 50);
+
+        });
+
+        ws.socket.on('say-hello', (theUser: User) => {
+            _editHeaderCtx.bus.emit('receive-hello', theUser);
+        });
+
+        _editHeaderCtx.bus.on('say-hello', () => {
+            ws.socket.emit('say-hello', user);
+        });
+
+        return () => {
+            ws.socket.off('others-joined');
+            ws.socket.off('others-exit');
+            ws.socket.off('i-logined');
+            ws.socket.off('say-hello');
+            _editHeaderCtx.bus.off('say-hello');
+        }
+    }, [ _editHeaderCtx ]);
 
     const saveAll = () => {
         if (!q) return;
