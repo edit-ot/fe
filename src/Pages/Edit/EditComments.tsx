@@ -73,23 +73,21 @@ export type LineCommentsProps = {
 
 
 export function LineComments(props: LineCommentsProps) {
-    const _editCommentsCtx = React.useContext(editCommentsCtx);
-
-    return (
+    return <editCommentsCtx.Consumer>{ ctx =>
         <div className="line-comments-main">
             { props.docc.comments.length !== 0 ?  
                 <div className="click-to-close" onClick={() => {
-                    _editCommentsCtx.removeDocComments(props.docc.line);
+                    ctx.removeDocComments(props.docc.line);
                 }}>点击此处结束此次讨论</div> : null
             }
             {
                 props.docc.comments.map((c, idx) => (
                     <LineComment {...c} key={ idx } />
-                    ))
-                }
+                ))
+            }
             <TypeComment onInput={ props.onInput } />
         </div>
-    )
+    }</editCommentsCtx.Consumer>
 }
 
 export type EditCommentsCtx = {
@@ -113,44 +111,6 @@ export function EditCommentsCtxProvider(props: EditCommentsCtxProviderProps) {
 
     const { q, ws, docId } = props;
     const _loginCtx = React.useContext(loginCtx);
-
-    React.useEffect(() => {
-        console.log('re get doccoments');
-        ws.socket.emit('get-docComments', docId);
-        ws.socket.once('reveive-docComments', dccs => setDocComments(dccs));
-
-        ws.socket.on('add-user-comment', data => {
-            console.log('on add-user-comment', data);
-            const comment = data.comment as UserComment;
-            const line = data.line as number;
-            if (comment.user.username === _loginCtx.user.username) return;
-            addCommentFor(line, comment, false);
-        });
-
-        return () => ws.socket.off('add-user-comment');
-    }, []);
-
-    React.useEffect(() => {
-        const addComment = idx => {
-            // console.log('docComments.length', docComments.length);
-            setDocComments(docComments.slice().concat({
-                line: idx,
-                comments: []
-            }));
-        }
-
-        ws.on('add-comment', addComment);
-
-        return () => ws.off('add-comment', addComment);
-    }, [ docComments ]);
-
-    React.useEffect(() => {
-        ws.socket.on('remove-doc-comments', line => {
-            removeDocComments(line, false);
-        });
-
-        return () => ws.socket.off('remove-doc-comments');
-    }, []);
 
     const addCommentFor = (line: number, comment: UserComment, isActive = true) => {
         const idx = docComments.findIndex(d => d.line === line);
@@ -188,6 +148,47 @@ export function EditCommentsCtxProvider(props: EditCommentsCtxProviderProps) {
             ws.socket.emit('remove-doc-comments', line);
         }
     }
+
+    React.useEffect(() => {
+        console.log('Re/Init Get Doccoments');
+        ws.socket.emit('get-docComments', docId);
+        ws.socket.once('reveive-docComments', dccs => setDocComments(dccs));       
+    }, []);
+
+    React.useEffect(() => {
+        ws.socket.on('add-user-comment', data => {
+            console.log('on add-user-comment', data);
+            const comment = data.comment as UserComment;
+            const line = data.line as number;
+            if (comment.user.username === _loginCtx.user.username) return;
+
+            addCommentFor(line, comment, false);
+        });
+
+        return () => ws.socket.off('add-user-comment');
+    }, [ docComments ])
+
+    React.useEffect(() => {
+        const addComment = idx => {
+            // console.log('docComments.length', docComments.length);
+            setDocComments(docComments.slice().concat({
+                line: idx,
+                comments: []
+            }));
+        }
+
+        ws.on('add-comment', addComment);
+
+        return () => ws.off('add-comment', addComment);
+    }, [ docComments ]);
+
+    React.useEffect(() => {
+        ws.socket.on('remove-doc-comments', line => {
+            removeDocComments(line, false);
+        });
+
+        return () => ws.socket.off('remove-doc-comments');
+    }, [ docComments ]);
     
     return (
         <editCommentsCtx.Provider value={{

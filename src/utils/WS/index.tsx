@@ -9,8 +9,9 @@ import JSONStringify from "fast-json-stable-stringify"
 
 // @ts-ignore
 window.Delta = Delta;
-// const _Delta: Delta = Quill.import('delta');
-// window.Delta = _Delta;
+
+// @ts-ignore
+window.IO = IO;
 
 const TICK_INTERVAL = 1500;
 
@@ -28,6 +29,7 @@ export class WS extends EventEmitter {
 
         const socket = IO(DEFAULT_URL, {
             query: { docId },
+            transports: ['websocket']
             // reconnection: false
         });
         this.socket = socket;

@@ -4,6 +4,7 @@ const express = require('express');
 
 const PORT = 1234;
 const SERVER_PORT = 5555;
+const IO_PORT = 5556;
 
 const bundler = new Bundler('src/index.html');
 const app = express();
@@ -21,7 +22,8 @@ app.use('/user-avatar', proxy({
 }));
 
 app.use('/socket.io', proxy({
-    target: `http://0.0.0.0:${ SERVER_PORT }`
+    target: `ws://0.0.0.0:${ IO_PORT }`,
+    ws: true
 }));
 
 

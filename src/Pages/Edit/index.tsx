@@ -56,7 +56,9 @@ export function EditPanel({ doc, user }: EditPanelProps) {
 
         const q = new Quill('#my-text-area', {
             modules: {
-                toolbar: `#my-toolbar`,
+                toolbar: {
+                    container: `#my-toolbar`,
+                }
                 // toolbar: [
                 //     [{ container: '#my-toolbar' }],
                 //     [{ header: [1, 2, false] }],
@@ -99,6 +101,13 @@ export function EditPanel({ doc, user }: EditPanelProps) {
                 setTimeout(() => setCommentBtnPosition(null), 50);
             }
         });
+
+        ws.on('disconnect', (why) => {
+            console.error('socket.io disconnect:', why);
+        });
+        ws.on('reconnect_attempt', to => {
+            console.log('reconnect_attempt:', to);
+        })
 
         setQ(q);
         setWS(ws);
@@ -155,7 +164,6 @@ export function EditPanel({ doc, user }: EditPanelProps) {
             setTimeout(() => {
                 ws.init();
             }, 50);
-
         });
 
         ws.socket.on('say-hello', (theUser: User) => {
@@ -173,7 +181,7 @@ export function EditPanel({ doc, user }: EditPanelProps) {
             ws.socket.off('say-hello');
             _editHeaderCtx.bus.off('say-hello');
         }
-    }, [ _editHeaderCtx ]);
+    }, [ _editHeaderCtx, ws ]);
 
     const saveAll = () => {
         if (!q) return;
@@ -230,7 +238,16 @@ export function EditPanel({ doc, user }: EditPanelProps) {
                         ])
                     }
                     <button className="ql-bold"></button>
-                    <button className="ql-align"></button>
+                    <button className="ql-italic"></button>
+                    <button className="ql-underline"></button>
+
+                    <span className="ql-formats">
+                        <button className="ql-align" value=""></button>
+                        <button className="ql-align" value="center"></button>
+                        <button className="ql-align" value="right"></button>
+                        {/* <button className="ql-align" value="justify"></button> */}
+                    </span>
+
                     <button className="ql-link"></button>
                     <button className="ql-image"></button>
 
