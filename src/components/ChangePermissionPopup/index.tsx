@@ -5,9 +5,9 @@ import { CreatePopupComponent, popupCtx } from "../../Ctx/Popup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faSearch, faCaretDown, faCopy, faCheckCircle, faQrcode } from "@fortawesome/free-solid-svg-icons";
 import { searchUser, delPermissionRemote, setPermissionRemote, togglePublic, mapDocToPubLink } from "./cpp-api";
-import { DocInfo } from "../../Pages/Home/Doc/doc-api";
+import { DocInfo, DocInfoWithPmap } from "../../Pages/Home/Doc/doc-api";
 import { loginCtx, User } from "../Login";
-import { getDocById } from "../../Pages/Edit/edit-api";
+import { getDocById, getDocWithPmapById } from "../../Pages/Edit/edit-api";
 import { UserLine } from "./UserLine";
 import { ToggleBtn } from "../ToggleBtn";
 import { MenuBtns } from "../MenuBtns";
@@ -57,13 +57,13 @@ export type ChangePermissionPopupProps = CreatePopupComponent<{
 }>
 
 export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
-    const [doc, setDoc] = React.useState(null as DocInfo | null);
+    const [doc, setDoc] = React.useState(null as DocInfoWithPmap | null);
     const [copySuccess, setCopySuccess] = React.useState(false);
 
     const _popupCtx = React.useContext(popupCtx);
 
     React.useEffect(() => {
-        getDocById(props.docId).then(setDoc);
+        getDocWithPmapById(props.docId).then(setDoc);
     }, []);
 
     const { user } = React.useContext(loginCtx);

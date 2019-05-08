@@ -1,5 +1,5 @@
 import { http } from "../../utils/http";
-import { DocInfo } from "../Home/Doc/doc-api";
+import { DocInfo, DocInfoWithPmap } from "../Home/Doc/doc-api";
 
 export function getDocById(docId: number) {
     return http.get<DocInfo>('/api/doc/byId', {
@@ -8,6 +8,17 @@ export function getDocById(docId: number) {
         return resp.code === 200 && resp.data ? 
             Promise.resolve(resp.data) : 
             Promise.reject(resp);
+    });
+}
+
+export function getDocWithPmapById(docId: number) {
+    return http.get<DocInfoWithPmap>('/api/doc/byId', {
+        withPmap: true,
+        docId
+    }).then(resp => {
+        return resp.code === 200 && resp.data ? 
+            Promise.resolve(resp.data) : 
+            Promise.reject(resp)
     });
 }
 
