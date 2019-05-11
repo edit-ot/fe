@@ -131,7 +131,7 @@ export function ChangePermissionPopup(props: ChangePermissionPopupProps) {
                 <span className="_search-icon">
                     <FontAwesomeIcon icon={ faSearch } />
                 </span>
-                <input ref={ $input } placeholder="搜索用户名" onChange={ onChange } />
+                <input ref={ $input } placeholder="搜索用户名或小组名" onChange={ onChange } />
             </div>
 
             { !doc && <div>Loading ...</div> }

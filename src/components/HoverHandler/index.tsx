@@ -1,8 +1,6 @@
 import * as React from "react";
 
 import "./hover-handler.less";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretUp } from "@fortawesome/free-solid-svg-icons";
 
 export type HoverHandleProps = React.PropsWithChildren<{
     hoverComponent: React.ReactNode,

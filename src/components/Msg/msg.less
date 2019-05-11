@@ -1,0 +1,51 @@
+@import (reference) "../../@ui/index.less";
+
+
+.msg-popup-main {
+    .std-popup-main(400px);
+
+    ._close {
+        position: absolute;
+        right: 50px;
+        top: 24px;
+        font-size: 24px;
+        height: 24px;
+        cursor: pointer;
+    }
+
+    .swicher-keys {
+        @gap: 9px;
+
+        border-bottom: 1px solid #CCC;
+        padding-bottom: @gap;
+        margin-bottom: @gap;
+
+        .switcher-item {
+            display: inline-block;
+            margin-right: @gap;
+            cursor: pointer;
+
+            opacity: .5;
+
+            &.active {
+                font-weight: bold;
+                opacity: 1;
+            }
+        }
+    }
+
+    .switcher-now {
+        min-height: 400px;
+    }
+
+
+    .no-info {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        width: 100%;
+        text-align: center;
+        color: #CCC;
+    }
+}
+

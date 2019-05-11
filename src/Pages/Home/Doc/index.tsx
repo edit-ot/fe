@@ -9,10 +9,9 @@ import "./doc.less";
 import { popupCtx } from "../../../Ctx/Popup/popup-ctx";
 import { GetInputPopup } from "../../../components/GetInputPopup";
 import { ChangePermissionPopup } from "../../../components/ChangePermissionPopup";
-import { getGroups, getJoinedGroups, linkDocGroup, unLinkDocGroup } from "../homeaside-api";
-import { SlideItem } from "../../../components/MenuBtns";
 
-
+// import { getGroups, getJoinedGroups, linkDocGroup, unLinkDocGroup } from "../homeaside-api";
+// import { SlideItem } from "../../../components/MenuBtns";
 
 export function Doc() {
     const _loginCtx = React.useContext(loginCtx);
@@ -107,7 +106,7 @@ export function DocMain({ docs, initDocs, onCreateDoc }: DocProps) {
                             }
                         }, {
                             // opened: true,
-                            name: '协作权限设置',
+                            name: '协作与分享',
                             onBtnClick() {
                                 _popupCtx.push(ChangePermissionPopup, {
                                     docId: doc.id
@@ -115,46 +114,6 @@ export function DocMain({ docs, initDocs, onCreateDoc }: DocProps) {
                                     style: { backgroundColor: 'rgba(0, 0, 0, .5)' }
                                 })
                             }
-                        }, {
-                            // opened: true,
-                            name: '分享到学习小组',
-                            inner: () => getAllGroup().then(lr => {
-                                    return lr.map(e => {
-                                        
-                                        return {
-                                            name: e.groupName,
-                                            onBtnClick() {
-                                                linkDocGroup(doc.id, e.groupId).then(() => {
-                                                    alert('分享成功');
-                                                }).catch(resp => {
-                                                    if (resp.code === 405) {
-                                                        alert(`该文档已添加至 ${ e.groupName }, 无需重复`);
-                                                    }
-                                                })
-                                            }
-                                        }
-                                    })
-                                })
-                        }, {
-                            name: '取消分享至学习小组', 
-                            inner: () => getAllGroup().then(lr => {
-                                return lr.map(e => {
-                                    return {
-                                        name: e.groupName, 
-                                        onBtnClick() {
-                                            unLinkDocGroup(doc.id, e.groupId).then(() => {
-                                                alert('取消分享成功');
-                                            }).catch(resp => {
-                                                if (resp.code === 403) {
-                                                    alert('权限不足，请联系文档所有者或组织管理员取消分享');
-                                                } else if (resp.code === 404) {
-                                                    alert('此文档已取消分享, 请勿重复');
-                                                }
-                                            })
-                                        }
-                                    }
-                                })
-                            })
                         }]} />
                 </div>
             )}

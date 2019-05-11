@@ -2,24 +2,24 @@ import * as React from "react";
 import "./popup-ctx.less";
 import { Popup, OutterProps } from "./Popup";
 
-const popup = new Popup();
+export const popup$ = new Popup();
 
 export const popupCtx = React.createContext(
-    popup
+    popup$
 );
 
 // @ts-ignore
-window.popup = popup;
+window.popup$ = popup$;
 
 export function PopupCtxWrap() {
     const [ popUps, setPopUps ] = React.useState([] as [React.ReactNode, OutterProps][]);
 
     React.useEffect(() => {
-        return popup.onPush(setPopUps);
+        return popup$.onPush(setPopUps);
     }, [ popUps ]);
 
     return (
-        <popupCtx.Provider value={ popup }>
+        <popupCtx.Provider value={ popup$ }>
             <div className="popup-main">{
                 popUps.map(([compo, outterProps], idx) => {
                     if (!outterProps.style) outterProps.style = {};
