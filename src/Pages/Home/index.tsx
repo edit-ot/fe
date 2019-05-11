@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 
 import "./home.less";
 import { HomeAside } from "./HomeAside";
-import { Doc } from "./Doc";
+import { DocPage } from "./Doc";
 import { Group } from "./Group";
 
 const ASIDE_WIDTH = '200px';
@@ -18,13 +18,13 @@ export function HomePage() {
                 <HomeAside />
             </Aside>
 
-            <div style={{ paddingLeft: ASIDE_WIDTH }}>
+            <div style={{ paddingLeft: ASIDE_WIDTH, height: window.innerHeight - 48 }}>
                 <div className="home-content">
                     <Route path="/home" exact component={() => 
                         <Redirect to="/home/docs" />
                     } />
 
-                    <Route path="/home/docs" component={ Doc } />
+                    <Route path="/home/docs" component={ DocPage } />
 
                     <Route path="/home/group/:groupId" component={ Group } />
 

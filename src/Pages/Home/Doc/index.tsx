@@ -1,122 +1,133 @@
-import * as React from "react";
-import { getDoc, DocInfo, createBlankDoc, deleteDoc, docRename, getAllGroup } from "./doc-api";
-import { NoDocs } from "../../../components/NoDocs";
-import { DocFile } from "./DocFile";
-import { CreateBtn } from "../../../components/NoDocs/CreateBtn";
-import { loginCtx } from "../../../components/Login";
-
 import "./doc.less";
-import { popupCtx } from "../../../Ctx/Popup/popup-ctx";
+import * as React from "react";
+import { DocFile } from "./DocFile";
+import { NoDocs } from "../../../components/NoDocs";
+import { loginCtx } from "../../../components/Login";
+import { popupCtx, popup$ } from "../../../Ctx/Popup/popup-ctx";
+import { CreateBtn } from "../../../components/NoDocs/CreateBtn";
 import { GetInputPopup } from "../../../components/GetInputPopup";
+import { ComponentSwitch } from "../../../components/ComponentSwitch";
 import { ChangePermissionPopup } from "../../../components/ChangePermissionPopup";
+import { getDoc, DocInfo, createBlankDoc, deleteDoc, docRename, cancelOthersShare, toRenameMyDoc, toDeleteMyDoc, toUnlinkDoc } from "./doc-api";
+import { SlideItem } from "../../../components/MenuBtns";
 
-// import { getGroups, getJoinedGroups, linkDocGroup, unLinkDocGroup } from "../homeaside-api";
-// import { SlideItem } from "../../../components/MenuBtns";
 
-export function Doc() {
+
+export type DocSourceProps = {
+    getDoc: (...args: any[]) => Promise< DocInfo[] >;
+    createDoc: () => Promise<any>;
+    noBtnMenu?: boolean;
+    getSlides: (doc: DocInfo) => SlideItem[]
+
+}
+
+export function DocPage() {
     const _loginCtx = React.useContext(loginCtx);
     const [docs, setDocs] = React.useState([] as DocInfo[]);
+    const [sharedDocs, setSharedDocs] = React.useState([] as DocInfo[]);
+    
+    const initDocs = () => getDoc().then(setDocs);
+    const initSharedDocs = () => getDoc(true).then(setSharedDocs);
 
-    const initDocs = () => {
-        getDoc()
-            .then(docs => docs && setDocs(docs))
-            .catch(console.error);
-    }
+    
+    React.useEffect(() => {
+        initDocs();
+        initSharedDocs();
+    },  [ _loginCtx.user ]);    
 
-    // 如果用户登录，也应该 initDocs
-    React.useEffect(initDocs,  [ _loginCtx.user ]);
+    const iCreated = (
+        <DocMain
+            key="i-created-doc-main"
+            docs={ docs }
+            onCreateDoc={ () => {
+                createBlankDoc().then(initDocs);
+            } }
+            getSlides={ (doc: DocInfo) => {
+                return [{
+                    name: '重命名',
+                    onBtnClick() {
+                        toRenameMyDoc(doc).then(initDocs);
+                    }
+                }, {
+                    name: '协作分享',
+                    onBtnClick() {
+                        popup$.push(ChangePermissionPopup, {
+                            docId: doc.id
+                        }, {
+                            style: { backgroundColor: 'rgba(0, 0, 0, .5)' }
+                        })
+                    }
+                }, {
+                    name: '删除',
+                    onBtnClick() {
+                        toDeleteMyDoc(doc).then(initDocs);
+                    }
+                }]
+            }}
+        />
+    );
 
-    const onCreateDoc = () => {
-        createBlankDoc().then(resp => {
-            if (resp.code === 200) {
-                initDocs();
-            } else {
-                console.error(resp);
-            }
-        }).catch(console.error);
-    }
+    const iShared = (
+        <DocMain
+            key="i-shared-doc-main"
+            docs={ sharedDocs }
+            getSlides={ (doc: DocInfo) => {
+                return [{
+                    name: '删除',
+                    onBtnClick() {
+                        toUnlinkDoc(doc).then(initSharedDocs);
+                    }
+                }]
+            }}
+        />
+    );
+
 
     return (
-        <DocMain docs={ docs }
-            initDocs={ initDocs }
-            onCreateDoc={ onCreateDoc } />
-    )
+        <div className="doc-page">
+            <ComponentSwitch configs={[{
+                name: '我创建的',
+                inner: iCreated
+            }, {
+                name: '共享给我的',
+                inner: iShared
+            }]} />
+        </div>
+    );
 }
 
 export type DocProps = {
-    docs: DocInfo[],
-    initDocs: () => void,
-    onCreateDoc: () => void,
+    docs: DocInfo[];
+    onCreateDoc?: () => void;
+    getSlides: (doc: DocInfo) => SlideItem[]
 }
 
-export function DocMain({ docs, initDocs, onCreateDoc }: DocProps) {
-    const _popupCtx = React.useContext(popupCtx);
-
-    const onDeleteDoc = doc => {
-        _popupCtx.push(GetInputPopup, {
-            title: `删除 '${ doc.title }' ?`,
-            confrimText: '删除',
-            cancelText: '取消',
-            pureConfirm: true,
-            onConfirm() {
-                deleteDoc(doc).then(resp => {
-                    if (resp.code === 200 && resp.data) {
-                        initDocs();
-                    } else {
-                        console.log('删除失败', resp);
-                    }
-                }).catch(console.error);
-            }
-        }, {
-            style: { backgroundColor: 'rgba(0, 0, 0, .5)' }
-        })
-    }
-
-    return docs.length === 0 ? <NoDocs onClick={ onCreateDoc } /> : (
+export function DocMain({
+    docs,
+    onCreateDoc,
+    getSlides
+}: DocProps) {
+    return docs.length === 0 ? (
+        <NoDocs onClick={ onCreateDoc } />
+    ) : (
         <div className="doc-main">
-            <div className="doc-menu">
-                <CreateBtn className="doc-menu-btn" onClick={ onCreateDoc }>新建</CreateBtn>
-            </div>
-            {docs.map((doc, idx) => 
-                <div className="doc-file-wrap" key={ idx }>
+            {docs.map((doc, idx) => {
+                const slides: SlideItem[] = getSlides(doc);
+
+                return <div className="doc-file-wrap" key={ idx }>
                     <DocFile doc={ doc }
                         // initVisible={ true }
-                        slides={[{
-                            name: '删除',
-                            onBtnClick: () => onDeleteDoc(doc)
-                        }, {
-                            name: '重命名',
-                            onBtnClick() {
-                                _popupCtx.push(GetInputPopup, {
-                                    title: '修改文件名',
-                                    onConfirm: input => {
-                                        docRename(doc, input).then(resp => {
-                                            if (resp.code === 200 && resp.data) {
-                                                initDocs()
-                                            } else {
-                                                console.error(resp);
-                                            }
-                                        })
-                                    },
-                                    checker: str => !!str,
-                                    errorInfo: '文件名请勿为空'
-                                }, {
-                                    style: { backgroundColor: 'rgba(0, 0, 0, .5)' }
-                                });
-                            }
-                        }, {
-                            // opened: true,
-                            name: '协作与分享',
-                            onBtnClick() {
-                                _popupCtx.push(ChangePermissionPopup, {
-                                    docId: doc.id
-                                }, {
-                                    style: { backgroundColor: 'rgba(0, 0, 0, .5)' }
-                                })
-                            }
-                        }]} />
+                        slides={ slides } />
                 </div>
-            )}
+            })}
+
+            {
+                onCreateDoc && (
+                    <div className="doc-menu">
+                        <CreateBtn className="doc-menu-btn" onClick={ onCreateDoc }>新建</CreateBtn>
+                    </div>
+                )
+            }
         </div>
     )
 }

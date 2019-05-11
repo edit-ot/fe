@@ -18,13 +18,15 @@ export type GetInputPopupProps = CreatePopupComponent<{
     onConfirm: (input: string) => any,
 
     mask?: boolean,
-    pureConfirm?: boolean
+    pureConfirm?: boolean,
+    introText?: string | React.ReactNode
 }>
 
 export function GetInputPopup(
     {
         title, confrimText, cancelText, onCancel, pop, mask,
-        placeholder, checker, onConfirm, errorInfo, pureConfirm
+        placeholder, checker, onConfirm, errorInfo, pureConfirm,
+        introText
     }: GetInputPopupProps
 ) {
     const [valid, setValid] = React.useState(true);
@@ -87,6 +89,10 @@ export function GetInputPopup(
                     }
                 </div>
             )}
+
+            {
+                pureConfirm && introText && <div className="intro-text">{ introText }</div>
+            }
             
             <div className="_btns">
                 <button className="_btn _confirm" type="submit">

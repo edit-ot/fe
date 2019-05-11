@@ -16,6 +16,8 @@ import { GeneralPermission } from "../../../components/GeneralPermissionProps";
 import { searchUser } from "../../../components/ChangePermissionPopup/cpp-api";
 import { CreateBtn } from "../../../components/NoDocs/CreateBtn";
 import { openManage } from "./group-util";
+import { DocInfo, toRenameMyDoc } from "../Doc/doc-api";
+import { SlideItem } from "../../../components/MenuBtns";
 
 
 export type GroupProps = RouteComponentProps<{
@@ -84,8 +86,28 @@ function RenderGroup(props: RenderGroupProps) {
     const { group, user, reInit } = props;
 
     const onCreateDoc = () => {
-        createDocForGroup(group.groupId)
-            .then(reInit);
+        createDocForGroup(group.groupId).then(reInit);
+    }
+
+    const getSlides = (doc: DocInfo) => {
+        const slides: SlideItem[] = [];
+
+        if (doc.owner === props.user.username) {
+            slides.push({
+                name: '您是创建者'
+            }, {
+                name: '重命名',
+                onBtnClick() {
+                    toRenameMyDoc(doc);
+                }
+            })
+        } else {
+            slides.push({
+                name: `由 ${doc.owner} 分享`
+            });
+        }
+
+        return slides;
     }
 
     return (
@@ -103,7 +125,9 @@ function RenderGroup(props: RenderGroupProps) {
                     {
                         group.docs && 
                             <DocMain
-                                docs={ group.docs } initDocs={ reInit } onCreateDoc={ onCreateDoc }
+                                onCreateDoc={ onCreateDoc }
+                                docs={ group.docs }
+                                getSlides={ getSlides }
                             />
                     }
                 </div>
