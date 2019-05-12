@@ -43,29 +43,20 @@ export function EditPanel({ doc, user }: EditPanelProps) {
     const [line, setLine] = React.useState(null as null | number);
 
     React.useEffect(() => {
-        const toolbarOptions = [
-            [{ container: 'my-toolbar' }],
-            [{ header: [1, 2, false] }],
-            ['bold', 'italic', 'underline'],
-            ['image', 'code-block'],
-            ['save']
-        ];
+        // const toolbarOptions = [
+        //     [{ container: 'my-toolbar' }],
+        //     [{ header: [1, 2, false] }],
+        //     ['bold', 'italic', 'underline'],
+        //     ['image', 'code-block'],
+        //     ['save']
+        // ];
 
-        // @ts-ignore
-        toolbarOptions.container = '#my-toolbar';
+        // // @ts-ignore
+        // toolbarOptions.container = '#my-toolbar';
 
         const q = new Quill('#my-text-area', {
             modules: {
-                toolbar: {
-                    container: `#my-toolbar`,
-                }
-                // toolbar: [
-                //     [{ container: '#my-toolbar' }],
-                //     [{ header: [1, 2, false] }],
-                //     ['bold', 'italic', 'underline'],
-                //     ['image', 'code-block'],
-                //     ['save']
-                // ],
+                toolbar: { container: `#my-toolbar` }
             },
             theme: 'snow'  // or 'bubble'
         });
@@ -116,13 +107,14 @@ export function EditPanel({ doc, user }: EditPanelProps) {
         window.q = q;
 
         return () => {
-            console.log('            EXITEXITEXITEXIT             ');
+            console.warn('RELOAD EDITPANEL');
             ws.socket.close();
             ws.removeAllListeners();
         }
     }, []);
 
     const _editHeaderCtx = React.useContext(editHeaderCtx);
+
     React.useEffect(() => {
         if (!ws) return;
 
@@ -139,6 +131,7 @@ export function EditPanel({ doc, user }: EditPanelProps) {
             _editHeaderCtx.removeLoginedList(user);
         });
 
+        
         ws.socket.on('i-logined', data => {
             // data.userInfo 是自己的信息, users 是目前在该文档下的用户
             console.log('i-logined', JSON.stringify(data));
@@ -165,6 +158,7 @@ export function EditPanel({ doc, user }: EditPanelProps) {
                 ws.init();
             }, 50);
         });
+        ws.socket.emit('i-login');
 
         ws.socket.on('say-hello', (theUser: User) => {
             _editHeaderCtx.bus.emit('receive-hello', theUser);

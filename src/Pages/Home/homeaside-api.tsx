@@ -13,6 +13,9 @@ export type Group = {
     // 主键
     groupId: string;
 
+    // introdution 
+    groupIntro: string;
+
     users: User[];
 
     // 所有者 id

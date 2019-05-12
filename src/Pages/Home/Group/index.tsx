@@ -18,6 +18,7 @@ import { CreateBtn } from "../../../components/NoDocs/CreateBtn";
 import { openManage } from "./group-util";
 import { DocInfo, toRenameMyDoc } from "../Doc/doc-api";
 import { SlideItem } from "../../../components/MenuBtns";
+import { NavLink } from "react-router-dom";
 
 
 export type GroupProps = RouteComponentProps<{
@@ -39,7 +40,9 @@ function GroupList(props: { group: Group, user: User, onPop: () => void }) {
         const isOwner = props.group.owner === innerUser.username;
         const isMe = user.username === innerUser.username;
         return (
-            <div className={cls('_user-line', {
+            <NavLink
+                to={`/user/${ innerUser.username }`}
+                className={cls('_user-line', {
                 '_owner': isOwner
             })} key={ idx }>
                 <img src={ innerUser.avatar } />
@@ -50,7 +53,7 @@ function GroupList(props: { group: Group, user: User, onPop: () => void }) {
                 ) : (
                     <span className="_right-text">小组成员 <FontAwesomeIcon icon={ faWalking } /></span>
                 ) }
-            </div>
+            </NavLink>
         )
     })
     return (
@@ -98,7 +101,7 @@ function RenderGroup(props: RenderGroupProps) {
             }, {
                 name: '重命名',
                 onBtnClick() {
-                    toRenameMyDoc(doc);
+                    toRenameMyDoc(doc).then(props.reInit);
                 }
             })
         } else {

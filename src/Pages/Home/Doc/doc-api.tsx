@@ -1,3 +1,4 @@
+import * as React from "react";
 import { http } from "../../../utils/http";
 import { UserPermissionMap } from "../../../components/ChangePermissionPopup/cpp-api";
 import { getGroups, getJoinedGroups } from "../homeaside-api";

@@ -1,4 +1,5 @@
 import { http } from "../../utils/http";
+import { Group } from "../../Pages/Home/homeaside-api";
 
 export type InputData = {
     [key: string]: string
@@ -9,6 +10,10 @@ export type User = {
     avatar: string;
     nickname: string;
     intro: string;
+}
+
+export type UserWithGroups = User & {
+    groups: Group[]
 }
 
 export function doLogin(data: InputData) {
@@ -23,6 +28,6 @@ export function doRegister(data: InputData) {
     return http.post<User>('/api/user/register', data);
 }
 
-export function getUserInfo() {
+export function getMyInfo() {
     return http.get<User>('/api/user/me');
 }

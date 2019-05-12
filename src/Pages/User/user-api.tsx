@@ -1,5 +1,5 @@
 import { http } from "../../utils/http";
-import { User } from "../../components/Login";
+import { UserWithGroups, User } from "../../components/Login";
 
 export function updateUserInfo(userInfo: Partial<User>) {
     return http.post<void>('/api/user/update', userInfo).then(resp => {
@@ -14,6 +14,14 @@ function getBlob(canvas: HTMLCanvasElement): Promise<Blob> {
         canvas.toBlob(b => {
             r(b);
         });
+    });
+}
+
+export function getUserInfo(username: string) {
+    return http.get<UserWithGroups>(`/api/user/info/${ username }`).then(resp => {
+        return resp.code === 200 ? 
+            Promise.resolve(resp.data) : 
+            Promise.reject(resp)
     });
 }
 

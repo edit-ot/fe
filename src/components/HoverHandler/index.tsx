@@ -4,12 +4,15 @@ import "./hover-handler.less";
 
 export type HoverHandleProps = React.PropsWithChildren<{
     hoverComponent: React.ReactNode,
+    className?: string,
     onClick?: () => void
 }>
 
 export function HoverHandler(props: HoverHandleProps) {
+    const clsn = 'hover-handler-main ' + (props.className || '');
+
     return (
-        <div className="hover-handler-main" onClick={ e => props.onClick && props.onClick() }>
+        <div className={ clsn } onClick={ e => props.onClick && props.onClick() }>
             { props.children }
 
             <div className="hover-info-hidden-one">
@@ -20,7 +23,7 @@ export function HoverHandler(props: HoverHandleProps) {
 }
 
 export type HoverInfoProps = React.PropsWithChildren<{
-    info: string,
+    info: React.ReactNode | string,
     onClick?: () => void
 }>
 

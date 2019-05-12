@@ -1,34 +1,41 @@
 import * as React from "react";
 import { RouteComponentProps } from "react-router";
-import { loginCtx } from "../../components/Login";
+import { loginCtx, User, UserWithGroups } from "../../components/Login";
 import { NavHeader } from "../../components/NavHeader";
 
 import "./user.less";
-import { HoverInfo } from "../../components/HoverHandler";
+import { HoverInfo, HoverHandler } from "../../components/HoverHandler";
 import { popupCtx, CreatePopupComponent } from "../../Ctx/Popup";
 import 'cropperjs/dist/cropper.css';
 import Cropper from 'cropperjs';
 import { GetInputPopup } from "../../components/GetInputPopup";
-import { updateUserInfo, uploadAvatar } from "./user-api";
-import { Link } from "react-router-dom";
+import { updateUserInfo, uploadAvatar, getUserInfo } from "./user-api";
+import { Link, NavLink } from "react-router-dom";
+import { Group } from "../Home/homeaside-api";
+import { Avatar } from "../../components/Avatar";
 
 export type UserPageProps = RouteComponentProps<{
 	username: string
 }>
 
 export function UserPage(props: UserPageProps) {
-    const _loginCtx = React.useContext(loginCtx);
     const { username } = props.match.params;
     
     return (
-        _loginCtx.user ? (
-            <div className="user-page-main">
-                <NavHeader />
-                
-                <UserPageNav />
-                <UserPanel />
-            </div>
-        ) : null
+        <loginCtx.Consumer>{ctx => 
+            ctx.user ? (
+                <div className="user-page-main">
+                    <NavHeader />
+                    <UserPageNav />
+                    { (ctx && ctx.user.username === username) ?
+                          <UserPanel /> :
+                          <UserHeader username={ username } />
+                    }
+                    
+                    
+                </div>
+            ) : null
+        }</loginCtx.Consumer>
     )
 }
 
@@ -36,6 +43,84 @@ export function UserPageNav() {
     return (
         <div className="user-page-nav">
             <Link to="/">首页</Link> &gt; 用户资料
+        </div>
+    )
+}
+
+export function UserHeader(props: { username: string }) {
+    const [user, setUser] = React.useState({
+        username: '加载中',
+        intro: '加载中'
+    } as UserWithGroups);
+
+    React.useEffect(() => {
+        getUserInfo(props.username).then(setUser);
+    }, []);
+
+    return (
+        <div className="user-page-inner">
+            <HoverInfo info={ user.username }>
+                <div className="avatar-username">
+                    <img src={ user.avatar || '' } />
+                    
+                    <div className="username">
+                        <div>{ user.username }</div>
+                    </div>
+                </div>
+            </HoverInfo>
+            <div className="_intro">{ user.intro || '该用户比较懒~ 暂时未设置个性签名' }</div>
+
+            { user.groups && <UserGroups user={ user } /> }
+        </div>
+    );
+}
+
+
+export function GroupDetail(props: { group: Group }) {
+    const { group } = props;
+    const { groupName, groupAvatar, groupIntro, groupId } = group;
+
+    return (
+        <div className="group-card-main">
+            <div className="group-card">
+                <div className="l">
+                    <Avatar text={ groupName } src={ groupAvatar } />
+                </div>
+
+                <div className="r">
+                    <div className="group-name">{ groupName }</div>
+                    <div className="group-intro">{ groupIntro || '该组所有者比较懒，还未写介绍' }</div>
+                </div>
+            </div>
+
+            <NavLink to={`/home/group/${ groupId }`} className="look-detail">查看详情</NavLink>
+        </div>
+    );
+}
+
+export function UserGroups(props: { user: UserWithGroups }) {
+    const list = props.user.groups.map(g => {
+        return (
+            <HoverHandler className="group-inner"
+                hoverComponent={ <GroupDetail group={ g } /> }
+                key={ g.groupId }>
+                <img src={ g.groupAvatar || '/default.png' } />                
+            </HoverHandler>
+        )
+    });
+
+    const noData = (
+        <div className="no-data">暂未加入任何小组</div>
+    )
+
+    return (
+        <div className="user-groups">
+            {/* <div className="group-title">Ta参与的小组</div> */}
+
+            <div>
+                { list.length ? list : noData }
+            </div>
+            {/* <div>{ JSON.stringify(props.user.groups) }</div> */}
         </div>
     )
 }
