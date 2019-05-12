@@ -48,6 +48,12 @@ export async function updateGroupInfo(groupId: string, groupName: string, groupI
         return resp.code === 200 ? 
             Promise.resolve(resp.data) : 
             Promise.reject(resp);
-    })
+    });
 }
 
+export function useTextAvatarRemote(groupId: string) {
+    return http.post<void>('/api/group/update-all', {
+        groupId,
+        groupAvatar: 'remove'
+    });
+}

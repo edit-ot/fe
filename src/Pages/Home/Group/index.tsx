@@ -22,6 +22,7 @@ import { NavLink } from "react-router-dom";
 import { HoverInfo } from "../../../components/HoverHandler";
 import { Avatar } from "../../../components/Avatar";
 import { globalBus } from "../../../utils/GlobalBus";
+import { GroupPunch } from "./GroupPunch";
 
 
 export type GroupProps = RouteComponentProps<{
@@ -58,7 +59,8 @@ function GroupList(props: { group: Group, user: User, onPop: () => void }) {
                 ) }
             </NavLink>
         )
-    })
+    });
+
     return (
         <div className="group-list">
             <div className="_g-l-t">
@@ -131,11 +133,10 @@ function RenderGroup(props: RenderGroupProps) {
                                 getSlides={ getSlides }
                             />
                     }
-
-                    <div className="_line">小组日历</div>
                 </div>
 
                 <div className="r">
+                    <GroupPunch group={ group } />
                     <GroupList group={ group } user={ user } onPop={() => {
                         reInit();
                     }} />

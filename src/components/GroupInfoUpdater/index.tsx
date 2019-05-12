@@ -6,7 +6,7 @@ import { Group } from "../../Pages/Home/homeaside-api";
 import { CreateBtn } from "../NoDocs/CreateBtn";
 import { Avatar } from "../Avatar";
 import { PreviewSelected } from "../../Pages/User";
-import { updateGroupInfo } from "./api";
+import { updateGroupInfo, useTextAvatarRemote } from "./api";
 import { globalBus } from "../../utils/GlobalBus";
 
 export type GroupInfoUpdaterProps = CreatePopupComponent<{
@@ -16,8 +16,9 @@ export type GroupInfoUpdaterProps = CreatePopupComponent<{
 export function GroupInfoUpdater(props: GroupInfoUpdaterProps) {
     const $name = React.createRef<HTMLInputElement>();
     const $intro = React.createRef<HTMLInputElement>();
-    const { group } = props;
+    const $file = React.createRef<HTMLInputElement>();
 
+    const [group, setGroup] = React.useState(props.group);
     const [groupName$, setGroupName$] = React.useState(group.groupName);
     const [groupIntro$, setGroupIntro$] = React.useState(group.groupIntro);
     const [cropped, setCropped] = React.useState(null as null | HTMLCanvasElement);
@@ -27,6 +28,7 @@ export function GroupInfoUpdater(props: GroupInfoUpdaterProps) {
         const intro = $intro.current.value;
 
         console.log('toSave', name, intro);
+
         updateGroupInfo(group.groupId, name, intro, cropped).then(g => {
             globalBus.emit('UpdateGroupInfo', {
                 groupName: g.groupName,
@@ -34,40 +36,48 @@ export function GroupInfoUpdater(props: GroupInfoUpdaterProps) {
                 groupAvatar: g.groupAvatar
             });
             props.pop();
+
+            // setGroup(g);
         });
+    }
+
+    const useTextAvatar = () => {
+        setCropped(null);
+
+        globalBus.emit('UpdateGroupInfo', {
+            groupAvatar: null
+        });
+
+        useTextAvatarRemote(group.groupId);
+
+        setGroup({ ...group, groupAvatar: null });
     }
 
     return (
         <div className="group-info-updater-main">
-            <input id="avatar" hidden type="file" onChange={ e => {
+            <input ref={ $file } hidden key={ Date.now() } id="avatar" type="file" onChange={e => {
                 if (e.target.files && e.target.files.length > 0) {
                     const reader = new FileReader();
-                    
                     reader.addEventListener("load", () =>
                         popup$.push(PreviewSelected, {
                             src: reader.result as string,
-                            ok(canvas: HTMLCanvasElement) {
-                                setCropped(canvas);
-                                // uploadAvatar(canvas).then(() => {
-                                //     loadUser();
-                                // })
-                            }
+                            ok: setCropped
                         }, { style: { background: 'rgba(0, 0, 0, .5)' } })
                     );
-                    
                     reader.readAsDataURL(e.target.files[0]);
+
+                    // $file.current.value = '';
                 }
-            } } />
+            }} />
 
             <h1>修改小组信息</h1>
 
             <div className="_item">
                 <p>小组头像</p>
                 
-                <label htmlFor="avatar" className="change-avatar">
+                <div className="change-avatar">
                     <div className="group-avatar-outter l">
-
-                        { 
+                        {
                             cropped ? 
                                 <Avatar text={ group.groupName } src={ cropped.toDataURL() } /> :
                                 <Avatar text={ group.groupName } src={ group.groupAvatar } />
@@ -75,9 +85,16 @@ export function GroupInfoUpdater(props: GroupInfoUpdaterProps) {
                     </div>
 
                     <div className="r">
-                        <div>点击此处修改</div>
+                        <label htmlFor="avatar" className="function-btn">点击此处修改</label>
+
+                        {
+                            (group.groupAvatar || cropped) ? 
+                                <div className="function-btn" onClick={ useTextAvatar }>
+                                    使用文本头像
+                                </div> : null
+                        }
                     </div>
-                </label>
+                </div>
             </div>
 
             <div className="_item">
@@ -90,8 +107,8 @@ export function GroupInfoUpdater(props: GroupInfoUpdaterProps) {
                 <input ref={ $intro } defaultValue={ groupIntro$ } />
             </div>
 
-            <div className="_btns" onClick={ toSave }>
-                <CreateBtn className="_btn">保存</CreateBtn>
+            <div className="_btns">
+                <CreateBtn className="_btn"  onClick={ toSave }>保存</CreateBtn>
                 <CreateBtn className="_btn _close" onClick={() => {
                     props.pop();
                 }}>关闭</CreateBtn>
@@ -99,4 +116,3 @@ export function GroupInfoUpdater(props: GroupInfoUpdaterProps) {
         </div>
     )
 }
-

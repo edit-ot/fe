@@ -40,7 +40,6 @@
     }
 
     .change-avatar {
-        cursor: pointer;
         display: flex;
         .l {
             margin-right: 20px;
@@ -50,10 +49,27 @@
             align-items: center;
             justify-content: center;
             width: 150px;
+            flex-wrap: wrap;
         }
         .group-avatar-outter {
             width: 100px;
             height: 100px;
+        }
+    }
+
+    .function-btn {
+        font-size: 80%;
+        cursor: pointer;
+        transition: all .3s;
+        padding: 6px 14px;
+        border-radius: 4px;
+
+        border: 1px solid #BBB;
+        color: #BBB;
+
+        &:hover {
+            border: 1px solid #555;
+            color: #555;
         }
     }
 }
