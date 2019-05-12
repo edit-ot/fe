@@ -1,6 +1,6 @@
 import * as React from "react";
 import { RouteComponentProps } from "react-router";
-import { loginCtx, User, UserWithGroups } from "../../components/Login";
+import { loginCtx, UserWithGroups } from "../../components/Login";
 import { NavHeader } from "../../components/NavHeader";
 
 import "./user.less";
@@ -10,9 +10,8 @@ import 'cropperjs/dist/cropper.css';
 import Cropper from 'cropperjs';
 import { GetInputPopup } from "../../components/GetInputPopup";
 import { updateUserInfo, uploadAvatar, getUserInfo } from "./user-api";
-import { Link, NavLink } from "react-router-dom";
-import { Group } from "../Home/homeaside-api";
-import { Avatar } from "../../components/Avatar";
+import { Link } from "react-router-dom";
+import { GroupCard } from "../../components/GroupCard";
 
 export type UserPageProps = RouteComponentProps<{
 	username: string
@@ -76,33 +75,13 @@ export function UserHeader(props: { username: string }) {
 }
 
 
-export function GroupDetail(props: { group: Group }) {
-    const { group } = props;
-    const { groupName, groupAvatar, groupIntro, groupId } = group;
 
-    return (
-        <div className="group-card-main">
-            <div className="group-card">
-                <div className="l">
-                    <Avatar text={ groupName } src={ groupAvatar } />
-                </div>
-
-                <div className="r">
-                    <div className="group-name">{ groupName }</div>
-                    <div className="group-intro">{ groupIntro || '该组所有者比较懒，还未写介绍' }</div>
-                </div>
-            </div>
-
-            <NavLink to={`/home/group/${ groupId }`} className="look-detail">查看详情</NavLink>
-        </div>
-    );
-}
 
 export function UserGroups(props: { user: UserWithGroups }) {
     const list = props.user.groups.map(g => {
         return (
             <HoverHandler className="group-inner"
-                hoverComponent={ <GroupDetail group={ g } /> }
+                hoverComponent={ <GroupCard group={ g } /> }
                 key={ g.groupId }>
                 <img src={ g.groupAvatar || '/default.png' } />                
             </HoverHandler>
