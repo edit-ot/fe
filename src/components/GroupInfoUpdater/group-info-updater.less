@@ -1,0 +1,60 @@
+@import (reference) "../../@ui/index.less";
+
+
+.group-info-updater-main {
+    .std-popup-main(400px);
+    padding-bottom: 40px;
+    ._item {
+        margin-bottom: 16px;  
+        p {
+            margin-bottom: 8px;
+            color: #AAA;
+        }
+        input {
+            padding: 6px;
+            width: 80%;
+        }
+    }
+
+    ._btns {
+        margin-top: 32px;
+        // font-size: 80%;
+
+        ._btn {
+            margin-right: 2em;
+            display: inline-block;
+            width: 4em;
+            text-align: center;
+        }
+
+        ._close {
+            background: #FFF;
+            color: #BBB;
+            border: 1px solid #BBB;
+
+            &:hover {
+                color: #222;
+                border: 1px solid #222;
+            }
+        }
+    }
+
+    .change-avatar {
+        cursor: pointer;
+        display: flex;
+        .l {
+            margin-right: 20px;
+        }
+        .r {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 150px;
+        }
+        .group-avatar-outter {
+            width: 100px;
+            height: 100px;
+        }
+    }
+}
+

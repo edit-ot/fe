@@ -21,6 +21,10 @@ app.use('/user-avatar', proxy({
     target: `http://0.0.0.0:${ SERVER_PORT }`
 }));
 
+app.use('/user-files', proxy({
+    target: `http://0.0.0.0:${ SERVER_PORT }`
+}));
+
 app.use('/socket.io', proxy({
     target: `ws://0.0.0.0:${ IO_PORT }`,
     ws: true

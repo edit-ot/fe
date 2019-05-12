@@ -15,7 +15,7 @@ import { faUserEdit, faWalking, faRunning } from "@fortawesome/free-solid-svg-ic
 import { GeneralPermission } from "../../../components/GeneralPermissionProps";
 import { searchUser } from "../../../components/ChangePermissionPopup/cpp-api";
 import { CreateBtn } from "../../../components/NoDocs/CreateBtn";
-import { openManage } from "./group-util";
+import { openManage, openGroupInfoUpdater } from "./group-util";
 import { DocInfo, toRenameMyDoc } from "../Doc/doc-api";
 import { SlideItem } from "../../../components/MenuBtns";
 import { NavLink } from "react-router-dom";
@@ -120,7 +120,7 @@ function RenderGroup(props: RenderGroupProps) {
                     <div className="_title">
                         { group.groupName }
                         <span className="fa-user-edit" onClick={ () => {
-                            openManage(_popupCtx, group);
+                            openGroupInfoUpdater(group);
                         } }>
                             <FontAwesomeIcon icon={ faUserEdit } />
                         </span>
