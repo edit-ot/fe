@@ -22,7 +22,7 @@ import { NavLink } from "react-router-dom";
 import { HoverInfo } from "../../../components/HoverHandler";
 import { Avatar } from "../../../components/Avatar";
 import { globalBus } from "../../../utils/GlobalBus";
-import { GroupPunch } from "./GroupPunch";
+import { GroupFunction } from "./GroupFunction";
 
 
 export type GroupProps = RouteComponentProps<{
@@ -136,7 +136,7 @@ function RenderGroup(props: RenderGroupProps) {
                 </div>
 
                 <div className="r">
-                    <GroupPunch group={ group } />
+                    <GroupFunction group={ group } />
                     <GroupList group={ group } user={ user } onPop={() => {
                         reInit();
                     }} />
