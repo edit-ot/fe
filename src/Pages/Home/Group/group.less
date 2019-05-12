@@ -1,12 +1,51 @@
+.group-info-main {
+    position: relative;
+    @IMGWIDTH: 100px;
+    @PADDING: 32px;
+    @IMG_RIGHT: 32px;
+
+    ._group-info {
+
+        border-bottom: 1px solid #d6d6d6;
+        box-sizing: border-box;
+        height: @PADDING + @PADDING + @IMGWIDTH;
+
+        line-height: 50px;
+
+        padding: @PADDING ;
+        padding-left: @PADDING + @IMGWIDTH + @IMG_RIGHT;
+
+        ._title {
+            padding-bottom: 4px;
+            margin-bottom: 4px;
+            width: 200px;
+            display: inline-block;
+            border-bottom: 1px solid #d6d6d6;
+            font-size: 24px;
+        }
+
+        .hover-info-main {
+            line-height: 1.5;
+            width: 100px;
+        }
+    }
+
+    ._avatar {
+        position: absolute;
+        left: @PADDING;
+        top: @PADDING;
+        width: @IMGWIDTH;
+        height: @IMGWIDTH;
+    }
+}
+
 .group-main {
     height: 100%;
     background: #F4F4F4;
 
-    ._title {
-        margin-left: 16px;
-        margin-top: 32px;
-        margin-bottom: 16px;
+    ._line {
         font-size: 24px;
+        padding: 16px 24px;
     }
 
     ._lr {
@@ -28,25 +67,24 @@
     }
 
     .fa-user-edit {
+        display: inline-block;
         margin-left: .5em;
         cursor: pointer;
     }
 
     .group-list {
         padding: 16px 16px 60px 16px;
-        border-left: 1px solid #BBB;
+        border-left: 1px solid #d6d6d6;
 
         ._g-l-t {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            // font-size: 24px;
             margin-bottom: 16px;
 
             ._add-btn {
                 font-size: 12px;
                 width: 6em;
-                // margin: 0 auto;
                 text-align: center;
             }
         }
@@ -59,9 +97,11 @@
                 position: relative;
                 box-sizing: border-box;
                 padding: 8px;
+
                 > * {
                     vertical-align: middle;
                 }
+
                 img {
                     border-radius: 2px;
                     margin-right: .5em;
@@ -70,12 +110,8 @@
                     height: 2em;
                 }
 
-                &._owner {
-                    
-                    // background-color: #BBB;
-
-                    
-                }
+                // &._owner {
+                // }
 
                 ._right-text {
                     position: absolute;

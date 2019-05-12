@@ -33,6 +33,7 @@ export function GroupInfoUpdater(props: GroupInfoUpdaterProps) {
                 groupIntro: g.groupIntro,
                 groupAvatar: g.groupAvatar
             });
+            props.pop();
         });
     }
 

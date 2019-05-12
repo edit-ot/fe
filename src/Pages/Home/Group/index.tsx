@@ -19,6 +19,9 @@ import { openManage, openGroupInfoUpdater } from "./group-util";
 import { DocInfo, toRenameMyDoc } from "../Doc/doc-api";
 import { SlideItem } from "../../../components/MenuBtns";
 import { NavLink } from "react-router-dom";
+import { HoverInfo } from "../../../components/HoverHandler";
+import { Avatar } from "../../../components/Avatar";
+import { globalBus } from "../../../utils/GlobalBus";
 
 
 export type GroupProps = RouteComponentProps<{
@@ -117,14 +120,9 @@ function RenderGroup(props: RenderGroupProps) {
         <div>
             <div className="_lr">
                 <div className="l">
-                    <div className="_title">
-                        { group.groupName }
-                        <span className="fa-user-edit" onClick={ () => {
-                            openGroupInfoUpdater(group);
-                        } }>
-                            <FontAwesomeIcon icon={ faUserEdit } />
-                        </span>
-                    </div>
+                    <GroupInfo group={ group } />
+
+                    <div className="_line">小组文件</div>
                     {
                         group.docs && 
                             <DocMain
@@ -133,6 +131,8 @@ function RenderGroup(props: RenderGroupProps) {
                                 getSlides={ getSlides }
                             />
                     }
+
+                    <div className="_line">小组日历</div>
                 </div>
 
                 <div className="r">
@@ -145,12 +145,51 @@ function RenderGroup(props: RenderGroupProps) {
     )
 }
 
+export function GroupInfo(props: { group: Group }) {
+    const { group } = props;
+
+    return (
+        <div className="group-info-main">
+            <div className="_group-info">
+                <div className="_title">
+                    { group.groupName }
+                </div>
+
+                <HoverInfo info="修改小组信息" className="fa-user-edit" onClick={() => {
+                    openGroupInfoUpdater(group);
+                }}>
+                    <FontAwesomeIcon icon={ faUserEdit } />                            
+                </HoverInfo>
+
+                <div className="_intro">
+                    { group.groupIntro || '该小组长比较懒，暂时没添加小组介绍' }
+                </div>
+            </div>
+
+            <div className="_avatar">
+                <Avatar text={ group.groupName } src={ group.groupAvatar } />
+            </div>
+        </div>
+    )
+}
+
 export function Group(props: GroupProps) {
     const _loginCtx = React.useContext(loginCtx);
     const _popupCtx = React.useContext(popupCtx);
 
     const [group, setGroup] = React.useState(null as null | Group);
     const [loading, setLoading] = React.useState(true);
+
+
+    React.useEffect(() => {
+        const patcher = (groupPatch: Partial<Group>) => {
+            setGroup(Object.assign({}, group, groupPatch));
+        }
+
+        globalBus.on('UpdateGroupInfo', patcher);
+
+        return () => globalBus.removeListener('UpdateGroupInfo', patcher);
+    }, [ group ]);
 
     const init = () => {
         setLoading(true);

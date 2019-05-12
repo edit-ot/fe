@@ -24,6 +24,7 @@ export function HoverHandler(props: HoverHandleProps) {
 
 export type HoverInfoProps = React.PropsWithChildren<{
     info: React.ReactNode | string,
+    className?: string,
     onClick?: () => void
 }>
 
@@ -35,7 +36,7 @@ export function HoverInfo(props: HoverInfoProps) {
     );
     
     return (
-        <HoverHandler hoverComponent={ hoverInfo } onClick={ props.onClick }>
+        <HoverHandler className={ props.className } hoverComponent={ hoverInfo } onClick={ props.onClick }>
             { props.children }
         </HoverHandler>
     )
