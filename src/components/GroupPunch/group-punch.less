@@ -3,4 +3,99 @@
 .group-punch-main {
     .std-popup-main(400px);
 
+    .check-in-btn {
+        cursor: pointer;
+        font-size: 28px;
+        position: absolute;
+        right: 50px;
+        top: 35px;
+
+        opacity: .75;
+
+        &:hover {
+            opacity: 1;
+        }
+
+        .hover-info-hidden-one {
+            width: 3em;
+        }
+    }
+
+    h1 {
+        position: relative;
+        
+        ._close {
+            position: absolute;
+            right: 0;
+            top: 0;
+            cursor: pointer;
+            font-size: 120%;
+        }
+    }
+
+    .punch-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        ._month {
+            font-size: 40px;
+        }
+    }
+
+    .punch-day {
+        position: relative;
+        @__WIDTH: 1.5em;
+        line-height: @__WIDTH;
+        width: @__WIDTH;
+        height: @__WIDTH;
+
+        padding: .2em;
+        border-radius: 100px;
+
+        &.punched {
+            color: #FFF;
+            
+            background: rgb(250, 88, 86);
+        }
+
+        &.today {
+            text-decoration: underline;
+        }
+    }
+
+    .close-btns {
+        cursor: pointer;
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translate(-50%, 40%);
+
+
+        ._btn {
+            color: #FFF;
+            font-size: 50px;
+            display: inline-block;
+            margin: 0 .5em;
+            
+            svg {
+                transition: all .3s;
+                border-radius: 100px;
+                box-shadow: 6px 6px #555;
+            }
+
+            &:hover {
+
+                svg {
+                    border-radius: 100px;
+                    box-shadow: 12px 4px #555;
+                }
+            }
+        }
+        
+
+        .hover-info-hidden-one {
+            width: 1.5em;
+        }
+    }
 }

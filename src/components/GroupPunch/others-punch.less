@@ -1,0 +1,51 @@
+@import (reference) "../../@ui/index.less";
+
+
+.others-punch-main {
+    .std-popup-main(400px);
+
+    h1 {
+        position: relative;
+        ._close {
+            position: absolute;
+            right: 0;
+            top: 0;
+            cursor: pointer;
+            font-size: 120%;
+        }
+    }
+
+
+    .others-punch-inner {
+        ._userline {
+            display: flex;
+            margin-bottom: 1em;
+            justify-content: space-between;
+            > * {
+                display: inline-block;
+                text-align: center;
+                width: 24%;
+
+            }
+
+            ._avatar {
+                width: 2em;
+                height: 2em;
+            }
+            
+            
+            &._header {
+                opacity: .5;
+            }
+
+            ._detail {
+                cursor: pointer;
+            }
+
+            .hover-info-hidden-one {
+                width: 6.2em;
+            }
+        }
+    }
+}
+

@@ -7,15 +7,19 @@ import "./group-function.less";
 import { popup$ } from "../../../Ctx/Popup";
 import { WordCard } from "../../../components/WordCard";
 import { GroupPunch } from "../../../components/GroupPunch";
+import { loginCtx } from "../../../components/Login";
 
 export type GroupFunctionProps = {
     group: Group
 }
 
 export function GroupFunction(props: GroupFunctionProps) {
+    const _loginCtx = React.useContext(loginCtx)
+
     const openPunch = () => {
         popup$.push(GroupPunch, {
-            groupId: props.group.groupId
+            groupId: props.group.groupId,
+            usernanme: _loginCtx.user.username
         }, {
             style: { background: 'rgba(0, 0, 0, .5)' }
         })

@@ -31,7 +31,12 @@ export function uploadAnImage(canvas: HTMLCanvasElement) {
     });
 }
 
-export async function updateGroupInfo(groupId: string, groupName: string, groupIntro: string, newImg?: HTMLCanvasElement | null) {
+export async function updateGroupInfo(
+    groupId: string,
+    groupName: string,
+    groupIntro: string,
+    newImg?: HTMLCanvasElement | null
+) {
     let groupAvatar;
 
     if (newImg) {
