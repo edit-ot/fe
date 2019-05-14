@@ -8,9 +8,11 @@ type CalendarData = CLine[];
 
 
 function CLine(props: { data: CLine, className?: string }) {
+    const _ = <span style={{ opacity: .4 }}>-</span>;
+
     const l = props.data.map((u, i) => {
         return (
-            <div className="c-item" key={ i }><div>{ (u === null) ? '-' : u }</div></div>
+            <div className="c-item" key={ i }><div>{ (u === null) ? _ : u }</div></div>
         )
     });
 
