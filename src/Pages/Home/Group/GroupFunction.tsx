@@ -5,9 +5,10 @@ import { faCalendar, faHatWizard, faHandPeace } from "@fortawesome/free-solid-sv
 
 import "./group-function.less";
 import { popup$ } from "../../../Ctx/Popup";
-import { WordCard } from "../../../components/WordCard";
+import { WordCard, openCard } from "../../../components/WordCard";
 import { GroupPunch } from "../../../components/GroupPunch";
 import { loginCtx } from "../../../components/Login";
+import { showCoCalendar } from "../../../components/CoCalendar";
 
 export type GroupFunctionProps = {
     group: Group
@@ -25,18 +26,6 @@ export function GroupFunction(props: GroupFunctionProps) {
         });
     }
 
-    const openCalendar = () => {
-        window.location.href = `/calendar/${ props.group.groupId }`;
-    }
-
-    const openCard = () => {
-        popup$.push(WordCard, {
-            group: props.group
-        }, {
-            style: { background: 'rgba(0, 0, 0, .5)' }
-        });
-    }
-
     return (
         <div className="group-function-main">
             <div className="calendar func" onClick={ openPunch }>
@@ -44,12 +33,12 @@ export function GroupFunction(props: GroupFunctionProps) {
                 <span>打卡</span>
             </div>
 
-            <div className="calendar func" onClick={ openCalendar }>
+            <div className="calendar func" onClick={ () => showCoCalendar(props.group) }>
                 <FontAwesomeIcon icon={ faCalendar } />
                 <span>小组日历</span>
             </div>
 
-            <div className="words func" onClick={ openCard }>
+            <div className="words func" onClick={ () => openCard(props.group) }>
                 <FontAwesomeIcon icon={ faHatWizard } />
                 <span>小组单词卡</span>
             </div>

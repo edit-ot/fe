@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import "./wordcard.less";
-import { CreatePopupComponent } from "../../Ctx/Popup";
+import { CreatePopupComponent, popup$ } from "../../Ctx/Popup";
 import { Group } from "../../Pages/Home/homeaside-api";
 import { WCWS } from "./WCWS";
 import { User } from "../Login";
@@ -48,7 +48,19 @@ export type WordCardProps = CreatePopupComponent<{
     group: Group
 }>;
 
-export function WordCardCtxWrap(props: React.PropsWithChildren<WordCardProps>) {
+export function openCard(group: Group) {
+    popup$.push(WordCard, {
+        group: group
+    }, {
+        style: { background: 'rgba(0, 0, 0, .5)' }
+    });
+}
+
+export type WordCardCtxWrapProps = React.PropsWithChildren<{
+    group: Group, use: string, path: string
+}>;
+
+export function WordCardCtxWrap(props: WordCardCtxWrapProps) {
     const [loading, setLoading] = React.useState(true);
     const [wcws, setWcws] = React.useState(null as null | WCWS);
     const [words, setWords] = React.useState([] as Word[]);
@@ -57,7 +69,7 @@ export function WordCardCtxWrap(props: React.PropsWithChildren<WordCardProps>) {
     const [msg, setMsg] = React.useState('');
 
     React.useEffect(() => {
-        const wcws = new WCWS(props.group);
+        const wcws = new WCWS(props.group, props.path, props.use);
         wcws.init();
         setWcws(wcws);
 
@@ -118,7 +130,7 @@ export function WordCard(props: WordCardProps) {
     );
 
     return (
-        <WordCardCtxWrap { ...props }>
+        <WordCardCtxWrap group={ props.group } path="/card" use="card">
             <wordCardCtx.Consumer>{ ctx => 
                 ctx.loading ? (
                     <div>加载中</div>
