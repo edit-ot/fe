@@ -18,13 +18,27 @@
 
     .wrods-line {
         margin-bottom: 1em;
+        user-select: none;
         
         .line {
+            cursor: pointer;
             display: inline-block;
             margin-right: .5em;
+            padding: 3px 8px;
+            border: 1px solid #CCC;
+            border-radius: 3px;
+
+            &.active {
+                font-weight: bold;
+            }
         }
 
         
+    }
+
+    .server-msg {
+        color: #AAA;
+        margin-bottom: 1em;
     }
     
 

@@ -7,6 +7,8 @@ import { wordCardCtx, Word } from "./index";
 import { Delta } from "edit-ot-quill-delta";
 import { FEditor } from "../../utils/WS/FEditor";
 import { loginCtx } from "../Login";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMagic } from "@fortawesome/free-solid-svg-icons";
 
 export function Card() {
     const _loginCtx = React.useContext(loginCtx);
@@ -109,9 +111,9 @@ export function Card() {
 
 
             { isAwait ? (
-                <div>同步中</div>
+                <div className="editor-info">同步中</div>
             ) : (
-                <div>同步完成</div>
+                <div className="editor-info">同步完成</div>
             ) }
         </div>
     )
@@ -125,7 +127,14 @@ export function Card() {
                 ) : (
                     info ? 
                         editor :
-                        <div>请选择</div>
+                        <div className="please-chooose">
+                            <div>
+                                <div className="_icon">
+                                    <FontAwesomeIcon icon={ faMagic } />
+                                </div>
+                                <div className="_text">请选择单词</div>
+                            </div>
+                        </div>
                 )
             }
         </div>

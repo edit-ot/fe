@@ -1,6 +1,31 @@
 .card-main {
+    @EDITOR-HEIGHT: 16px;
 
     #word-card {
         min-height: 200px;
+    }
+
+    .please-chooose {
+        display: flex;
+        height: 255px;
+        padding-bottom: @EDITOR-HEIGHT;
+        text-align: center;
+        color: #AAA;
+
+        justify-content: center;
+        align-items: center;
+
+        ._icon {
+            font-size: 200%;
+        }
+        
+        ._text {
+            margin-top: .5em;
+            font-size: 80%;
+        }
+    }
+
+    .editor-info {
+        line-height: @EDITOR-HEIGHT;
     }
 }

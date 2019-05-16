@@ -1,13 +1,13 @@
 import * as React from "react";
 
 import "./wordcard.less";
-import { CreatePopupComponent, popup$ } from "../../Ctx/Popup";
+import { CreatePopupComponent } from "../../Ctx/Popup";
 import { Group } from "../../Pages/Home/homeaside-api";
 import { WCWS } from "./WCWS";
 import { User } from "../Login";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { GetInputPopup } from "../GetInputPopup";
+import cls from "classnames";
 import { getInput } from "./$";
 import { Card } from "./Card";
 import { Delta } from "edit-ot-quill-delta";
@@ -37,6 +37,9 @@ export type WordCardCtx = {
 
     wcws: WCWS;
     setWcws: (w: WCWS) => void;
+
+    msg: string;
+    setMsg: (msg: string) => void;
 }
 
 export const wordCardCtx = React.createContext(null as null | WordCardCtx);
@@ -51,6 +54,8 @@ export function WordCardCtxWrap(props: React.PropsWithChildren<WordCardProps>) {
     const [words, setWords] = React.useState([] as Word[]);
     const [loginedUsers, setLoginedUsers] = React.useState([] as User[]);
 
+    const [msg, setMsg] = React.useState('');
+
     React.useEffect(() => {
         const wcws = new WCWS(props.group);
         wcws.init();
@@ -64,6 +69,8 @@ export function WordCardCtxWrap(props: React.PropsWithChildren<WordCardProps>) {
         wcws.socket.on('setWords', setWords);
 
         wcws.socket.emit('login');
+
+        wcws.socket.on('setMsg', setMsg);
 
         return () => {
             wcws.socket.removeAllListeners();
@@ -87,6 +94,8 @@ export function WordCardCtxWrap(props: React.PropsWithChildren<WordCardProps>) {
             wcws, setWcws,
             words, setWords, addWord, changeWordName,
             loginedUsers, setLoginedUsers,
+
+            msg, setMsg
         }}>
             { props.children }
         </wordCardCtx.Provider>
@@ -122,15 +131,23 @@ export function WordCard(props: WordCardProps) {
 }
 
 export function WordsLine() {
+    const [activePosi, setActivePosi] = React.useState(-1);
     const [editPosi, setEditPosi] = React.useState(-1);
     const _wordCardCtx = React.useContext(wordCardCtx);
     const $input = React.createRef<HTMLInputElement>();
 
     React.useEffect(() => {
         if (!$input.current) return;
+
         $input.current.focus();
 
         const blur = () => {
+            if (_wordCardCtx.words[editPosi].word
+                === $input.current.value) {
+                setEditPosi(-1);
+                return;
+            }
+
             _wordCardCtx.changeWordName(
                 _wordCardCtx.words[editPosi].id,
                 $input.current.value
@@ -141,9 +158,9 @@ export function WordsLine() {
         $input.current.addEventListener('blur', blur);
 
         return () => {
-            if ($input.current) {
-                $input.current.removeEventListener('blur', blur);
-            }
+            if (!$input.current) return;
+            
+            $input.current.removeEventListener('blur', blur);
         }
     }, [$input]);
 
@@ -151,7 +168,11 @@ export function WordsLine() {
         let signal = 0;
         let timer: NodeJS.Timeout;
         
-        const oneclk = () => _wordCardCtx.wcws.emit('chooseWord', w);
+        const oneclk = () => {
+            _wordCardCtx.wcws.emit('chooseWord', w);
+
+            setActivePosi(i);
+        }
         const twoclk = () => setEditPosi(i);
 
         const handle = () => {
@@ -166,10 +187,18 @@ export function WordsLine() {
         }
 
         return (
-            <div className="line" key={ i } onClick={ handle }>
+            <div className={cls('line', {
+                active: i === activePosi
+            })} key={ i } onClick={ handle }>
                 {
                     (i === editPosi) ? (
-                        <input ref={$input} defaultValue={w.word} />
+                        <input ref={$input} defaultValue={w.word}
+                            size={ w.word.length }
+                            style={{
+                                textAlign: 'center'
+                            }}
+                            // onClick={e => e.stopPropagation()}
+                            />
                     ) : w.word
                 }
             </div>
@@ -178,6 +207,7 @@ export function WordsLine() {
 
     return (
         <div className="wrods-line">
+            <div className="server-msg">{ _wordCardCtx.msg }</div>
             { lines }
 
             <div className="line" onClick={ () => {
