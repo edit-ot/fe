@@ -30,6 +30,8 @@ export type Group = {
     pmap: UserPermissionMap;
 
     permission: string;
+
+    card: string;
 }
 
 export function getGroup(groupId: string) {

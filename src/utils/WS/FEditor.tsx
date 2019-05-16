@@ -1,39 +1,38 @@
-import IO from "socket.io-client";
 import Quill from "quill";
 import { Delta } from "edit-ot-quill-delta";
 import { User } from "../../components/Login";
 import md5 = require("md5");
 import EventEmitter from "eventemitter3";
 import JSONStringify from "fast-json-stable-stringify"
-// import { debounce } from "..";
-
-// @ts-ignore
-window.Delta = Delta;
-
-// @ts-ignore
-window.IO = IO;
 
 const TICK_INTERVAL = 1500;
 
-const DEFAULT_URL = '/doc'
-
-export class WS extends EventEmitter {
+export class FEditor extends EventEmitter {
     socket: SocketIOClient.Socket;
     q: Quill;
     user: User;
+    subDocId: string;
 
-    constructor(q: Quill, docId: number, user: User) {
+    lastTimeLineCursor: number | null = null;
+    cursorChnage = (idx: number, why: string) => {
+        if (idx === this.lastTimeLineCursor) {
+            return;
+        } else {
+            console.log('Change Line Send');
+            this.socket.emit('change-line', {
+                idx
+            });
+            this.lastTimeLineCursor = idx;
+        }
+    }
+
+    constructor(q: Quill, user: User, subDocId: string, socket: SocketIOClient.Socket) {
         super();
+
         this.user = user;
         this.q = q;
-
-        const socket = IO(DEFAULT_URL, {
-            query: { docId },
-            transports: ['websocket']
-            // reconnection: false
-        });
-
         this.socket = socket;
+        this.subDocId = subDocId;
     }
 
     init() {
@@ -67,6 +66,7 @@ export class WS extends EventEmitter {
                 // find ancestor block blot
                 while (block.statics.blotName !== 'block' && block.parent)
                     block = block.parent;
+                
                 const root = block.parent; // assume parent of block is root
                 let cur;
                 const next = root.children.iterator();
@@ -89,44 +89,23 @@ export class WS extends EventEmitter {
         this.whenTextChange();
     }
 
-    lastTimeLineCursor: number | null = null;
-
-    cursorChnage = (idx: number, why: string) => {
-        if (idx === this.lastTimeLineCursor) {
-            return;
-        } else {
-            console.log('Change Line Send');
-            this.socket.emit('change-line', {
-                idx
-            });
-            this.lastTimeLineCursor = idx;
-        }
-    }
-
     whenTextChange() {
-        // let counter = 0;
         let nowDocDelta = this.q.getContents();
-
         let addition = new Delta();
 
-        // @ts-ignore
-        window.addition = addition;
-
-        // @ts-ignore
-        window.nowDocDelta = nowDocDelta;
-
+        // window.addition = addition;
+        // window.nowDocDelta = nowDocDelta;
         this.q.on('text-change', (delta, oldDel, source) => {
             if (source === 'api') {
                 console.log("An API call triggered this change.");
             } else if (source === 'user') {
                 // @ts-ignore
                 addition = addition.compose(delta);
-                // @ts-ignore
-                window.addition = addition;
             }
         });
 
         let isAwait = false;
+        this.emit('isAwait', isAwait);
         let toSend: Delta;
         // 5 s
         const send = () => {
@@ -136,13 +115,15 @@ export class WS extends EventEmitter {
 
             toSend = addition;
             addition = new Delta();
+
+            console.log('FEditor send', toSend);
             
             isAwait = true;
-
-            
+            this.emit('isAwait', isAwait);
 
             this.socket.emit('updateContents', {
-                delta: toSend
+                delta: toSend,
+                subDocId: this.subDocId
             });
             // setTimeout(send, 3000);
 
@@ -155,11 +136,13 @@ export class WS extends EventEmitter {
 
                 if (remoteHash === localHash) {
                     isAwait = false;
+                    this.emit('isAwait', isAwait);
                     nowDocDelta = nextDocDelta;
                 } else {
                     if (md5(JSONStringify(nowDocDelta)) === remoteHash) {
                         console.info('finishUpdate: Hash Equal To nowDocDelta, Also OK');
                         isAwait = false;
+                        this.emit('isAwait', isAwait);
                     } else {
                         console.error('finishUpdate: Local/Remote Hash Not Equal');
                         console.log(' - local ', localHash, JSONStringify(nextDocDelta));
@@ -168,6 +151,8 @@ export class WS extends EventEmitter {
                         console.log(' - nowDocDelta  ', JSONStringify(nowDocDelta));
                         console.log(' - tosendDelta  ', JSONStringify(toSend));
                         console.log(' - nextDocDelta ', JSONStringify(nextDocDelta));
+
+                        this.emit('update-hash-error');
                     }
                 }
             });
@@ -176,7 +161,8 @@ export class WS extends EventEmitter {
         setInterval(send, TICK_INTERVAL);
 
         this.socket.on('update', data => {
-            console.group('update');
+            console.group('Update');
+
             const delta = new Delta(data.delta);
             const contentHash = data.contentHash as string;
 
@@ -191,9 +177,6 @@ export class WS extends EventEmitter {
             const localHash = md5(JSONStringify(nextDocDelta));
 
             if (localHash !== contentHash) {
-                // isAwait = false;
-                // 有锅哦
-                // @Error !!!
                 console.error('update: Local/Remote Hash Not Equal');
                 console.log(' - local ', localHash);
                 console.log(' - remote', contentHash);
@@ -201,25 +184,21 @@ export class WS extends EventEmitter {
                 console.log(' - nowDocDelta  ', JSONStringify(nowDocDelta));
                 console.log(' - updateDelta  ', JSONStringify(delta));
                 console.log(' - nextDocDelta ', JSONStringify(nextDocDelta));
-                
+
+                this.emit('update-hash-error');
             } else {
                 console.info('OK: Hash Check');
                 nowDocDelta = nextDocDelta;
                 this.q.updateContents(delta);
             }
 
-            // if (isAwait) {
-            //     const update = toSend.transform(delta, false);
-            //     this.q.updateContents(update);
-            // } else {
-            //     this.q.updateContents(delta);
-            //     this.socket.emit('update-ok');
-            // }
-            
             console.groupEnd();
         });
     }
-}
 
-// @ts-ignore
-window.md5 = md5;
+    destroy() {
+        this.removeAllListeners();
+        this.socket.removeEventListener('update');
+        this.socket.removeEventListener('finishUpdate');
+    }
+}

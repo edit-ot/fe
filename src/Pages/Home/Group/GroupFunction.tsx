@@ -22,16 +22,16 @@ export function GroupFunction(props: GroupFunctionProps) {
             usernanme: _loginCtx.user.username
         }, {
             style: { background: 'rgba(0, 0, 0, .5)' }
-        })
+        });
     }
 
     const openCalendar = () => {
-        window.location.href = `/calendar/${ props.group.groupId }`
+        window.location.href = `/calendar/${ props.group.groupId }`;
     }
 
     const openCard = () => {
         popup$.push(WordCard, {
-            groupId: props.group.groupId
+            group: props.group
         }, {
             style: { background: 'rgba(0, 0, 0, .5)' }
         });
