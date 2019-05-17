@@ -1,4 +1,8 @@
 .doc-file-main {
+    @PADDING-RIGHT: 4px;
+    padding-right: @PADDING-RIGHT;
+    padding-top: @PADDING-RIGHT;
+    padding-bottom: @PADDING-RIGHT;
     font-size: 14px;
     position: relative;
     display: inline-block;
@@ -15,7 +19,7 @@
     .fa-cog-icon {
         display: inline-block;
         position: absolute;
-        right: 0;
+        right: @PADDING-RIGHT;
         top: 0;
     }
 
@@ -31,5 +35,11 @@
         span {
             margin-right: .5em;
         }
+    }
+
+    &._active {
+        // border: 1px solid #BBB;
+        background: #DBDBDB;
+        border-radius: 3px;
     }
 }

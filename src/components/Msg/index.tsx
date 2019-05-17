@@ -4,8 +4,9 @@ import { popupCtx, popup$, CreatePopupComponent } from "../../Ctx/Popup";
 import "./msg.less";
 import { ComponentSwitch } from "../ComponentSwitch";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { getNotification, Msg } from "./msg-api";
+import { faTimes, faEnvelopeOpenText, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { getNotification, Msg, setReadRemote } from "./msg-api";
+import cls from "classnames";
 
 export type MsgPopupProps = CreatePopupComponent<{}>;
 
@@ -32,21 +33,53 @@ export function MsgPopup(props: MsgPopupProps) {
     )
 }
 
+type NotificationItem = {
+    text: string;
+    url?: string;
+}
+
 function Notification() {
     const [msgs, setMsgs] = React.useState([] as Msg[]); 
 
-    React.useEffect(() => {
-        getNotification().then(arg => {
-            setMsgs(arg);
-        });        
-    }, []);
+    const init = () => {
+        getNotification().then(setMsgs);
+    }
+
+    React.useEffect(init, []);
+
+    const list = msgs.map(m => {
+        const ni = JSON.parse(m.jsonData || '{}') as NotificationItem;
+
+        return (
+            <div key={ m.msgId } className={cls('one-notification', {
+                'unread': !m.isRead
+            })} onClick={() => {
+                setReadRemote(m).then(init);
+                ni.url && window.open(ni.url);
+            }}>
+                <div className="_icon">
+                    <FontAwesomeIcon icon={ faEnvelopeOpenText } />
+                </div>
+                <div className="_text">
+                    <div className="_noti">消息</div>
+                    <div className="_noti-text">{ ni.text }</div>
+                </div>
+
+                <div className="_to-right">
+                    <FontAwesomeIcon icon={ faChevronRight } />
+                </div>
+            </div>
+        );
+    })
 
     return (
-        <div>{
+        <div className="notifications">{
             msgs.length === 0 ? (
                 <div className="no-info">暂无通知</div>
             ) : (
-                <div>msgs</div>
+                <div>
+                    { list }
+                </div>
             )
         }</div>
     )

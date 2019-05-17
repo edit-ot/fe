@@ -38,6 +38,7 @@ export function DocPage() {
 
     const iCreated = (
         <DocMain
+            activeDocId={ getNowPageQuery().activeDocId || '_' }
             key="i-created-doc-main"
             docs={ docs }
             onCreateDoc={ () => {
@@ -70,6 +71,7 @@ export function DocPage() {
 
     const iShared = (
         <DocMain
+            activeDocId={ getNowPageQuery().activeDocId || '_' }
             key="i-shared-doc-main"
             docs={ sharedDocs }
             getSlides={ (doc: DocInfo) => {
@@ -102,13 +104,15 @@ export function DocPage() {
 export type DocProps = {
     docs: DocInfo[];
     onCreateDoc?: () => void;
-    getSlides: (doc: DocInfo) => SlideItem[]
+    getSlides: (doc: DocInfo) => SlideItem[];
+    activeDocId: string;
 }
 
 export function DocMain({
     docs,
     onCreateDoc,
-    getSlides
+    getSlides,
+    activeDocId
 }: DocProps) {
     return docs.length === 0 ? (
         <NoDocs onClick={ onCreateDoc } />
@@ -119,6 +123,7 @@ export function DocMain({
 
                 return <div className="doc-file-wrap" key={ idx }>
                     <DocFile doc={ doc }
+                        activeDocId={ activeDocId }
                         // initVisible={ true }
                         slides={ slides } />
                 </div>

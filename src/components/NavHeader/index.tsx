@@ -38,7 +38,10 @@ export function NavHeader() {
             <div className="to-right"> 
                 <span className={cls("navlink msg-info", {
                     'has-unread': hasUnRead
-                })} onClick={ OpenMsgWindow }>
+                })} onClick={ () => {
+                    setHasUnRead(false);
+                    OpenMsgWindow();
+                } }>
                     <FontIcon icon="icon-xiaoxi1" />
                 </span>
 

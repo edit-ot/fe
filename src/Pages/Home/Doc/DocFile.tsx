@@ -4,19 +4,22 @@ import { NavLink } from "react-router-dom";
 import { date2str } from "../../../utils/date2str";
 import { faFile, faCog } from '@fortawesome/free-solid-svg-icons'; 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
+import cls from "classnames";
 import "./doc-file.less";
 import { MenuBtns, SlideItem } from "../../../components/MenuBtns";
 
 export type DocFileProps = {
-    doc: DocInfo,
-    slides: SlideItem[],
-    initVisible?: boolean
+    doc: DocInfo;
+    slides: SlideItem[];
+    initVisible?: boolean;
+    activeDocId: string;
 }
 
-export function DocFile({ doc, slides, initVisible }: DocFileProps) {
+export function DocFile({ doc, slides, initVisible, activeDocId }: DocFileProps) {
     return (
-        <NavLink className="doc-file-main" to={`/edit/${ doc.id }`}>
+        <NavLink className={cls('doc-file-main', {
+            '_active': (+activeDocId) === doc.id
+        })} to={`/edit/${ doc.id }`}>
             <div>
                 <div className="_left">
                     <FontAwesomeIcon icon={ faFile } />

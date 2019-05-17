@@ -20,5 +20,9 @@ export function getNotification() {
     });
 }
 
+export function setReadRemote(msg: Msg) {
+    return http.post$<void>('/api/msg/has-been-read', msg);
+}
+
 
 
