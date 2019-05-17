@@ -2,18 +2,19 @@ import * as React from "react";
 
 import "./file.less";
 import { FileItem } from "../../components/GroupInfoUpdater/api";
-import { getFilesRemote, uploadAnFile } from "./file-api";
+import { getFilesRemote, uploadAnFile, deleteFileRemote } from "./file-api";
 import { MIMETYPE_ICON_MAP, getMIMEIcon } from "./MIME-TYPE";
 import { HoverInfo } from "../../components/HoverHandler";
 import { getKey } from "../../components/CoCalendar/DayList";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faLongArrowAltDown, faEye, faMagic } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faLongArrowAltDown, faEye, faMagic, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { popup$ } from "../../Ctx/Popup";
 import { PreviewSelected } from "../User";
 import { toPreviewFile } from "./PreviewFile";
 // import { ComponentSwitch } from "../../components/ComponentSwitch";
 
 export type FilePageCtx = {
+    initFiles: () => void;
     files: FileItem[];
     setFiles: (files: FileItem[]) => void;
     addFile: (file: FileItem) => void;
@@ -28,9 +29,11 @@ export function FilePage() {
     const [theFile, setTheFile] = React.useState(null as FileItem);
     const [files, setFiles] = React.useState([] as FileItem[]);
 
-    React.useEffect(() => {
+    const initFiles = () => {
         getFilesRemote().then(setFiles);
-    }, []);
+    }
+
+    React.useEffect(initFiles, []);
 
     const addFile = (file: FileItem) => {
         setFiles(files.concat(file));
@@ -38,6 +41,7 @@ export function FilePage() {
 
     return (
         <filePageCtx.Provider value={{
+            initFiles,
             files, setFiles, addFile,
 
             theFile, setTheFile
@@ -59,7 +63,6 @@ function RenderFiles(props: { files: FileItem[] }) {
     
     return (
         <div className="file-page">
-            
             <input hidden id="file-upload" type="file" onChange={e => {
                 if (e.target.files && e.target.files.length > 0) {
                     const file = e.target.files[0];
@@ -124,6 +127,13 @@ function FileDetail() {
                         window.open(ctx.theFile.URL);
                     }}>
                         <FontAwesomeIcon icon={ faLongArrowAltDown } />
+                    </HoverInfo>
+                    <HoverInfo className="_icon" info="删除" onClick={() => {
+                        window.confirm('你确定吗？') && 
+                            deleteFileRemote(ctx.theFile).then(ctx.initFiles) && 
+                            ctx.setTheFile(null);
+                    }}>
+                        <FontAwesomeIcon icon={ faTrashAlt } />
                     </HoverInfo>
                 </div>
             </div>

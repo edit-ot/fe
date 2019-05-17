@@ -50,5 +50,17 @@ export const http = {
     }
 }
 
+export function getNowPageQuery(): { [key: string]: string } {
+    if (location.search) {
+        return location.search.slice(1).split('&').reduce((acc, cur) => {
+            const [l, r] = cur.split('=');
+            acc[l] = r;
+            return acc;
+        }, {});
+    } else {
+        return {};
+    }
+}
+
 //@ts-ignore
 window.http = http;

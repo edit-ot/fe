@@ -10,6 +10,7 @@ import { ComponentSwitch } from "../../../components/ComponentSwitch";
 import { ChangePermissionPopup } from "../../../components/ChangePermissionPopup";
 import { getDoc, DocInfo, createBlankDoc, deleteDoc, docRename, cancelOthersShare, toRenameMyDoc, toDeleteMyDoc, toUnlinkDoc } from "./doc-api";
 import { SlideItem } from "../../../components/MenuBtns";
+import { getNowPageQuery } from "../../../utils/http";
 
 
 
@@ -82,10 +83,12 @@ export function DocPage() {
         />
     );
 
-
     return (
         <div className="doc-page">
-            <ComponentSwitch configs={[{
+            <ComponentSwitch initPosi={
+                getNowPageQuery().tab ? 
+                    (+getNowPageQuery().tab) : 0
+            } configs={[{
                 name: '我创建的',
                 inner: iCreated
             }, {

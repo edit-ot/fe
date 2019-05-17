@@ -8,11 +8,12 @@ export type SwitchConfig = {
 type Switcher = (position: number) => void;
 
 export type ComponentSwitchProps = {
-    configs: SwitchConfig[]
+    configs: SwitchConfig[],
+    initPosi?: number
 }
 
 export function ComponentSwitch(props: ComponentSwitchProps) {
-    const [position, setPosition] = React.useState(0);
+    const [position, setPosition] = React.useState(props.initPosi || 0);
 
     const config = props.configs[position];
 

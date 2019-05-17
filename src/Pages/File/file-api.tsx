@@ -16,3 +16,6 @@ export function uploadAnFile(file: File) {
     });
 }
 
+export function deleteFileRemote(file: FileItem) {
+    return http.post$<FileItem>('/api/user/delete-file', file);
+}
