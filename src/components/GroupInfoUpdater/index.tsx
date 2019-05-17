@@ -18,6 +18,7 @@ export function GroupInfoUpdater(props: GroupInfoUpdaterProps) {
     const $intro = React.createRef<HTMLInputElement>();
     const $file = React.createRef<HTMLInputElement>();
 
+    const [fileName, setFileName] = React.useState(null);
     const [group, setGroup] = React.useState(props.group);
     const [groupName$, setGroupName$] = React.useState(group.groupName);
     const [groupIntro$, setGroupIntro$] = React.useState(group.groupIntro);
@@ -29,7 +30,7 @@ export function GroupInfoUpdater(props: GroupInfoUpdaterProps) {
 
         console.log('toSave', name, intro);
 
-        updateGroupInfo(group.groupId, name, intro, cropped).then(g => {
+        updateGroupInfo(group.groupId, name, intro, fileName, cropped).then(g => {
             globalBus.emit('UpdateGroupInfo', {
                 groupName: g.groupName,
                 groupIntro: g.groupIntro,
@@ -58,15 +59,18 @@ export function GroupInfoUpdater(props: GroupInfoUpdaterProps) {
             <input ref={ $file } hidden key={ Date.now() } id="avatar" type="file" onChange={e => {
                 if (e.target.files && e.target.files.length > 0) {
                     const reader = new FileReader();
+                    const n = e.target.files[0].name;
+
                     reader.addEventListener("load", () =>
                         popup$.push(PreviewSelected, {
                             src: reader.result as string,
-                            ok: setCropped
+                            ok: canvas => {
+                                setCropped(canvas);
+                                setFileName(n);
+                            }
                         }, { style: { background: 'rgba(0, 0, 0, .5)' } })
                     );
                     reader.readAsDataURL(e.target.files[0]);
-
-                    // $file.current.value = '';
                 }
             }} />
 

@@ -1,0 +1,44 @@
+@import (reference) "../../@ui/index.less";
+
+.preview-file-main {
+    .std-popup-main(500px);
+
+    min-height: 200px;
+
+    img {
+        max-width: 500px;
+    }
+
+    .close-btns {
+        cursor: pointer;
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translate(-50%, 40%);
+        ._btn {
+            color: #FFF;
+            font-size: 50px;
+            display: inline-block;
+            margin: 0 .5em;
+            
+            svg {
+                transition: all .3s;
+                border-radius: 100px;
+                box-shadow: 6px 6px #555;
+            }
+
+            &:hover {
+
+                svg {
+                    border-radius: 100px;
+                    box-shadow: 12px 4px #555;
+                }
+            }
+        }
+        
+
+        .hover-info-hidden-one {
+            width: 1.5em;
+        }
+    }
+}

@@ -25,11 +25,12 @@ export function getUserInfo(username: string) {
     });
 }
 
-export function uploadAvatar(canvas: HTMLCanvasElement) {
+export function uploadAvatar(fileName: string, canvas: HTMLCanvasElement) {
     return getBlob(canvas).then(blob => {
         const data = new FormData();
         // data.append('name', 'image');
         data.append('file', blob);
+        data.append('fileName', fileName);
 
         return http.post('/api/user/avatar', data, {
             headers: { 'Content-Type' : 'multipart/form-data' }

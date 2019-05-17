@@ -124,7 +124,7 @@ function RenderGroup(props: RenderGroupProps) {
                 <div className="l">
                     <GroupInfo group={ group } />
 
-                    <div className="_line">小组文件</div>
+                    <div className="_line">小组文档</div>
                     {
                         group.docs && 
                             <DocMain

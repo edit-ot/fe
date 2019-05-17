@@ -163,16 +163,15 @@ export function UserPanel() {
             <input id="_file" style={{ visibility: 'hidden' }} type="file" onChange={ e => {
                 if (e.target.files && e.target.files.length > 0) {
                     const reader = new FileReader();
-                    
+                    const n = e.target.files[0].name;
                     reader.addEventListener("load", () =>
                         _popup.push(PreviewSelected, {
                             src: reader.result as string,
                             ok(canvas: HTMLCanvasElement) {
                                 setCropped(canvas);
-                                uploadAvatar(canvas).then(() => {
+                                uploadAvatar(n, canvas).then(() => {
                                     loadUser();
                                 })
-
                             }
                         }, { style: { background: 'rgba(0, 0, 0, .5)' } })
                     );

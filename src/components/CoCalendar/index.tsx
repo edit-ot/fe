@@ -4,7 +4,7 @@ import "./co-calendar.less";
 import { CreatePopupComponent, popup$ } from "../../Ctx/Popup";
 import { Group } from "../../Pages/Home/homeaside-api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faTimes, faCalendarAlt } from "@fortawesome/free-solid-svg-icons";
 import { WordCardCtxWrap, wordCardCtx } from "../WordCard";
 import { DayList, DayListCtxWrap, dayListCtx } from "./DayList";
 import { CalendarEditor } from "./CalendatEditor";
@@ -33,6 +33,7 @@ export function CoCalendar(props: CoCalendarProps) {
                     ) : (
                         <div className="co-calendar-main">
                             <h1>日历
+                                <span className="_calendar"><FontAwesomeIcon icon={ faCalendarAlt } /></span>
                                 <div className="_msg">{ ctx.msg }</div>
                                 <div className="_close" onClick={ props.pop }>
                                     <FontAwesomeIcon icon={ faTimes } />

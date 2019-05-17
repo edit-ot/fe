@@ -8,6 +8,7 @@ import { HomeAside } from "./HomeAside";
 import { DocPage } from "./Doc";
 import { Group } from "./Group";
 import { PlayGround } from "./PlayGround";
+import { FilePage } from "../File";
 
 const ASIDE_WIDTH = '200px';
 
@@ -31,11 +32,7 @@ export function HomePage() {
 
                     <Route path="/home/group/:groupId" component={ Group } />
 
-                    
-
-                    <Route path="/home/files" component={ () => (
-                        <div>wenjian</div>
-                    )} />
+                    <Route path="/home/files" component={ FilePage } />
                 </div>
             </div>
         </div>

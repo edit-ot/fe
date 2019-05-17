@@ -14,12 +14,17 @@ export type FileItem = {
     fileId: string;
     URL: string;
     owner: string;
+    type: string;
+    cratedAt: Date;
+    fileName: string;
+    size: number;
 }
 
-export function uploadAnImage(canvas: HTMLCanvasElement) {
+export function uploadAnImage(fileName: string, canvas: HTMLCanvasElement) {
     return getBlob(canvas).then(blob => {
         const data = new FormData();
         data.append('file', blob);
+        data.append('fileName', fileName);
 
         return http.post<FileItem>('/api/user/upload-file', data, {
             headers: { 'Content-Type' : 'multipart/form-data' }
@@ -35,12 +40,13 @@ export async function updateGroupInfo(
     groupId: string,
     groupName: string,
     groupIntro: string,
+    fileName: string,
     newImg?: HTMLCanvasElement | null
 ) {
     let groupAvatar;
 
     if (newImg) {
-        const f = await uploadAnImage(newImg);
+        const f = await uploadAnImage(fileName, newImg);
         groupAvatar = f.URL;
     }
     
