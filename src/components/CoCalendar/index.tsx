@@ -8,6 +8,8 @@ import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { WordCardCtxWrap, wordCardCtx } from "../WordCard";
 import { DayList, DayListCtxWrap, dayListCtx } from "./DayList";
 import { CalendarEditor } from "./CalendatEditor";
+import { User } from "../Login";
+import { HoverInfo } from "../HoverHandler";
 
 export function showCoCalendar(group: Group) {
     popup$.push(CoCalendar, {
@@ -38,12 +40,32 @@ export function CoCalendar(props: CoCalendarProps) {
                             </h1>
 
                             <CoCalendarInner />
+
+                            <LoginedUsers users={ ctx.loginedUsers } />
                         </div>
                     )   
                 }</DayListCtxWrap>
             }</wordCardCtx.Consumer>
         </WordCardCtxWrap>
     )
+}
+
+function LoginedUsers(props: { users: User[] }) {
+
+    const $$ = props.users.map((u, i) => {
+        return (
+            <HoverInfo className="_user" key={ i } info={ u.username }
+                onClick={() => {
+                    window.open('/user/' + u.username);
+                }}>
+                <img src={ u.avatar } />
+            </HoverInfo>
+        )
+    });
+
+    return (
+        <div className="_users">{ $$ }</div>
+    );
 }
 
 export function CoCalendarInner() {
