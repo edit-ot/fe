@@ -1,5 +1,120 @@
 @import (reference) "../../@ui/index.less";
 
 .co-calendar-main {
-    .std-popup-main(600px);
+    .std-popup-main(650px);
+
+    .co-calendar-inner {
+        .day-list-main {
+            user-select: none;
+            position: relative;
+
+            // &::after {
+            //     content: "";
+            //     position: absolute;
+            //     bottom: -10px;
+            //     left: 50%;
+            //     width: 20px;
+            //     border: 1px solid #DDD;
+            //     transform: translateX(-50%);
+            // }
+
+            ._top {
+                text-align: center;
+                font-size: 20px;
+            }
+
+            ._to-r { right: 0; }
+            ._to-l { left: 0; }
+
+            ._to-l, ._to-r {
+                top: 0;
+                width: 1em;
+                height: 100%;
+                display: flex;
+                cursor: pointer;
+                font-size: 32px;
+                position: absolute;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .day-list {
+                overflow: hidden;
+                position: relative;
+                width: 560px;
+                height: 80px;
+                margin: 0 auto;
+                font-size: 0;
+                text-align: center;
+                white-space: nowrap;
+                
+                > div {
+                    width: 5em;
+                    position: absolute;
+                    font-size: 16px;
+                    display: inline-block;
+                    transform: translateX(-50%);
+                    transition: all .3s;
+                }
+
+                .one-day {
+                    cursor: pointer;
+                    display: flex;
+                    justify-content: center;
+                    align-content: center;
+                    align-items: center;
+                    width: 5em;
+                    height: 5em;
+
+                    > div {
+                        text-align: center;
+                        ._month {
+                            font-size: 50%;
+                            color: #AAA;
+                        }
+                        ._date {
+                            font-size: 200%;
+                        }
+                        ._work {
+                            font-size: 50%;
+                            color: #AAA;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    .please-chooose {
+        display: flex;
+        height: 255px;
+        // padding-bottom: @EDITOR-HEIGHT;
+        text-align: center;
+        color: #AAA;
+
+        justify-content: center;
+        align-items: center;
+
+        ._icon {
+            font-size: 200%;
+        }
+        
+        ._text {
+            margin-top: .5em;
+            font-size: 80%;
+        }
+
+        ._add {
+            cursor: pointer;
+            background: #555;
+            color: #DDD;
+            padding: 2px 0;
+            border-radius: 4px;
+        }
+    }
+
+    #calendar-quill {
+        min-height: 200px;
+    }
 }

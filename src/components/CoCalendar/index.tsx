@@ -6,6 +6,8 @@ import { Group } from "../../Pages/Home/homeaside-api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { WordCardCtxWrap, wordCardCtx } from "../WordCard";
+import { DayList, DayListCtxWrap, dayListCtx } from "./DayList";
+import { CalendarEditor } from "./CalendatEditor";
 
 export function showCoCalendar(group: Group) {
     popup$.push(CoCalendar, {
@@ -20,26 +22,25 @@ export type CoCalendarProps = CreatePopupComponent<{
 }>;
 
 export function CoCalendar(props: CoCalendarProps) {
-    const content = (
-        <div className="word-card-main">
-            <h1>日历
-                <div className="_close" onClick={ props.pop }>
-                    <FontAwesomeIcon icon={ faTimes } />
-                </div>
-
-                <CoCalendarInner />
-            </h1>
-        </div>
-    );
-
     return (
         <WordCardCtxWrap { ...props } use="calendar" path="/calendar">
             <wordCardCtx.Consumer>{ ctx => 
-                ctx.loading ? (
-                    <div>加载中</div>
-                ) : (
-                    content
-                )
+                <DayListCtxWrap wordCardCtx={ ctx }>{
+                    ctx.loading ? (
+                        <div>加载中</div>
+                    ) : (
+                        <div className="co-calendar-main">
+                            <h1>日历
+                                <div className="_msg">{ ctx.msg }</div>
+                                <div className="_close" onClick={ props.pop }>
+                                    <FontAwesomeIcon icon={ faTimes } />
+                                </div>
+                            </h1>
+
+                            <CoCalendarInner />
+                        </div>
+                    )   
+                }</DayListCtxWrap>
             }</wordCardCtx.Consumer>
         </WordCardCtxWrap>
     )
@@ -47,6 +48,10 @@ export function CoCalendar(props: CoCalendarProps) {
 
 export function CoCalendarInner() {
     return (
-        <div>CoCalendarInner</div>
-    )
+        <div className="co-calendar-inner">
+            <DayList />
+            {/* { JSON.stringify(ctx.words) } */}
+            <CalendarEditor />
+        </div>
+    );
 }

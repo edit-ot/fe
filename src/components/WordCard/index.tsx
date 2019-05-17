@@ -25,6 +25,7 @@ export type WordMap = {
 
 export type WordCardCtx = {
     words: Word[];
+    wordMap: WordMap;
     setWords: (ws: Word[]) => void;
     addWord: (wordStr: string) => void;
     changeWordName: (wordId: string, word: string) => void;
@@ -40,6 +41,8 @@ export type WordCardCtx = {
 
     msg: string;
     setMsg: (msg: string) => void;
+
+    
 }
 
 export const wordCardCtx = React.createContext(null as null | WordCardCtx);
@@ -64,6 +67,8 @@ export function WordCardCtxWrap(props: WordCardCtxWrapProps) {
     const [loading, setLoading] = React.useState(true);
     const [wcws, setWcws] = React.useState(null as null | WCWS);
     const [words, setWords] = React.useState([] as Word[]);
+    const [wordMap, setWordMap] = React.useState({} as WordMap);
+    
     const [loginedUsers, setLoginedUsers] = React.useState([] as User[]);
 
     const [msg, setMsg] = React.useState('');
@@ -100,14 +105,23 @@ export function WordCardCtxWrap(props: WordCardCtxWrapProps) {
         });
     }
 
+    React.useEffect(() => {
+        setWordMap(words.reduce((acc, w) => {
+            acc[w.word] = w;
+            return acc;
+        }, {} as WordMap));
+    }, [ words ]);
+
     return (
         <wordCardCtx.Provider value={{
             loading, setLoading,
             wcws, setWcws,
-            words, setWords, addWord, changeWordName,
+            words, setWords, addWord, changeWordName, wordMap,
             loginedUsers, setLoginedUsers,
 
-            msg, setMsg
+            msg, setMsg,
+
+            
         }}>
             { props.children }
         </wordCardCtx.Provider>
