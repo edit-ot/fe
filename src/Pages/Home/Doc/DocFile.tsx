@@ -12,7 +12,7 @@ export type DocFileProps = {
     doc: DocInfo;
     slides: SlideItem[];
     initVisible?: boolean;
-    activeDocId: string;
+    activeDocId?: string;
 }
 
 export function DocFile({ doc, slides, initVisible, activeDocId }: DocFileProps) {

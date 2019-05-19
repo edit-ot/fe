@@ -105,7 +105,7 @@ export type DocProps = {
     docs: DocInfo[];
     onCreateDoc?: () => void;
     getSlides: (doc: DocInfo) => SlideItem[];
-    activeDocId: string;
+    activeDocId?: string;
 }
 
 export function DocMain({

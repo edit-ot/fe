@@ -17,12 +17,13 @@ export function NavHeader() {
 
     React.useEffect(() => {
         msgConnect.socket.emit('msg-login');
-        msgConnect.socket.on('msg-read-state-change', data => {
-            console.log('msg-read-state-change', data);
-            setHasUnRead(data.hasUnRead);
-        });
 
-        return () => msgConnect.socket.off('msg-read-state-change');
+        const $$ = data => {
+            setHasUnRead(data.hasUnRead);
+        }
+        msgConnect.socket.on('msg-read-state-change', $$);
+
+        return () => msgConnect.socket.removeListener('msg-read-state-change', $$);
     }, []);
 
     return (

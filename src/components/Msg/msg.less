@@ -104,6 +104,46 @@
                 transform: translateY(-50%);
             }
 
+            ._req-btns {
+                margin-top: 16px;
+                display: block;
+
+                button {
+                    border-radius: 3px;
+                    opacity: .9;
+                    cursor: pointer;
+                    border: none;
+                    padding: 4px 18px;
+                    margin-right: 16px;
+
+                    &:hover { opacity: 1; }
+                    &:focus { outline: none; }
+                    &:active { transform: scale(.9); }
+                }
+
+                .to-resolve {
+                    background: #555;
+                    color: #FFF;
+                }
+
+                .to-reject {
+                    background: #DDD;
+                    color: #222;
+
+                    &:hover {
+                        color: #F55;
+                    }
+                }
+
+                .to-delete {
+                    margin-left: 16px;
+                }
+
+                &._finish {
+                    color: #BBB;
+                }
+            }
+
             &.unread {
                 ._noti {
                     position: relative;

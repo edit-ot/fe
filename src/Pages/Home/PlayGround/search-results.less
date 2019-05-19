@@ -39,4 +39,56 @@
             color: #D55;
         }
     }
+
+    ._results {
+        
+
+        > div {
+            margin-bottom: 16px;
+            padding-left: 16px;
+        }
+
+        .the-lines {
+            position: relative;
+            margin-bottom: 48px;
+            border: 1px solid #d6d6d6;
+            padding: 24px 16px;
+
+            ._title {
+                position: absolute;
+                top: 0;
+                
+                background: rgb(240, 240, 240);
+                height: 16px;
+                transform: translateY(-50%);
+
+                font-size: 80%;
+                color: #BBB;
+                margin-bottom: 8px;
+                padding: 0 16px;
+            }
+
+            ._no-data {
+                text-align: center;
+                color: #BBB;
+                padding: 75px 0;
+            }
+
+            &::before {
+                
+            }
+
+            &._users::before {
+                content: '相关用户'
+            }
+
+
+            .the-line {
+                display: inline-block;
+                margin-right: 2em;
+
+                
+            }
+        }
+    }
 }

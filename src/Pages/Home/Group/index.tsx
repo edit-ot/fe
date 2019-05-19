@@ -8,12 +8,10 @@ import { NoDocs } from "../../../components/NoDocs";
 import { loginCtx, User } from "../../../components/Login";
 import { popupCtx } from "../../../Ctx/Popup";
 import { DocMain } from "../Doc";
-import { createDocForGroup, cancelShare, setPermissionRemote } from "./group-api";
+import { createDocForGroup, cancelShare, setPermissionRemote, sendGroupPermissionReq } from "./group-api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserEdit, faWalking, faRunning } from "@fortawesome/free-solid-svg-icons";
 
-import { GeneralPermission } from "../../../components/GeneralPermissionProps";
-import { searchUser } from "../../../components/ChangePermissionPopup/cpp-api";
 import { CreateBtn } from "../../../components/NoDocs/CreateBtn";
 import { openManage, openGroupInfoUpdater } from "./group-util";
 import { DocInfo, toRenameMyDoc } from "../Doc/doc-api";
@@ -23,6 +21,8 @@ import { HoverInfo } from "../../../components/HoverHandler";
 import { Avatar } from "../../../components/Avatar";
 import { globalBus } from "../../../utils/GlobalBus";
 import { GroupFunction } from "./GroupFunction";
+import { ErrInfo } from "../../../components/ErrInfo";
+import { msgConnect } from "../../../utils/WS/MsgConnect";
 
 
 export type GroupProps = RouteComponentProps<{
@@ -65,10 +65,13 @@ function GroupList(props: { group: Group, user: User, onPop: () => void }) {
         <div className="group-list">
             <div className="_g-l-t">
                 <span>小组成员列表</span>
-                <CreateBtn className="_add-btn"
-                    onClick={() => openManage(_popupCtx, props.group, props.onPop)}>
-                    成员管理
-                </CreateBtn>            
+
+                { (user.username === props.group.owner) ? (
+                    <CreateBtn className="_add-btn"
+                        onClick={() => openManage(_popupCtx, props.group, props.onPop)}>
+                        成员管理
+                    </CreateBtn>
+                ) : null}
             </div>
             <div className="member-list">
                 { list }
@@ -180,7 +183,17 @@ export function Group(props: GroupProps) {
 
     const [group, setGroup] = React.useState(null as null | Group);
     const [loading, setLoading] = React.useState(true);
+    const [code, setCode] = React.useState(200);
 
+    React.useEffect(() => {
+        const $$ = () => {
+            console.log('group msg read state change');
+            init();
+        }
+        msgConnect.socket.on('msg-read-state-change', $$);
+        return () => msgConnect.socket.removeListener(
+            'msg-read-state-change', $$);
+    }, []);
 
     React.useEffect(() => {
         const patcher = (groupPatch: Partial<Group>) => {
@@ -193,30 +206,46 @@ export function Group(props: GroupProps) {
     }, [ group ]);
 
     const init = () => {
+        setCode(200);
         setLoading(true);
         getGroup(props.match.params.groupId)
             .then(setGroup)
-            .then(() => setLoading(false));
+            .then(() => setLoading(false))
+            .catch(resp => {
+                setCode(resp.code);
+            })
     }
 
-    React.useEffect(init, [ _loginCtx.user, props ])
+    React.useEffect(init, [ _loginCtx.user, props ]);
+
+    const content = loading ? (
+        <div>加载登录中</div>
+    ) : (
+        group ? (
+            <loginCtx.Consumer>{ctx => 
+                <RenderGroup group={ group } user={ ctx.user } reInit={ init } />
+            }</loginCtx.Consumer>
+        ) : (
+            <NoDocs text="未找到这个学习小组，请检查 URL" />
+        )
+    );
 
     return (
         <div className="group-main">
-        
             {
-                loading ? (
-                    <div>加载登录中</div>
-                ) : (
-                    group ? (
-                        <loginCtx.Consumer>{ctx => 
-                            <RenderGroup group={ group } user={ ctx.user } reInit={ init } />
-                        }</loginCtx.Consumer>
-                    ) : (
-                        <NoDocs text="未找到这个学习小组，请检查 URL" />
-                    )
+                (code === 200) ? content : (
+                    <ErrInfo title="访问权限">
+                        <CreateBtn className="request-permission" onClick={() => {
+                            sendGroupPermissionReq(props.match.params.groupId).then(() => {
+                                alert('已发起申请');
+                            }).catch(() => {
+                                alert('你上次申请过，请稍等');
+                            })
+                        }}>申请加入</CreateBtn>
+                    </ErrInfo>
                 )
             }
         </div>
     )
 }
+

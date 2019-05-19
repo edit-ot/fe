@@ -46,6 +46,10 @@ export function getGroup(groupId: string) {
     });
 }
 
+export function reqPermission(groupId: string) {
+
+}
+
 export function getGroups() {
     return http.get<Group[]>('/api/group').then(resp => {
         if (resp.code === 200 && resp.data) {

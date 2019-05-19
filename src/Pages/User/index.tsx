@@ -11,7 +11,7 @@ import Cropper from 'cropperjs';
 import { GetInputPopup } from "../../components/GetInputPopup";
 import { updateUserInfo, uploadAvatar, getUserInfo } from "./user-api";
 import { Link } from "react-router-dom";
-import { GroupCard } from "../../components/GroupCard";
+import { GroupCard } from "../../components/TheCard";
 
 export type UserPageProps = RouteComponentProps<{
 	username: string
@@ -73,9 +73,6 @@ export function UserHeader(props: { username: string }) {
         </div>
     );
 }
-
-
-
 
 export function UserGroups(props: { user: UserWithGroups }) {
     const list = props.user.groups.map(g => {

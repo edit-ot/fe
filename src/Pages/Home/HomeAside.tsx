@@ -13,6 +13,7 @@ import { GetInputPopup } from "../../components/GetInputPopup";
 import { getGroups, Group, createGroup, changeGroupName, getJoinedGroups, deleteGroup } from "./homeaside-api";
 import { loginCtx } from "../../components/Login";
 import { MenuBtns } from "../../components/MenuBtns";
+import { msgConnect } from "../../utils/WS/MsgConnect";
 
 
 export function HomeAside(props: HomeAsideProps) {
@@ -22,6 +23,18 @@ export function HomeAside(props: HomeAsideProps) {
     const [loading, setLoading] = React.useState(true);
     const [groups, setGroups] = React.useState([] as Group[]);
     const [joinedGroups, setJoinedGroups] = React.useState([] as Group[]);
+
+    React.useEffect(() => {
+        const $$ = () => {
+            console.log('home msg read state change');
+            init();
+        }
+
+        msgConnect.socket.on('msg-read-state-change', $$);
+        return () => msgConnect.socket.removeListener(
+            'msg-read-state-change', $$);
+    }, []);
+
 
     const init = () => {
         setLoading(true);

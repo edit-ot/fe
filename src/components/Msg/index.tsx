@@ -5,7 +5,7 @@ import "./msg.less";
 import { ComponentSwitch } from "../ComponentSwitch";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faEnvelopeOpenText, faChevronRight } from "@fortawesome/free-solid-svg-icons";
-import { getNotification, Msg, setReadRemote } from "./msg-api";
+import { getAllMsgs, Msg, setReadRemote, NotificationItem, resolveReqRemote, remoteMsgRemote, rejectReqRemote } from "./msg-api";
 import cls from "classnames";
 
 export type MsgPopupProps = CreatePopupComponent<{}>;
@@ -33,44 +33,88 @@ export function MsgPopup(props: MsgPopupProps) {
     )
 }
 
-type NotificationItem = {
-    text: string;
-    url?: string;
-}
-
 function Notification() {
     const [msgs, setMsgs] = React.useState([] as Msg[]); 
 
     const init = () => {
-        getNotification().then(setMsgs);
+        getAllMsgs().then(setMsgs);
     }
 
     React.useEffect(init, []);
 
     const list = msgs.map(m => {
-        const ni = JSON.parse(m.jsonData || '{}') as NotificationItem;
+        if (m.type === 'notification') {
+            const ni = m.jsonData;
+            return (
+                <div key={ m.msgId } className={cls('one-notification', {
+                    'unread': !m.isRead
+                })} onClick={() => {
+                    setReadRemote(m).then(init);
+                    ni.url && window.open(ni.url);
+                }}>
+                    <div className="_icon">
+                        <FontAwesomeIcon icon={ faEnvelopeOpenText } />
+                    </div>
+                    <div className="_text">
+                        <div className="_noti">消息</div>
+                        <div className="_noti-text">{ ni.text }</div>
+                    </div>
+    
+                    <div className="_to-right">
+                        <FontAwesomeIcon icon={ faChevronRight } />
+                    </div>
+                </div>
+            );
+        } else {
+            // req
+            return (
+                <div key={ m.msgId } className={cls('one-notification', {
+                    'unread': !m.isRead
+                })} onClick={() => {
+                    // setReadRemote(m).then(init);
+                }}>
+                    <div className="_icon">
+                        <FontAwesomeIcon icon={ faEnvelopeOpenText } />
+                    </div>
+                    <div className="_text">
+                        <div className="_noti">用户申请</div>
+                        <div className="_noti-text">{ m.content }</div>
+                    </div>
 
-        return (
-            <div key={ m.msgId } className={cls('one-notification', {
-                'unread': !m.isRead
-            })} onClick={() => {
-                setReadRemote(m).then(init);
-                ni.url && window.open(ni.url);
-            }}>
-                <div className="_icon">
-                    <FontAwesomeIcon icon={ faEnvelopeOpenText } />
-                </div>
-                <div className="_text">
-                    <div className="_noti">消息</div>
-                    <div className="_noti-text">{ ni.text }</div>
-                </div>
+                    
+                        {
+                            m.jsonData.state === 'pendding' ? (
+                                <div className="_req-btns">
+                                    <button
+                                        onClick={() => {
+                                            resolveReqRemote(m.msgId).then(init);
+                                        }}
+                                        className="to-resolve">同意</button>
 
-                <div className="_to-right">
-                    <FontAwesomeIcon icon={ faChevronRight } />
+                                    <button
+                                        onClick={() => {
+                                            rejectReqRemote(m.msgId).then(init);
+                                        }}
+                                        className="to-reject">拒绝</button>
+                                </div>
+                            ) : (
+                                <div className="_req-btns _finish">
+                                    已{ m.jsonData.state === 'resolved' ? '同意' : '拒绝' }
+
+                                    <button
+                                        onClick={() => remoteMsgRemote(m.msgId).then(init)}
+                                        className="to-reject to-delete">删除此消息</button>
+                                </div>
+                            )
+                        }                   
+
+                    <div className="_to-right">
+                        <FontAwesomeIcon icon={ faChevronRight } />
+                    </div>
                 </div>
-            </div>
-        );
-    })
+            );
+        }
+    });
 
     return (
         <div className="notifications">{

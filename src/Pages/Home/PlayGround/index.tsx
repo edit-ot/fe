@@ -6,6 +6,7 @@ import { SearchResults } from "./SearchResults";
 // import { getNowPageQuery, objToQueryStr } from "../../../utils/http";
 import { Route, RouteComponentProps } from "react-router-dom";
 import { getNowPageQuery } from "../../../utils/http";
+import { ResultData } from "./pg-api";
 
 
 
@@ -13,6 +14,8 @@ import { getNowPageQuery } from "../../../utils/http";
 export type PlayGroundCtx = {
     keyword: string;
     setKeyword: (s: string) => void;
+    res: ResultData,
+    setRes: (r: ResultData) => void;
 }
 
 export const playGroundCtx = React.createContext({} as PlayGroundCtx);
@@ -20,6 +23,7 @@ export const playGroundCtx = React.createContext({} as PlayGroundCtx);
 
 export function PlayGround(props: RouteComponentProps<{}>) {
     const [keyword, setKeyword] = React.useState(getNowPageQuery().q || '');
+    const [res, setRes] = React.useState(null as null | ResultData);
 
     React.useEffect(() => {
         if (keyword) {
@@ -31,7 +35,8 @@ export function PlayGround(props: RouteComponentProps<{}>) {
 
     return (
         <playGroundCtx.Provider value={{
-            keyword, setKeyword
+            keyword, setKeyword,
+            res, setRes
         }}>
             <div className="play-ground-main">
                 <Route path="/home/playground" exact
