@@ -4,6 +4,9 @@
 .msg-popup-main {
     .std-popup-main(400px);
 
+    max-height: 500px;
+    overflow-y: auto;
+
     ._close {
         position: absolute;
         right: 50px;
@@ -141,6 +144,22 @@
 
                 &._finish {
                     color: #BBB;
+                }
+            }
+
+            ._notification-btns {
+                height: 0;
+                opacity: .5;
+                overflow: hidden;
+                transition: all .3s;
+                margin-top: 0px;
+            }
+
+            &:hover {
+                ._notification-btns {
+                    opacity: 1;
+                    height: 25px;
+                    margin-top: 16px;
                 }
             }
 

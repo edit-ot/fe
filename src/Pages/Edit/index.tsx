@@ -1,7 +1,7 @@
 import * as React from "react";
 import Quill from "quill";
 
-import { RouteComponentProps } from "react-router";
+import { RouteComponentProps } from "react-router-dom";
 // import { Blot } from 'parchment/dist/src/blot/abstract/blot';
 
 
@@ -9,7 +9,7 @@ import "quill/dist/quill.snow.css";
 import "./edit.less";
 import { getDocById, docSave } from "./edit-api";
 import { DocInfo } from "../Home/Doc/doc-api";
-import { NavHeader } from "../../components/NavHeader";
+// import { NavHeader } from "../../components/NavHeader";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faCarCrash, faCommentAlt } from "@fortawesome/free-solid-svg-icons";
 import { debounce } from "../../utils";

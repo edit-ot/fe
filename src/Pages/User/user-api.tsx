@@ -37,3 +37,32 @@ export function uploadAvatar(fileName: string, canvas: HTMLCanvasElement) {
         });
     });
 }
+
+export type UserMap = {
+    [username: string]: User
+}
+
+export function toUserMap(users: User[]) {
+    return users.reduce((acc, cur) => {
+        acc[cur.username] = cur;
+        return acc;
+    }, {} as UserMap);
+}
+
+export function getFollowers(who: string) {
+    return http.get$<User[]>('/api/user/followers', {
+        username: who
+    })
+}
+
+export function getFollowings(who: string) {
+    return http.get$<User[]>('/api/user/followings', {
+        username: who
+    })
+}
+
+export function followOneRemote(who: string) {
+    return http.post$<void>('/api/user/follow-one', {
+        username: who
+    });
+}

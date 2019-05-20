@@ -1,8 +1,89 @@
 @import (reference) "../../@ui/index.less";
 
+.user-no-data {
+    padding: 64px 0;
+    text-align: center;
+    ._icon {
+        font-size: 32px;
+        margin-bottom: 12px;
+    }
 
+    ._text {
+        opacity: .9;
+    }
+}
+
+.one-follower-main {
+    position: relative;
+    display: flex;
+    margin-left: 16px;
+    margin-right: 16px;
+    margin-bottom: 16px;
+    flex-wrap: nowrap;
+
+    ._avatar {
+        width: 65px;
+        height: 65px;
+        margin-right: 16px;
+    }
+
+    ._follow_btn {
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        position: absolute;
+        
+        cursor: pointer;
+        display: inline-block;
+        border: 1px solid #BBB;
+        padding: 4px 8px;
+        border-radius: 3px;
+        background-color: #eff3f6;
+        background-image: linear-gradient(-180deg,#fafbfc,#eff3f6 90%);
+        color: #24292e;
+
+        &:hover {
+            opacity: .8;
+        }
+        &:active {
+            opacity: 1;
+            transform: scale(.95);
+        }
+    }
+}
 
 .user-page-main {
+    .swicher-keys {
+        // padding: 8px 0;
+        margin-bottom: 16px;
+        border-bottom: 1px solid #d6d6d6;
+
+        .switcher-item {
+            user-select: none;
+            padding: 8px 0;
+            position: relative;
+            cursor: pointer;
+            display: inline-block;
+            margin: 0 1em;
+
+            &.active {
+                font-weight: bold;
+
+                &::after {
+                    position: absolute;
+                    display: block;
+                    content: "";
+                    bottom: -2px;
+                    width: 100%;
+                    left: 0;
+                    height: 3px;
+                    background: #e36209;
+                }
+            }
+        }
+    }
+
+
 
     .user-groups {
         box-sizing: border-box;
@@ -43,7 +124,7 @@
 
     .user-page-inner {
         box-shadow: 0 2px 4px -1px rgba(0, 0, 0, .3);
-        padding: 48px 0;
+        padding-bottom: 48px;
 
         max-width: 600px;
         min-height: 200px;
@@ -88,7 +169,7 @@
             line-height: 32px;
             
             border-radius: 4px;
-            // margin-bottom: 24px;
+            margin-bottom: 24px;
 
             &._blue {
                 background-color: rgb(123, 157, 208);
@@ -111,8 +192,38 @@
             width: 100%;
             margin-left: auto;
             margin-right: auto;
+            margin-bottom: 24px;
 
             line-height: 32px;
+        }
+
+        .user-tab {
+            padding-top: 32px;
+        }
+
+        ._user-tab_btns {
+            user-select: none;
+            margin-bottom: 24px;
+            text-align: center;
+
+            > * {
+                cursor: pointer;
+                display: inline-block;
+                border: 1px solid #BBB;
+                padding: 4px 8px;
+                border-radius: 3px;
+                background-color: #eff3f6;
+                background-image: linear-gradient(-180deg,#fafbfc,#eff3f6 90%);
+                color: #24292e;
+
+                &:hover {
+                    opacity: .8;
+                }
+                &:active {
+                    opacity: 1;
+                    transform: scale(.95);
+                }
+            }
         }
 
         #_file {

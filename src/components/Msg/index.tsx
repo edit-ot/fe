@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faEnvelopeOpenText, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { getAllMsgs, Msg, setReadRemote, NotificationItem, resolveReqRemote, remoteMsgRemote, rejectReqRemote } from "./msg-api";
 import cls from "classnames";
+import { msgConnect } from "../../utils/WS/MsgConnect";
 
 export type MsgPopupProps = CreatePopupComponent<{}>;
 
@@ -40,6 +41,16 @@ function Notification() {
         getAllMsgs().then(setMsgs);
     }
 
+    React.useEffect(() => {
+        const $$ = () => {
+            init();
+        }
+
+        msgConnect.socket.on('msg-read-state-change', $$);
+        return () => msgConnect.socket.removeListener(
+            'msg-read-state-change', $$);
+    }, []);
+
     React.useEffect(init, []);
 
     const list = msgs.map(m => {
@@ -58,6 +69,15 @@ function Notification() {
                     <div className="_text">
                         <div className="_noti">消息</div>
                         <div className="_noti-text">{ ni.text }</div>
+                    </div>
+
+                    <div className="_req-btns _notification-btns">
+                        <button onClick={e => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            remoteMsgRemote(m.msgId).then(init);
+                        }}
+                            className="to-resolve">删除</button>
                     </div>
     
                     <div className="_to-right">
@@ -80,8 +100,6 @@ function Notification() {
                         <div className="_noti">用户申请</div>
                         <div className="_noti-text">{ m.content }</div>
                     </div>
-
-                    
                         {
                             m.jsonData.state === 'pendding' ? (
                                 <div className="_req-btns">

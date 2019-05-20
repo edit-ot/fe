@@ -39,3 +39,37 @@ export function ComponentSwitch(props: ComponentSwitchProps) {
         </div>
     )
 }
+
+export type ComponentSwitchBindPosiProps = {
+    position: number;
+    setPosition: (n: number) => void;
+    configs: SwitchConfig[];
+}
+
+export function ComponentSwitchBindPosi(props: ComponentSwitchBindPosiProps) {
+    const { position, setPosition } = props;
+    const config = props.configs[position];
+
+    return (
+        <div className="compo-switcher">
+            <div className="swicher-keys">{
+                props.configs.map((c, idx) => 
+                    <span className={
+                        idx === position ?
+                            'switcher-item active' :
+                            'switcher-item'
+                    } key={ idx } onClick={ () => {
+                        setPosition(idx);
+                    }}>
+                        { c.name }
+                    </span>
+                )
+            }</div>
+
+            <div className="switcher-now">
+                { config.inner }
+            </div>
+        </div>
+    )
+}
+

@@ -1,7 +1,6 @@
 import * as React from "react";
-import { RouteComponentProps } from "react-router";
-import { loginCtx, UserWithGroups } from "../../components/Login";
-import { NavHeader } from "../../components/NavHeader";
+import { RouteComponentProps, Route, NavLink } from "react-router-dom";
+import { loginCtx, UserWithGroups, User } from "../../components/Login";
 
 import "./user.less";
 import { HoverInfo, HoverHandler } from "../../components/HoverHandler";
@@ -9,31 +8,170 @@ import { popupCtx, CreatePopupComponent } from "../../Ctx/Popup";
 import 'cropperjs/dist/cropper.css';
 import Cropper from 'cropperjs';
 import { GetInputPopup } from "../../components/GetInputPopup";
-import { updateUserInfo, uploadAvatar, getUserInfo } from "./user-api";
+import { updateUserInfo, uploadAvatar, getUserInfo, UserMap, getFollowers, getFollowings, toUserMap, followOneRemote } from "./user-api";
 import { Link } from "react-router-dom";
 import { GroupCard } from "../../components/TheCard";
+import { UserTab } from "./UserTab";
+import { NavHeader } from "../../components/NavHeader";
+import { UserFollowers } from "./UserFollowers";
+import { ComponentSwitch, ComponentSwitchBindPosi } from "../../components/ComponentSwitch";
+import { getNowPageQuery } from "../../utils/http";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar } from "@fortawesome/free-solid-svg-icons";
+import { Avatar } from "../../components/Avatar";
+
+export * from "./PreviewSelected";
 
 export type UserPageProps = RouteComponentProps<{
 	username: string
-}>
+}>;
+
+export type userPageCtx = {
+    user: UserWithGroups;
+    setUser: (u: UserWithGroups) => void;
+
+    followers: User[];
+    setFollowers: (us: User[]) => void;
+
+    followings: User[];
+    setFollowings: (us: User[]) => void;
+
+    loginedFollowings: User[];
+    setLoginedFollowings: (us: User[]) => void;
+
+
+    toFollowThis: () => void;
+    followOne: (theUser: User) => void;
+}
+
+export const userPageCtx = React.createContext({} as userPageCtx);
 
 export function UserPage(props: UserPageProps) {
-    const { username } = props.match.params;
-    
     return (
         <loginCtx.Consumer>{ctx => 
-            ctx.user ? (
-                <div className="user-page-main">
-                    <NavHeader />
-                    <UserPageNav />
-                    { (ctx && ctx.user.username === username) ?
-                          <UserPanel /> :
-                          <UserHeader username={ username } />
-                    }
-                    
-                    
-                </div>
-            ) : null
+            (ctx && ctx.user) ? (
+                <UserPageInner { ...props } />
+            ) : null            
+        }</loginCtx.Consumer>
+    );
+}
+
+function listUserToggle(theUser: User, users: User[]): User[] {
+    const i = users.findIndex(u => u.username === theUser.username);
+    const theUsers = users.slice() as User[];
+
+    if (i === -1) {
+        // 没有 
+        theUsers.push(theUser);
+    } else {
+        // 有 
+        theUsers.splice(i, 1);
+    }
+
+    return theUsers;
+}
+
+export function UserPageInner(props: UserPageProps) {
+    const { username } = props.match.params;
+    const _loginCtx = React.useContext(loginCtx);
+    const [loading, setLoading] = React.useState(true);
+    const [user, setUser] = React.useState({} as UserWithGroups);
+    const [tabPosi, setTabPosi] = React.useState(0);
+    const [followers, setFollowers] = React.useState({} as User[]);
+    const [followings, setFollowings] = React.useState({} as User[]);
+    const [loginedFollowings, setLoginedFollowings] = React.useState([] as User[]);
+
+    const init = () => {
+        Promise.all([
+            // 目标
+            getUserInfo(username).then(setUser),
+            // 目标的followers
+            getFollowers(username).then(setFollowers),
+            // 目标的follow的人
+            getFollowings(username).then(setFollowings),
+            // 相关
+            getFollowings(_loginCtx.user.username).then(setLoginedFollowings),
+        ]).then(() => {
+            setLoading(false);
+        });
+    }
+    
+    const followOne = (theUser: User) => {
+        followOneRemote(theUser.username).then(init);
+
+        setLoginedFollowings(
+            listUserToggle(theUser, loginedFollowings)
+        );
+    }
+
+    const toFollowThis = () => {
+        followOneRemote(user.username).then(init);
+
+        setFollowers(
+            listUserToggle(_loginCtx.user, followers)
+        );
+    }
+
+    React.useEffect(() => {
+        setLoading(true);
+        init();
+    }, []);
+
+    React.useEffect(() => {
+        const query = getNowPageQuery();
+        const targetTab = +query.tab || 0;
+        setTabPosi(targetTab);
+    }, [ props ]);
+
+   
+    return (
+        <loginCtx.Consumer>{ctx => 
+            <userPageCtx.Provider value={{
+                user, setUser,
+                followers, setFollowers, 
+                followings, setFollowings, 
+                loginedFollowings, setLoginedFollowings,
+                toFollowThis, followOne
+            }}>{
+                ctx.user ? (
+                    loading ? (
+                        <div className="user-page-main">加载中</div>
+                    ) : (
+                        <div className="user-page-main">
+                            <NavHeader />
+                            <UserPageNav />
+                            <div className="user-page-inner">
+                                <ComponentSwitchBindPosi
+                                    position={ tabPosi % 3 }
+                                    setPosition={ setTabPosi }
+                                    configs={[
+                                        {
+                                            name: <div className="user-nav-link"
+                                                onClick={() => {
+                                                    props.history.push(`/user/${username}?tab=0`)
+                                                }}>用户资料</div>,
+                                            inner: <UserTab />
+                                        },
+                                        {
+                                            name: <div className="user-nav-link"
+                                                onClick={() => {
+                                                    props.history.push(`/user/${username}?tab=1`)
+                                                }}>Followers</div>,
+                                            inner: <TheList text="暂时还没有人关注这个人" users={ followers } />
+                                        },
+                                        {
+                                            name: <div className="user-nav-link"
+                                                onClick={() => {
+                                                    props.history.push(`/user/${username}?tab=2`)
+                                                }}>Followings</div>,
+                                            inner: <TheList text="Ta 暂时还没有关注其他人" users={ followings } />
+                                        }
+                                    ]} />
+                            </div>
+                        </div>
+                    )
+                ) : null
+            }</userPageCtx.Provider>
         }</loginCtx.Consumer>
     )
 }
@@ -46,202 +184,61 @@ export function UserPageNav() {
     )
 }
 
-export function UserHeader(props: { username: string }) {
-    const [user, setUser] = React.useState({
-        username: '加载中',
-        intro: '加载中'
-    } as UserWithGroups);
-
-    React.useEffect(() => {
-        getUserInfo(props.username).then(setUser);
-    }, []);
+function Follower(props: { user: User, follow: boolean, onClk: () => void }) {
+    const _loginCtx = React.useContext(loginCtx);
+    const { user, follow } = props;
 
     return (
-        <div className="user-page-inner">
-            <HoverInfo info={ user.username }>
-                <div className="avatar-username">
-                    <img src={ user.avatar || '' } />
-                    
-                    <div className="username">
-                        <div>{ user.username }</div>
-                    </div>
-                </div>
-            </HoverInfo>
-            <div className="_intro">{ user.intro || '该用户比较懒~ 暂时未设置个性签名' }</div>
+        <div className="one-follower-main">
+            
+            <div className="_avatar"><Avatar text={ user.username } src={ user.avatar } /></div>
+            <div>
+                <div>{ user.username }</div>
+                <div>{ user.intro || '这个用户比较懒，暂时还未填写个人介绍' }</div>
+            </div>
 
-            { user.groups && <UserGroups user={ user } /> }
+            {
+                _loginCtx.user.username === user.username ? (
+                    <div className="_follow_btn">这是我</div>
+                ) : (
+                    <div onClick={ props.onClk }
+                        className="_follow_btn">{
+                            follow ? 'Unfollow' : 'Follow'
+                    }</div>
+                )
+            }
         </div>
     );
 }
 
-export function UserGroups(props: { user: UserWithGroups }) {
-    const list = props.user.groups.map(g => {
+function TheList(props: { users: User[], text: string }) {
+    const ctx = React.useContext(userPageCtx);
+    const map = toUserMap(ctx.loginedFollowings);
+
+    const list = props.users.map((er, i) => {
+        
         return (
-            <HoverHandler className="group-inner"
-                hoverComponent={ <GroupCard group={ g } /> }
-                key={ g.groupId }>
-                <img src={ g.groupAvatar || '/default.png' } />                
-            </HoverHandler>
+            <Follower key={ i }
+                onClk={() => {
+                    ctx.followOne(er);
+                }}
+                user={ er }
+                follow={ !!map[er.username] } />
         )
     });
 
-    const noData = (
-        <div className="no-data">暂未加入任何小组</div>
-    )
-
     return (
-        <div className="user-groups">
-            {/* <div className="group-title">Ta参与的小组</div> */}
-
-            <div>
-                { list.length ? list : noData }
-            </div>
-            {/* <div>{ JSON.stringify(props.user.groups) }</div> */}
+        <div className="user-list followers">
+            { list.length ? list : (
+                <NoData text={ props.text } />
+            )  }
         </div>
     )
 }
 
-export function UserPanel() {
-    const { user, update, doLogout, loadUser } = React.useContext(loginCtx);
-    const _popup = React.useContext(popupCtx);
-    // const [previewSrc, setPreviewSrc] = React.useState(null as null | string);
-    const [cropped, setCropped] = React.useState(null as null | HTMLCanvasElement);
-
-    const changePwd = (newPwd: string) => {
-        console.log('change pwd', newPwd);
-        alert('修改密码成功');
-    }
-
-    const changeIntro = (newIntro: string) => {
-        updateUserInfo({
-            intro: newIntro
-        }).then(() => {
-            update({ intro: newIntro });
-            alert('修改成功');
-        });
-    }
-
-    const mySelf = <>
-        <div className="_btn _blue" onClick={ e => {
-            // changeIntro()
-            _popup.push(GetInputPopup, {
-                title: '修改个性签名',
-                placeholder: '个性签名',
-                onConfirm: changeIntro,
-                checker: str => !!str,
-                errorInfo: '请勿为空'
-            }, {
-                style: { backgroundColor: 'rgba(0, 0, 0, .5)' }
-            });
-        }}>
-            修改个性签名
-        </div>
-        <div className="_btn _blue" onClick={ e => {
-            _popup.push(GetInputPopup, {
-                title: '修改密码',
-                placeholder: '请输入新密码',
-                onConfirm: changePwd,
-                checker: str => !!str,
-                mask: true,
-                errorInfo: '密码请勿为空'
-            }, {
-                style: { backgroundColor: 'rgba(0, 0, 0, .5)' }
-            });
-        } }>
-            修改密码
-        </div>
-        <div className="_btn _red" onClick={ doLogout }>
-            退出登录
-        </div>
-    </>
-   
-    return (
-        <div className="user-page-inner">
-            <input id="_file" style={{ visibility: 'hidden' }} type="file" onChange={ e => {
-                if (e.target.files && e.target.files.length > 0) {
-                    const reader = new FileReader();
-                    const n = e.target.files[0].name;
-                    reader.addEventListener("load", () =>
-                        _popup.push(PreviewSelected, {
-                            src: reader.result as string,
-                            ok(canvas: HTMLCanvasElement) {
-                                setCropped(canvas);
-                                uploadAvatar(n, canvas).then(() => {
-                                    loadUser();
-                                })
-                            }
-                        }, { style: { background: 'rgba(0, 0, 0, .5)' } })
-                    );
-                    
-                    reader.readAsDataURL(e.target.files[0]);
-                }
-            } } />
-
-            <HoverInfo info="点击修改">
-                <label htmlFor="_file" className="avatar-username">
-                    { cropped ? (
-                        <img src={ cropped.toDataURL() } />
-                    ) : (
-                        <img src={ user.avatar } />
-                    ) }
-                    <div className="username">
-                        <div>{ user.username }</div>
-                    </div>
-                </label>
-            </HoverInfo>
-
-            <div className="_intro">{ user.intro || '该用户比较懒~ 暂时未设置个性签名' }</div>
-
-            { mySelf }
-        </div>
-    )
-}
-
-export type PreviewSelectedProps = CreatePopupComponent<{
-    src: string,
-    ok: (canvas: HTMLCanvasElement) => void
-}>
-
-export function PreviewSelected(props: PreviewSelectedProps) {
-    const [$cropper, setCropper] = React.useState(null as null | Cropper);
-
-    const $img = React.createRef<HTMLImageElement>();
-
-    React.useEffect(() => {
-        const $cropper = new Cropper($img.current, {
-            aspectRatio: 1
-        });
-
-        setCropper($cropper);
-
-        // @ts-ignore
-        window.$cropper = $cropper;
-    }, []);
-
-    const width = window.innerWidth < 600 ? 300 : 600;
-    // const height = window.innerWidth < 600 ? 300 : 600;
-
-    return (
-        <div className="preview-selected-main">
-            <div style={{
-                // width, 
-                // height
-            }}>
-                <img ref={ $img } style={{
-                    maxWidth: '100%',
-                    visibility: 'hidden'
-                }} src={ props.src } />
-            </div>
-
-            <HoverInfo info="鼠标缩放 / 双指缩放, 确定无误后点击即可" onClick={() => {
-                if (!$cropper) return;
-                props.ok($cropper.getCroppedCanvas());
-                props.pop();
-            }}>
-                <div className="_confirm">提交</div>
-            </HoverInfo>
-
-            <div className="_confirm _cancel" onClick={ props.pop }>取消</div>
-        </div>
-    )
+function NoData(props: { text: string }) {
+    return <div className="user-no-data">
+        <div className="_icon"><FontAwesomeIcon icon={ faStar } /></div>
+        <div className="_text">{ props.text }</div>
+    </div>
 }
