@@ -1,6 +1,8 @@
 import * as React from "react";
 import { CreatePopupComponent } from "../../Ctx/Popup";
 import { HoverInfo } from "../../components/HoverHandler";
+import 'cropperjs/dist/cropper.css';
+import Cropper from 'cropperjs';
 
 export type PreviewSelectedProps = CreatePopupComponent<{
     src: string,

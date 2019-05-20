@@ -5,8 +5,7 @@ import { loginCtx, UserWithGroups, User } from "../../components/Login";
 import "./user.less";
 import { HoverInfo, HoverHandler } from "../../components/HoverHandler";
 import { popupCtx, CreatePopupComponent } from "../../Ctx/Popup";
-import 'cropperjs/dist/cropper.css';
-import Cropper from 'cropperjs';
+
 import { GetInputPopup } from "../../components/GetInputPopup";
 import { updateUserInfo, uploadAvatar, getUserInfo, UserMap, getFollowers, getFollowings, toUserMap, followOneRemote } from "./user-api";
 import { Link } from "react-router-dom";
@@ -193,8 +192,8 @@ function Follower(props: { user: User, follow: boolean, onClk: () => void }) {
             
             <div className="_avatar"><Avatar text={ user.username } src={ user.avatar } /></div>
             <div>
-                <div>{ user.username }</div>
-                <div>{ user.intro || '这个用户比较懒，暂时还未填写个人介绍' }</div>
+                <div className="_username">{ user.username }</div>
+                <div className="_userintro">{ user.intro || '这个用户比较懒，暂时还未填写个人介绍' }</div>
             </div>
 
             {
