@@ -9,6 +9,7 @@ import EventEmitter from "eventemitter3";
 import { popupCtx } from "../../../Ctx/Popup";
 import { ChangePermissionPopup } from "../../../components/ChangePermissionPopup";
 import { DocInfo } from "../../Home/Doc/doc-api";
+import { Link } from "react-router-dom";
 
 export type EditHeaderCtx = {
     doc: DocInfo,
@@ -66,7 +67,9 @@ function RenderLoginedList(props: { list: User[] }) {
 
             
             <div className="logined-user _myself">
-                <img src={ ctx.user.avatar } />
+                <HoverInfo info="我自己">
+                    <img src={ ctx.user.avatar } />
+                </HoverInfo>
             </div>
             
             <div className="logined-user _icon" onClick={ () => {
@@ -83,7 +86,10 @@ function RenderLoginedList(props: { list: User[] }) {
                         docId: editCtx.doc.id
                     }, {
                         style: { backgroundColor: 'rgba(0, 0, 0, .5)' }
-                    })
+                    }, () => {
+                        console.log('When Pop');
+                        editCtx.bus.emit('ChangePermissionPopup Popped');
+                    });
                 }}>
                     <HoverInfo info="协作权限管理">
                         协作
@@ -94,6 +100,10 @@ function RenderLoginedList(props: { list: User[] }) {
                     <HoverInfo info="只有文档所有者才能修改权限">协作</HoverInfo>
                 </div>
             ) }
+
+            <div className="logined-user _coo">
+                <Link to="/">首页</Link>
+            </div>
             
         </div>
     )

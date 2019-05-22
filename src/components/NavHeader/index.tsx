@@ -9,22 +9,35 @@ import { FontIcon } from "../FontIcon";
 import { OpenMsgWindow } from "../Msg";
 import { msgConnect } from "../../utils/WS/MsgConnect";
 
-console.log('msgConnect', msgConnect)
+console.log('msgConnect', msgConnect);
 
-export function NavHeader() {
-    const { user, doLogout } = React.useContext(loginCtx);
+export function TheMsgIcon() {
     const [ hasUnRead, setHasUnRead ] = React.useState(false);
 
     React.useEffect(() => {
         msgConnect.socket.emit('msg-login');
 
-        const $$ = data => {
-            setHasUnRead(data.hasUnRead);
-        }
+        const $$ = data => setHasUnRead(data.hasUnRead);
+
         msgConnect.socket.on('msg-read-state-change', $$);
 
         return () => msgConnect.socket.removeListener('msg-read-state-change', $$);
     }, []);
+
+    return (
+        <span className={cls("navlink msg-info", {
+            'has-unread': hasUnRead
+        })} onClick={ () => {
+            setHasUnRead(false);
+            OpenMsgWindow();
+        } }>
+            <FontIcon icon="icon-xiaoxi1" />
+        </span>
+    )
+}
+
+export function NavHeader() {
+    const { user, doLogout } = React.useContext(loginCtx);
 
     return (
         <nav className="nav-header">
@@ -37,14 +50,7 @@ export function NavHeader() {
             </span>
 
             <div className="to-right"> 
-                <span className={cls("navlink msg-info", {
-                    'has-unread': hasUnRead
-                })} onClick={ () => {
-                    setHasUnRead(false);
-                    OpenMsgWindow();
-                } }>
-                    <FontIcon icon="icon-xiaoxi1" />
-                </span>
+                <TheMsgIcon />
 
                 {
                     user && user.avatar && (
@@ -74,10 +80,7 @@ export function NavHeader() {
                     )
                 }
             </div>
-            
-            
         </nav>
     );
 }
-
 

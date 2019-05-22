@@ -1,7 +1,7 @@
 import * as React from "react";
 import Quill from "quill";
 
-import { RouteComponentProps } from "react-router-dom";
+import { RouteComponentProps, Link } from "react-router-dom";
 // import { Blot } from 'parchment/dist/src/blot/abstract/blot';
 
 
@@ -28,6 +28,7 @@ import JSONStringify from "fast-json-stable-stringify";
 import { ErrInfo } from "../../components/ErrInfo";
 import { CreateBtn } from "../../components/NoDocs/CreateBtn";
 import { showTextPopup } from "./TextPopup";
+import { msgConnect } from "../../utils/WS/MsgConnect";
 
 Quill.register(AuthorAttr);
 
@@ -38,7 +39,8 @@ export type EditPageProps = RouteComponentProps<{
 
 export type EditPanelProps = {
     doc: DocInfoWithPmap,
-    user: User
+    user: User,
+    whenCppp: () => void;
 }
 
 function onlyRead(username: string, doc: DocInfoWithPmap) {
@@ -65,7 +67,8 @@ function showPermissionTips() {
     );
 }
 
-export function EditPanel({ doc, user }: EditPanelProps) {
+export function EditPanel(props: EditPanelProps) {
+    const { doc, user, whenCppp } = props;
     const [msg, showMsg] = React.useState('');
     const [q, setQ] = React.useState(null as null | Quill);
     const [ws, setWS] = React.useState(null as null | WS);
@@ -74,6 +77,24 @@ export function EditPanel({ doc, user }: EditPanelProps) {
     const [line, setLine] = React.useState(null as null | number);
     const [loading, setLoading] = React.useState(true);
     const _editHeaderCtx = React.useContext(editHeaderCtx);
+
+    React.useEffect(() => {
+        if (!q) return;
+
+        if (onlyRead(user.username, doc)) {
+            q.disable();
+            console.log('当前只读');
+            showPermissionTips();
+        } else {
+            q.enable();
+            showTextPopup(
+                <div>
+                    <h1>文档权限 <FontAwesomeIcon icon={ faQuestionCircle } /></h1>
+                    <p>欢迎来到此文档的协同编辑，你当前对此文档的权限为可读可写，Have Fun ~</p>
+                </div>
+            );
+        }
+    }, [ props, q ]);
 
     React.useEffect(() => {
         const q = new Quill('#my-text-area', {
@@ -88,12 +109,6 @@ export function EditPanel({ doc, user }: EditPanelProps) {
         const ws = new WS(q, doc.id, user);
         // @ts-ignore
         window.ws = ws;
-
-        if (onlyRead(user.username, doc)) {
-            q.disable();
-            console.log('当前只读');
-            showPermissionTips();
-        }
 
         ws.socket.on('owner-change-title', (newTitle: string) => {
             if (doc.owner === user.username) return;
@@ -139,7 +154,7 @@ export function EditPanel({ doc, user }: EditPanelProps) {
             ws.socket.close();
             ws.removeAllListeners();
         }
-    }, []);
+    }, [ ]);
 
     React.useEffect(() => {
         if (!q) return;
@@ -215,6 +230,33 @@ export function EditPanel({ doc, user }: EditPanelProps) {
             _editHeaderCtx.bus.removeListener('say-hello', whenBusSayHello);
         }
     }, [ _editHeaderCtx, ws ]);
+
+    React.useEffect(() => {
+        if (!_editHeaderCtx && !_editHeaderCtx.bus) return;
+
+        const CPPP = () => {
+            ws.socket.emit('ChangePermissionPopup Popped');
+        }
+        _editHeaderCtx.bus.on('ChangePermissionPopup Popped', CPPP)
+
+        return () => {
+            _editHeaderCtx.bus.removeListener('ChangePermissionPopup Popped', CPPP);
+        }
+    }, [ _editHeaderCtx ]);
+
+    React.useEffect(() => {
+        if (!ws) return;
+
+        const CPPP = () => {
+            whenCppp();
+        }
+
+        ws.socket.on('ChangePermissionPopup Popped', CPPP);
+
+        return () => {
+            ws.socket.removeEventListener('ChangePermissionPopup Popped', CPPP);
+        }
+    }, [ ws ]);
 
     React.useEffect(() => {
         if (!ws) return;
@@ -346,7 +388,7 @@ export function EditPanel({ doc, user }: EditPanelProps) {
                     <span onClick={ () => allScreen(doc.title, q) }><FontAwesomeIcon icon={ faTv } /></span>
 
                     { onlyRead(user.username, doc) && <span onClick={ showPermissionTips }>
-                        <FontAwesomeIcon icon={ faQuestionCircle } />
+                        <FontAwesomeIcon icon={ faQuestionCircle } /> 只读
                     </span> }
                      
                     <div className="msg">{ msg }</div>
@@ -356,7 +398,24 @@ export function EditPanel({ doc, user }: EditPanelProps) {
     );
 }
 
-
+function WaitForPermission(props: { docId: string }) {
+    return (
+        <ErrInfo title="拒绝访问" intro="你没有访问此文档的权限">
+            <CreateBtn className="_btn" onClick={
+                () => {
+                    reqPermRemote(+props.docId || 0).then(resp => {
+                        alert('申请成功');
+                    }).catch(() => {
+                        alert('你已经申请过了，请勿重复申请');
+                    });
+                }
+            }>申请访问</CreateBtn>
+            <CreateBtn className="_btn">
+                <Link to="/">回到首页</Link>
+            </CreateBtn>
+        </ErrInfo>
+    );
+}
 
 
 export function EditPage(props: EditPageProps) {
@@ -367,13 +426,13 @@ export function EditPage(props: EditPageProps) {
     
     const [perm, setPerm] = React.useState(200);
 
-    React.useEffect(() => {
+    const init = () => {
         getDocWithPmapById(+props.match.params.docId).then(doc => {
             setDoc(doc);
             setPerm(200);
             setTimeout(() => {
                 setDocLoading(false);
-            }, 2000 + ~~(Math.random() * 1500));
+            }, 1000 + ~~(Math.random() * 500));
         }).catch(err => {
             if (err.code === 403) {
                 setPerm(403)   
@@ -381,7 +440,9 @@ export function EditPage(props: EditPageProps) {
                 setPerm(404);
             }
         });
-    }, [ _loginCtx ]);
+    }
+
+    React.useEffect(init, [ _loginCtx ]);
 
     const $loading = (
         <div className="doc-loading">
@@ -404,15 +465,7 @@ export function EditPage(props: EditPageProps) {
 
         if (perm === 403) {
             return (
-                <ErrInfo title="拒绝访问" intro="你没有访问此文档的权限">
-                    <CreateBtn className="_btn" onClick={
-                        () => reqPermRemote(+props.match.params.docId || 0).then(resp => {
-                            alert('申请成功');
-                        }).catch(() => {
-                            alert('你已经申请过了，请勿重复申请');
-                        })
-                    }>申请访问</CreateBtn>
-                </ErrInfo>
+                <WaitForPermission docId={ props.match.params.docId } />
             )
         }
 
@@ -420,9 +473,47 @@ export function EditPage(props: EditPageProps) {
 
     if (!doc) return <div className="edit-page">{ $loading }</div>;
 
+    console.log('Re WhenCpp');
+    const whenCppp = () => {
+        if (doc.owner === _loginCtx.user.username) return;
+
+        console.log('Owner Chnage CPPP');
+
+        setDocLoading(true);
+
+        getDocWithPmapById(+props.match.params.docId).then(newDoc => {
+            // 没事
+            const preP = doc.pmap[_loginCtx.user.username]
+            const newP = newDoc.pmap[_loginCtx.user.username];
+
+            console.log('preP', preP, 'newP', newP);
+
+            if (!preP.w && newP.w) {
+                setDoc(newDoc);
+                setPerm(200);
+            }
+
+            if (preP.w && !newP.w) {
+                setDoc(newDoc);
+                setPerm(200);
+            }
+
+            setDocLoading(false);
+        }).catch(resp => {
+            setPerm(resp.code);
+            showTextPopup(
+                <div>
+                    文档权限发生变化
+                </div>
+            );
+
+            setDocLoading(false);
+        })
+    }
+
     const content = (
         docLoading ?
-            $loading : <EditPanel user={ _loginCtx.user } doc={ doc } />
+            $loading : <EditPanel user={ _loginCtx.user } doc={ doc } whenCppp={ whenCppp } />
     );
 
     return (

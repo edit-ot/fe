@@ -56,40 +56,42 @@
             }
         }
 
-        .msg-info {
-            margin-right: 16px;
-            cursor: pointer;
-    
-            &.has-unread {
-                position: relative;
-                &::before {
-                    display: block;
-                    content: "";
-                    width: 4px;
-                    height: 4px;
-                    border-radius: 4px;
-                    background-color: red;
-                    position: absolute;
-                    right: 0px;
-                    top: 2px;
-                }
-                &::after {
-                    opacity: 0;
-                    content: "您有未读消息";
-                    display: block;
-                    position: absolute;
-                    top: 100%;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    width: 100px;
-                    text-align: center;
-                    background: #222;
-                    color: #FFF;
-                }
-                &:hover::after {
-                    opacity: 1;
-                }
-            }
+        
+    }
+}
+
+.msg-info {
+    margin-right: 16px;
+    cursor: pointer;
+
+    &.has-unread {
+        position: relative;
+        &::before {
+            display: block;
+            content: "";
+            width: 4px;
+            height: 4px;
+            border-radius: 4px;
+            background-color: red;
+            position: absolute;
+            right: 0px;
+            top: 2px;
+        }
+        &::after {
+            opacity: 0;
+            content: "您有未读消息";
+            display: block;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            text-align: center;
+            background: #222;
+            color: #FFF;
+        }
+        &:hover::after {
+            opacity: 1;
         }
     }
 }
