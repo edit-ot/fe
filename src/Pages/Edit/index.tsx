@@ -377,11 +377,8 @@ export function EditPanel(props: EditPanelProps) {
                     <EditComments q={ q } ws={ ws } doc={ doc } /> }
                 
                 <div id="my-text-area" style={{
-                    height: Math.max(
-                        (window.innerHeight - 300),
-                        (commentBtnPosition + 50) ? (commentBtnPosition + 50) : 0
-                    ) }}
-                />
+                    height: window.innerHeight - 300
+                }} />
         
                 <div className="bottom-btns">
                     <span onClick={ saveAll }><FontAwesomeIcon icon={ faSave } /></span>

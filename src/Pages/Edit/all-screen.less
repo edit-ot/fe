@@ -1,13 +1,32 @@
 .all-screen-main {
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    top: 0!important;
+    transform: translate(-50%, 0)!important;
+    margin: 200px 0;
+    // height: 100%;
+    box-sizing: border-box;
+    overflow: visible;
+    box-shadow: 0 0 16px -6px rgba(0, 0, 0, .5);
+    
+
+    font-family: 
+        'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif, 
+        "Hiragino Sans", "微软雅黑";
+    
     padding-bottom: 64px;
     background: #FFF;
     position: static;
 
     h1 {
-        padding: 0 32px;
+        font-weight: normal;
         padding-top: 32px;
+        padding-bottom: 20px;
+
+        // padding-top: 32px;
         text-align: center;
+    }
+
+    img {
+        width: 100%;
     }
 
     ._close {
@@ -22,5 +41,37 @@
     #all-screen-edit {
         padding: 0 32px;
         width: 600px;
+        font-size: 14px;
+
+        // .ql-editor {
+        //     overflow: visible;
+        // }
+
+        ._article {
+            font-size: 14px;
+            color: inherit; 
+            line-height: 1.75; 
+            
+        }
     }
+
+    p {
+        font-size: 16px!important;
+
+        font-family: 
+            'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif, 
+            "Hiragino Sans", "微软雅黑";
+
+        .ql-size-large {
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+    }
+    
+
+    
+    
+
+
+
 }

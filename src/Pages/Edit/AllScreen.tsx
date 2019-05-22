@@ -19,7 +19,10 @@ export function allScreen(title: string, q: Quill) {
         delta: new Delta(delta.compose(new Delta())),
         title
     }, {
-        style: { background: 'rgb(240, 240, 240)' }
+        style: {
+            background: 'rgb(240, 240, 240)',
+            overflowY: 'auto'
+        }
     });
 }
 
@@ -46,8 +49,10 @@ export function AllScreen(props: CreatePopupComponent<{ delta: Delta, title: str
             <div className="_close" onClick={ props.pop }>
                 <FontAwesomeIcon icon={ faTimes } />
             </div>
-            <h1>{ props.title }</h1>
-            <div id="all-screen-edit"></div>
+            <div className="_article">
+                <h1>{ props.title }</h1>
+                <div id="all-screen-edit"></div>
+            </div>
         </div>
     )
 }
