@@ -25,10 +25,10 @@ export function MsgPopup(props: MsgPopupProps) {
                     name: <div className="_item">全部通知</div>,
                     inner: <Notification />
                 },
-                {
-                    name: <div className="_item">站内私信</div>,
-                    inner: <SiteIM />
-                }
+                // {
+                //     name: <div className="_item">站内私信</div>,
+                //     inner: <SiteIM />
+                // }
             ]} />
         </div>
     )

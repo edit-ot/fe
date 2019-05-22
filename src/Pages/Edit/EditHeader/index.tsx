@@ -10,6 +10,9 @@ import { popupCtx } from "../../../Ctx/Popup";
 import { ChangePermissionPopup } from "../../../components/ChangePermissionPopup";
 import { DocInfo } from "../../Home/Doc/doc-api";
 import { Link } from "react-router-dom";
+import { msgConnect } from "../../../utils/WS/MsgConnect";
+import cls from "classnames";
+import { OpenMsgWindow } from "../../../components/Msg";
 
 export type EditHeaderCtx = {
     doc: DocInfo,
@@ -104,9 +107,36 @@ function RenderLoginedList(props: { list: User[] }) {
             <div className="logined-user _coo">
                 <Link to="/">首页</Link>
             </div>
+
+            <div className="logined-user _coo has-msg-box">
+                <MsgIcon />
+            </div>
             
         </div>
     )
+}
+
+function MsgIcon() {
+    const [ hasUnRead, setHasUnRead ] = React.useState(false);
+
+    React.useEffect(() => {
+        msgConnect.socket.emit('msg-login');
+
+        const $$ = data => setHasUnRead(data.hasUnRead);
+
+        msgConnect.socket.on('msg-read-state-change', $$);
+
+        return () => msgConnect.socket.removeListener('msg-read-state-change', $$);
+    }, []);
+
+    return <div className={ cls('msg-box', {
+        'hasUnRead': hasUnRead
+    }) } onClick={() => {
+        setHasUnRead(false);
+        OpenMsgWindow();
+    }}>
+        信箱
+    </div>
 }
 
 export function EditHedaerProvider(props: React.PropsWithChildren<{ doc: DocInfo }>) {

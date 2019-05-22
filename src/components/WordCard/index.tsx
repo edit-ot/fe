@@ -80,7 +80,10 @@ export function WordCardCtxWrap(props: WordCardCtxWrapProps) {
 
         const setLoadingToFalse = () => loading && setLoading(false);
 
-        wcws.socket.on('setLoginedUsers', setLoginedUsers);
+        wcws.socket.on('setLoginedUsers', (users) => {
+            console.log('setLoginedUsers', users.map(u => u.username));
+            setLoginedUsers(users);
+        });
         wcws.socket.on('setLoginedUsers', setLoadingToFalse)
               
         wcws.socket.on('setWords', setWords);

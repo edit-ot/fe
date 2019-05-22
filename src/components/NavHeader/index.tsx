@@ -11,7 +11,7 @@ import { msgConnect } from "../../utils/WS/MsgConnect";
 
 console.log('msgConnect', msgConnect);
 
-export function TheMsgIcon() {
+export function TheMsgIcon(props: { className?: string }) {
     const [ hasUnRead, setHasUnRead ] = React.useState(false);
 
     React.useEffect(() => {
@@ -25,7 +25,7 @@ export function TheMsgIcon() {
     }, []);
 
     return (
-        <span className={cls("navlink msg-info", {
+        <span className={cls("msg-info", props.className || '', {
             'has-unread': hasUnRead
         })} onClick={ () => {
             setHasUnRead(false);
@@ -50,7 +50,7 @@ export function NavHeader() {
             </span>
 
             <div className="to-right"> 
-                <TheMsgIcon />
+                <TheMsgIcon className="navlink" />
 
                 {
                     user && user.avatar && (

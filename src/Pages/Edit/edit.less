@@ -88,24 +88,26 @@
     }
 }
 
-.error-info-main {
-    margin-top: 200px;
 
-    ._btn {
-        font-size: 14px;
-        margin-top: 1em;
-        padding: 2px 10px;
-        display: inline-block;
-        margin-right: 1em;
-
-        a {
-            text-decoration: inherit;
-        }
-    }
-}
   
 
 .edit-page {
+    .error-info-main {
+        margin-top: 200px;
+    
+        ._btn {
+            font-size: 14px;
+            margin-top: 1em;
+            padding: 2px 10px;
+            display: inline-block;
+            margin-right: 1em;
+    
+            a {
+                text-decoration: inherit;
+            }
+        }
+    }
+
     .doc-loading {
         user-select: none;
         font-size: 64px;
@@ -127,7 +129,7 @@
 
     .edit-main {
         overflow-y: hidden;
-        
+
         color: #555;
         background-color: rgb(240, 240, 240);
         padding-top: 40px;
@@ -207,6 +209,16 @@
                 font-size: 18px;
                 padding: 0 .5em;
                 // border-right: 1px solid #ccc;
+                
+
+                svg {
+                    vertical-align: middle;
+                }
+
+                span {
+                    vertical-align: middle;
+                    font-size: 14px;
+                }
             }
     
             .msg {

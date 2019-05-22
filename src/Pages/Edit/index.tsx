@@ -29,6 +29,7 @@ import { ErrInfo } from "../../components/ErrInfo";
 import { CreateBtn } from "../../components/NoDocs/CreateBtn";
 import { showTextPopup } from "./TextPopup";
 import { msgConnect } from "../../utils/WS/MsgConnect";
+import { RWDescriptorToString } from "../../utils/RWDescriptor";
 
 Quill.register(AuthorAttr);
 
@@ -45,7 +46,15 @@ export type EditPanelProps = {
 
 function onlyRead(username: string, doc: DocInfoWithPmap) {
     if (doc.owner === username) return false;
-    if (!doc.pmap[username]) return false;
+
+    if (!doc.pmap[username]) {
+        if (doc.pmap['*']) {
+            return !doc.pmap['*'].w
+        } else {
+            return true;
+        }
+        // return false;
+    }
 
     if (!doc.pmap[username].w) {
         return true;
@@ -54,15 +63,25 @@ function onlyRead(username: string, doc: DocInfoWithPmap) {
     }
 }
 
-function showPermissionTips() {
+
+
+function showPermissionTips(doc: DocInfoWithPmap) {
     showTextPopup(
         <div className="perm-tips">
             <h1>你当前对此文档的权限为只读</h1>
             <p>因此你无法编辑此文档，只能查看协同编辑情况以及评论。</p>
-            <p>如果想申请权限可以点击下方按钮</p>
-            <CreateBtn>申请权限</CreateBtn>
-
+            <p>如果想申请读写权限可以点击下方按钮</p>
+            <CreateBtn onClick={() => {
+                reqPermRemote(doc.id, 'rw').then(resp => {
+                    alert('申请成功');
+                }).catch(() => {
+                    alert('你已经申请过了，请勿重复申请');
+                });
+            }}>申请读写权限</CreateBtn>
+            <p>申请后，将会通知文档所有者，请留意您的信箱。<br /> </p>
             <p>当然，你也可以随时点击页面底部的 <FontAwesomeIcon icon={ faQuestionCircle } /> 来打开这个弹窗</p>
+            <br />
+            { doc.isPublic && <p>当前文档是公开文档，其权限为 { RWDescriptorToString(doc.pmap['*']) }</p> }
         </div>
     );
 }
@@ -84,7 +103,7 @@ export function EditPanel(props: EditPanelProps) {
         if (onlyRead(user.username, doc)) {
             q.disable();
             console.log('当前只读');
-            showPermissionTips();
+            showPermissionTips(doc);
         } else {
             q.enable();
             showTextPopup(
@@ -384,8 +403,8 @@ export function EditPanel(props: EditPanelProps) {
                     <span onClick={ saveAll }><FontAwesomeIcon icon={ faSave } /></span>
                     <span onClick={ () => allScreen(doc.title, q) }><FontAwesomeIcon icon={ faTv } /></span>
 
-                    { onlyRead(user.username, doc) && <span onClick={ showPermissionTips }>
-                        <FontAwesomeIcon icon={ faQuestionCircle } /> 只读
+                    { onlyRead(user.username, doc) && <span onClick={ () => showPermissionTips(doc) }>
+                        <FontAwesomeIcon icon={ faQuestionCircle } /> <span>只读</span>
                     </span> }
                      
                     <div className="msg">{ msg }</div>
@@ -462,7 +481,9 @@ export function EditPage(props: EditPageProps) {
 
         if (perm === 403) {
             return (
-                <WaitForPermission docId={ props.match.params.docId } />
+                <div className="edit-page">
+                    <WaitForPermission docId={ props.match.params.docId } />
+                </div>
             )
         }
 
@@ -484,19 +505,20 @@ export function EditPage(props: EditPageProps) {
             const newP = newDoc.pmap[_loginCtx.user.username];
 
             console.log('preP', preP, 'newP', newP);
-
-            if (!preP.w && newP.w) {
-                setDoc(newDoc);
-                setPerm(200);
-            }
-
-            if (preP.w && !newP.w) {
-                setDoc(newDoc);
-                setPerm(200);
-            }
-
+            setDoc(newDoc);
+            setPerm(200);
             setDocLoading(false);
+
+
+            showTextPopup(
+                <div>
+                    文档权限发生变化
+                </div>
+            );
+            
         }).catch(resp => {
+            console.log(resp);
+
             setPerm(resp.code);
             showTextPopup(
                 <div>

@@ -188,7 +188,9 @@ function Follower(props: { user: User, follow: boolean, onClk: () => void }) {
     const { user, follow } = props;
 
     return (
-        <div className="one-follower-main">
+        <div className="one-follower-main" onClick={() => {
+            window.open(`/user/${ user.username }`);
+        }}>
             
             <div className="_avatar"><Avatar text={ user.username } src={ user.avatar } /></div>
             <div>
@@ -200,7 +202,10 @@ function Follower(props: { user: User, follow: boolean, onClk: () => void }) {
                 _loginCtx.user.username === user.username ? (
                     <div className="_follow_btn">这是我</div>
                 ) : (
-                    <div onClick={ props.onClk }
+                    <div onClick={ e => {
+                        e.stopPropagation();
+                        props.onClk();
+                    } }
                         className="_follow_btn">{
                             follow ? 'Unfollow' : 'Follow'
                     }</div>
