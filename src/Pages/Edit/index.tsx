@@ -7,11 +7,11 @@ import { RouteComponentProps } from "react-router-dom";
 
 import "quill/dist/quill.snow.css";
 import "./edit.less";
-import { getDocById, docSave } from "./edit-api";
-import { DocInfo } from "../Home/Doc/doc-api";
+import { getDocById, docSave, reqPermRemote, getDocWithPmapById } from "./edit-api";
+import { DocInfoWithPmap } from "../Home/Doc/doc-api";
 // import { NavHeader } from "../../components/NavHeader";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave, faCarCrash, faCommentAlt } from "@fortawesome/free-solid-svg-icons";
+import { faSave, faCarCrash, faCommentAlt, faMagic, faTv, faQuestionCircle } from "@fortawesome/free-solid-svg-icons";
 import { debounce } from "../../utils";
 import { loginCtx, User } from "../../components/Login";
 import { WS } from "../../utils/WS";
@@ -21,6 +21,13 @@ import { editHeaderCtx, EditHedaerProvider, EditHeader } from "./EditHeader";
 
 // import { Delta } from "edit-ot-quill-delta";
 import { AuthorAttr } from "./Custom/AuthorColor";
+import { articleDomStyle } from "./EditHeader/dom-style";
+import { allScreen } from "./AllScreen";
+
+import JSONStringify from "fast-json-stable-stringify";
+import { ErrInfo } from "../../components/ErrInfo";
+import { CreateBtn } from "../../components/NoDocs/CreateBtn";
+import { showTextPopup } from "./TextPopup";
 
 Quill.register(AuthorAttr);
 
@@ -30,8 +37,32 @@ export type EditPageProps = RouteComponentProps<{
 
 
 export type EditPanelProps = {
-    doc: DocInfo,
+    doc: DocInfoWithPmap,
     user: User
+}
+
+function onlyRead(username: string, doc: DocInfoWithPmap) {
+    if (doc.owner === username) return false;
+    if (!doc.pmap[username]) return false;
+
+    if (!doc.pmap[username].w) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function showPermissionTips() {
+    showTextPopup(
+        <div className="perm-tips">
+            <h1>你当前对此文档的权限为只读</h1>
+            <p>因此你无法编辑此文档，只能查看协同编辑情况以及评论。</p>
+            <p>如果想申请权限可以点击下方按钮</p>
+            <CreateBtn>申请权限</CreateBtn>
+
+            <p>当然，你也可以随时点击页面底部的 <FontAwesomeIcon icon={ faQuestionCircle } /> 来打开这个弹窗</p>
+        </div>
+    );
 }
 
 export function EditPanel({ doc, user }: EditPanelProps) {
@@ -41,19 +72,10 @@ export function EditPanel({ doc, user }: EditPanelProps) {
     const $input = React.useRef<HTMLInputElement>();
     const [commentBtnPosition, setCommentBtnPosition] = React.useState(null as number | null);
     const [line, setLine] = React.useState(null as null | number);
+    const [loading, setLoading] = React.useState(true);
+    const _editHeaderCtx = React.useContext(editHeaderCtx);
 
     React.useEffect(() => {
-        // const toolbarOptions = [
-        //     [{ container: 'my-toolbar' }],
-        //     [{ header: [1, 2, false] }],
-        //     ['bold', 'italic', 'underline'],
-        //     ['image', 'code-block'],
-        //     ['save']
-        // ];
-
-        // // @ts-ignore
-        // toolbarOptions.container = '#my-toolbar';
-
         const q = new Quill('#my-text-area', {
             modules: {
                 toolbar: { container: `#my-toolbar` }
@@ -66,6 +88,12 @@ export function EditPanel({ doc, user }: EditPanelProps) {
         const ws = new WS(q, doc.id, user);
         // @ts-ignore
         window.ws = ws;
+
+        if (onlyRead(user.username, doc)) {
+            q.disable();
+            console.log('当前只读');
+            showPermissionTips();
+        }
 
         ws.socket.on('owner-change-title', (newTitle: string) => {
             if (doc.owner === user.username) return;
@@ -113,26 +141,31 @@ export function EditPanel({ doc, user }: EditPanelProps) {
         }
     }, []);
 
-    const _editHeaderCtx = React.useContext(editHeaderCtx);
+    React.useEffect(() => {
+        if (!q) return;
+        articleDomStyle.reload(q);
+    }, [ q ]);
 
     React.useEffect(() => {
-        if (!ws) return;
+        if (!ws) return console.info('No WS, Return');
 
-        ws.socket.on('others-joined', (others: User) => {
+        const whenOthersJoined = (others: User) => {
             // 排除自己 
             if (others.username === user.username) return;
 
             console.log('others-joined', others);
             _editHeaderCtx.addLoginedList(others)
-        });
+        }
+        ws.socket.on('others-joined', whenOthersJoined);
 
-        ws.socket.on('others-exit', (user: User) => {
+        const whenOthersExit = (user: User) => {
             console.log('others-exit', user);
             _editHeaderCtx.removeLoginedList(user);
-        });
+        }
+        ws.socket.on('others-exit', whenOthersExit);
 
-        
-        ws.socket.on('i-logined', data => {
+        let loginedTimer;
+        const whenILogined = data => {
             // data.userInfo 是自己的信息, users 是目前在该文档下的用户
             console.log('i-logined', JSON.stringify(data));
             const user: User = data.userInfo;
@@ -145,43 +178,56 @@ export function EditPanel({ doc, user }: EditPanelProps) {
             _editHeaderCtx.setLoginedList(users);
 
             if (data.doc) {
-                // if (doc && doc.content) {
-                    if (data.doc.now) {
-                        console.log(data.doc.now, doc.content);
-                        q.setContents(data.doc.now, 'silent');
-                    }
-                    $input.current.value = doc.title;
-                // }
+                if (data.doc.now) {
+                    console.log(data.doc.now, doc.content);
+                    q.setContents(data.doc.now, 'silent');
+                }
+                $input.current.value = doc.title;
             }
 
-            setTimeout(() => {
+            setLoading(false);
+            loginedTimer = setTimeout(() => {
+                articleDomStyle.reload(q);
                 ws.init();
             }, 50);
-        });
-        ws.socket.emit('i-login');
+        }
+        ws.socket.on('i-logined', whenILogined);
 
-        ws.socket.on('say-hello', (theUser: User) => {
+        const whenSayHello = (theUser: User) => {
             _editHeaderCtx.bus.emit('receive-hello', theUser);
-        });
+        }
+        ws.socket.on('say-hello', whenSayHello);
 
-        _editHeaderCtx.bus.on('say-hello', () => {
+        const whenBusSayHello = () => {
             ws.socket.emit('say-hello', user);
-        });
+        }
+
+        _editHeaderCtx.bus.on('say-hello', whenBusSayHello);
 
         return () => {
-            ws.socket.off('others-joined');
-            ws.socket.off('others-exit');
-            ws.socket.off('i-logined');
-            ws.socket.off('say-hello');
-            _editHeaderCtx.bus.off('say-hello');
+            console.log('cancel');
+            ws.socket.removeEventListener('others-joined', whenOthersJoined);
+            ws.socket.removeEventListener('others-exit', whenOthersExit);
+            ws.socket.removeEventListener('i-logined', whenILogined);
+            clearTimeout(loginedTimer);
+
+            ws.socket.removeEventListener('say-hello', whenSayHello);
+            _editHeaderCtx.bus.removeListener('say-hello', whenBusSayHello);
         }
     }, [ _editHeaderCtx, ws ]);
+
+    React.useEffect(() => {
+        if (!ws) return;
+
+        console.log('To Emit I-Login')
+        ws.socket.emit('i-login');
+    }, [ws]);
 
     const saveAll = () => {
         if (!q) return;
 
         const delta = q.getContents();
-        const deltaStr = JSON.stringify(delta);
+        const deltaStr = JSONStringify(delta);
         
         showMsg('保存中 ...');
 
@@ -285,7 +331,8 @@ export function EditPanel({ doc, user }: EditPanelProps) {
                     )
                 }</div>
 
-                { q && ws && doc && <EditComments q={ q } ws={ ws } doc={ doc } /> }
+                { q && ws && doc && !loading &&
+                    <EditComments q={ q } ws={ ws } doc={ doc } /> }
                 
                 <div id="my-text-area" style={{
                     height: Math.max(
@@ -296,6 +343,12 @@ export function EditPanel({ doc, user }: EditPanelProps) {
         
                 <div className="bottom-btns">
                     <span onClick={ saveAll }><FontAwesomeIcon icon={ faSave } /></span>
+                    <span onClick={ () => allScreen(doc.title, q) }><FontAwesomeIcon icon={ faTv } /></span>
+
+                    { onlyRead(user.username, doc) && <span onClick={ showPermissionTips }>
+                        <FontAwesomeIcon icon={ faQuestionCircle } />
+                    </span> }
+                     
                     <div className="msg">{ msg }</div>
                 </div>
             </div>
@@ -304,16 +357,23 @@ export function EditPanel({ doc, user }: EditPanelProps) {
 }
 
 
+
+
 export function EditPage(props: EditPageProps) {
-    const [doc, setDoc] = React.useState(null as null | DocInfo);   
+    const [docLoading, setDocLoading] = React.useState(true);
+
+    const [doc, setDoc] = React.useState(null as null | DocInfoWithPmap);   
     const _loginCtx = React.useContext(loginCtx);
     
     const [perm, setPerm] = React.useState(200);
 
     React.useEffect(() => {
-        getDocById(+props.match.params.docId).then(doc => {
+        getDocWithPmapById(+props.match.params.docId).then(doc => {
             setDoc(doc);
             setPerm(200);
+            setTimeout(() => {
+                setDocLoading(false);
+            }, 2000 + ~~(Math.random() * 1500));
         }).catch(err => {
             if (err.code === 403) {
                 setPerm(403)   
@@ -323,28 +383,56 @@ export function EditPage(props: EditPageProps) {
         });
     }, [ _loginCtx ]);
 
+    const $loading = (
+        <div className="doc-loading">
+            <FontAwesomeIcon icon={ faMagic } />
+            <div>
+                <div className="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+            </div>
+        </div>
+    );
 
-    if (!doc) return null;
-    
+    if (perm !== 200) {
+        if (perm === 404) {
+            return (
+                <div className="perm-err">
+                    <span><FontAwesomeIcon icon={ faCarCrash } /></span>
+                    找不到文档，请检查 URL
+                </div>
+            )
+        }
+
+        if (perm === 403) {
+            return (
+                <ErrInfo title="拒绝访问" intro="你没有访问此文档的权限">
+                    <CreateBtn className="_btn" onClick={
+                        () => reqPermRemote(+props.match.params.docId || 0).then(resp => {
+                            alert('申请成功');
+                        }).catch(() => {
+                            alert('你已经申请过了，请勿重复申请');
+                        })
+                    }>申请访问</CreateBtn>
+                </ErrInfo>
+            )
+        }
+
+    }
+
+    if (!doc) return <div className="edit-page">{ $loading }</div>;
+
+    const content = (
+        docLoading ?
+            $loading : <EditPanel user={ _loginCtx.user } doc={ doc } />
+    );
+
     return (
         <EditHedaerProvider doc={ doc }>
             <div className="edit-page">
                 <EditHeader />
 
-                { perm === 404 && <div className="perm-err">
-                    <span><FontAwesomeIcon icon={ faCarCrash } /></span>
-                    找不到文档，请检查 URL
-                </div> }
-
-                { perm === 403 && <div className="perm-err">
-                    <span><FontAwesomeIcon icon={ faCarCrash } /></span>
-                    您没有权限打开此文档 <br />
-                    请联系文档所有者
-                </div> }
-
                 <editHeaderCtx.Consumer>{ ctx => 
                     (perm === 200) && _loginCtx.user &&
-                        doc && <EditPanel user={ _loginCtx.user } doc={ doc } />                    
+                        doc && content
                 }</editHeaderCtx.Consumer>
             </div>
         </EditHedaerProvider>

@@ -51,18 +51,23 @@ export function LineComment(uc: UserComment) {
 }
 
 function getLineTop(q: Quill, line = 0) {
-    // @ts-ignore
-    const fatherRect = q.container.getBoundingClientRect() as DOMRect | ClientRect;
-    const l = q.getLines()[line - 1];
-    const lineRect = l.domNode.getBoundingClientRect() as DOMRect | ClientRect;
+    try {
+        // @ts-ignore
+        const fatherRect = q.container.getBoundingClientRect() as DOMRect | ClientRect;
+        const l = q.getLines()[line - 1];
+        const lineRect = l.domNode.getBoundingClientRect() as DOMRect | ClientRect;
 
-    const top = Math.abs(lineRect.top - fatherRect.top);
-    // console.group('getLineTop');
-    //  console.log('getLineTop:', line, top);
-    //  console.log('fatherRect:', fatherRect);
-    //  console.log('lineRect  :', lineRect);
-    // console.groupEnd();
-    return top;
+        const top = Math.abs(lineRect.top - fatherRect.top);
+        // console.group('getLineTop');
+        //  console.log('getLineTop:', line, top);
+        //  console.log('fatherRect:', fatherRect);
+        //  console.log('lineRect  :', lineRect);
+        // console.groupEnd();
+        return top;
+    } catch (err) {
+        console.log('Line Top Error', err);
+        return 0;
+    }
 }
 
 export type LineCommentsProps = {

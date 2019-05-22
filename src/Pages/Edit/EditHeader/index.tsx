@@ -9,7 +9,6 @@ import EventEmitter from "eventemitter3";
 import { popupCtx } from "../../../Ctx/Popup";
 import { ChangePermissionPopup } from "../../../components/ChangePermissionPopup";
 import { DocInfo } from "../../Home/Doc/doc-api";
-import { userDomStyle } from "./dom-style";
 
 export type EditHeaderCtx = {
     doc: DocInfo,
@@ -108,7 +107,6 @@ export function EditHedaerProvider(props: React.PropsWithChildren<{ doc: DocInfo
     const setLoginedList = (users: User[]) => {
         console.log('setLoginedList', users.map(u => u.username));
         ReactSetLoginedList(users);
-        userDomStyle.reload(users);
     }
 
     console.log('!!!!!!!', loginedList.map(u => u.username));

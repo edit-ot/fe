@@ -31,3 +31,9 @@ export function docSave(newDocData: NewDocData) {
             Promise.reject(resp);
     })
 }
+
+export function reqPermRemote(docId: number, wantRW = 'r') {
+    return http.post$('/api/req/doc-permission-req', {
+        docId, wantRW
+    });
+}

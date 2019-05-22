@@ -5,6 +5,8 @@ import { User } from "../../components/Login";
 import md5 = require("md5");
 import EventEmitter from "eventemitter3";
 import JSONStringify from "fast-json-stable-stringify"
+import { debounce } from "..";
+import { articleDomStyle } from "../../Pages/Edit/EditHeader/dom-style";
 // import { debounce } from "..";
 
 // @ts-ignore
@@ -85,6 +87,10 @@ export class WS extends EventEmitter {
                 this.emit('selection-change', null);
             }
         });
+
+        this.q.on('editor-change', debounce(() => {
+            articleDomStyle.reload(this.q);
+        }));
 
         this.whenTextChange();
     }

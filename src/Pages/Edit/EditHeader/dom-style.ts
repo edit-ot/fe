@@ -1,4 +1,5 @@
 import { User } from "../../../components/Login";
+import Quill from "quill";
 
 const COLORS = [
     'rgb(203,187,88)',
@@ -78,4 +79,55 @@ export class UserDomStyle extends DomStyle {
     }
 }
 
+export class ArticleDomStyle extends DomStyle {
+    getAuthorsFrom(q: Quill) {
+        const delta = q.getContents();
+        const authors = {};
+        
+        delta.ops.forEach(op => {
+            if (op && op.attributes && op.attributes.author) {
+                authors[op.attributes.author] = true;
+            }
+        });
+
+        return Object.keys(authors);
+    }
+
+    calc(users: string[]) {
+        return users.map(u => {
+            const cls = `.author-${ u }`;
+            const c = hashColor(u);
+            return `${cls} {
+                color: ${ c }; 
+                border-bottom: 2px dotted ${c};
+                position: relative;
+            }
+            ${cls}::after {
+                content: "${ u }";
+                position: absolute;
+                content: "eczn";
+                top: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #222;
+                padding: 2px 12px;
+                font-size: 12px;
+                display: none;
+            }
+
+            ${cls}::after:hover {
+                display: block;
+            }
+            `;
+        }).join('\n');
+    }
+
+    reload(q: Quill) {
+        const users = this.getAuthorsFrom(q);
+        console.log('Article Dom Style Reload.', users.join(', '));
+        this.update(this.calc(users));
+    }
+}
+
+export const articleDomStyle = new ArticleDomStyle();
 export const userDomStyle = new UserDomStyle();
