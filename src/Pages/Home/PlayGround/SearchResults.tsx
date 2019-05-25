@@ -11,6 +11,7 @@ import { Group } from "../homeaside-api";
 import { User } from "../../../components/Login";
 
 import { TheCard, GroupCard, UserCard } from "../../../components/TheCard";
+import { Link } from "react-router-dom";
 
 export function SearchBar() {
     const ctx = React.useContext(playGroundCtx);
@@ -29,7 +30,7 @@ export function SearchBar() {
             }
         }} className="search-bar">
             <input type="text" ref={ $input }
-                defaultValue={ getNowPageQuery().q } />
+                defaultValue={ decodeURIComponent(getNowPageQuery().q) } />
 
             <button><FontAwesomeIcon icon={ faSearch } /></button>
 
@@ -43,7 +44,7 @@ export function SearchResults() {
     const [loading, setLoading] = React.useState(true);
 
     React.useEffect(() => {
-        searchRemote(ctx.keyword).then(r => {
+        searchRemote(decodeURIComponent(ctx.keyword)).then(r => {
             ctx.setRes(r);
             setLoading(false);
         });
@@ -53,7 +54,7 @@ export function SearchResults() {
         <div className="search-results-main">
             <SearchBar />
 
-            <div className="key-word-info">{ ctx.keyword } 的搜索结果</div>
+            <div className="key-word-info">{ decodeURIComponent(ctx.keyword) } 的搜索结果</div>
 
             {
                 loading ? (
@@ -111,6 +112,10 @@ function TheLines<T>(props: TheLinesProps<T>) {
 
 function TheDoc(props: { doc: DocInfo }) {
     return (
-        <div>{ props.doc.title }</div>
+        <div>
+            <div>
+                { props.doc.title }, 作者: { props.doc.owner }, 公开分享权限为: { props.doc.permission }, <Link to={`/edit/${ props.doc.id }`}>点击查看</Link>
+            </div>
+        </div>
     )
 }
